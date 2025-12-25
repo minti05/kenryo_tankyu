@@ -41,7 +41,8 @@ class ResultPreviewContent extends ConsumerWidget {
                           ref
                               .read(userArchiveRepositoryProvider)
                               .deleteHistory(searched.documentID);
-                          ref.invalidate(searchedHistoryProvider);
+                          ref.invalidate(searchedHistoryProvider(true));
+                          ref.invalidate(searchedHistoryProvider(false));
                           Navigator.of(context).pop();
                         },
                         child: const Text('消去'),

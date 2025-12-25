@@ -14,8 +14,12 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notificationSettingAsync = ref.watch(notificationSettingNotifierProvider);
-    final themeMode = ref.watch(themeModeNotifierProvider);
+    final notification = ref.watch(notificationSettingProvider).when(
+          data: (value) => value,
+          loading: () => false, // Default to false while loading
+          error: (err, stack) => false, // Default to false on error
+        );
+    final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('設定')),
@@ -23,14 +27,14 @@ class SettingsPage extends ConsumerWidget {
         child: ListBody(
           children: [
             SwitchListTile(
-                value: notificationSettingAsync.value ?? false,
+                value: notification,
                 onChanged: (bool value) async {
                   if (value) {
                     final fcm = ref.read(firebaseMessagingProvider);
                     final token = await fcm.getToken();
                     debugPrint(token);
                   }
-                  ref.read(notificationSettingNotifierProvider.notifier).toggle();
+                  ref.read(notificationSettingProvider.notifier).toggle();
                 },
                 secondary: const Icon(Icons.notifications_active_outlined),
                 title: const Text('通知を受け取る')),
@@ -42,8 +46,7 @@ class SettingsPage extends ConsumerWidget {
                   value: theme,
                   onChanged: (ThemeMode? value) {
                     if (value != null) {
-ref.read(themeModeNotifierProvider.notifier)
-                          .setThemeMode(value);
+                      ref.read(themeModeProvider.notifier).setThemeMode(value);
                     }
                   },
                   items: const [
@@ -114,9 +117,11 @@ ref.read(themeModeNotifierProvider.notifier)
                 showDialog(
                     context: context,
                     builder: (context) {
-                      final profileName =
-                          ref.watch(authRepositoryProvider).currentUser?.displayName ??
-                              'ゲスト';
+                      final profileName = ref
+                              .watch(authRepositoryProvider)
+                              .currentUser
+                              ?.displayName ??
+                          'ゲスト';
                       return AlertDialog(
                           title: Text('待って！ $profileNameさん'),
                           content: const Text('ログアウトしてよろしいですか？'),
@@ -144,8 +149,11 @@ ref.read(themeModeNotifierProvider.notifier)
                 showDialog(
                   context: context,
                   builder: (context) {
-                    final profileName =
-                        ref.watch(authRepositoryProvider).currentUser?.displayName ?? 'ゲスト';
+                    final profileName = ref
+                            .watch(authRepositoryProvider)
+                            .currentUser
+                            ?.displayName ??
+                        'ゲスト';
                     return AlertDialog(
                       title: Text('待って！ $profileNameさん'),
                       content: const Text('アカウントを削除してよろしいですか？'),
@@ -159,8 +167,10 @@ ref.read(themeModeNotifierProvider.notifier)
                         TextButton(
                           onPressed: () async {
                             try {
-                              await ref.read(authProvider.notifier).deleteAccount();
-                              if(!context.mounted) return;
+                              await ref
+                                  .read(authProvider.notifier)
+                                  .deleteAccount();
+                              if (!context.mounted) return;
                               Navigator.of(context).pop();
                             } on FirebaseAuthException catch (e) {
                               if (e.code == 'requires-recent-login') {

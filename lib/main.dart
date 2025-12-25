@@ -13,16 +13,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // 依存性の事前初期化 (Strict Initialization)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   final sharedPreferences = await SharedPreferences.getInstance();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  
+
   runApp(
     ProviderScope(
       overrides: [
@@ -64,11 +64,11 @@ class _MainAppState extends ConsumerState<MainApp> {
   @override
   Widget build(BuildContext context) {
     final routerConfig = ref.watch(routesProvider);
-    final themeMode = ref.watch(themeModeNotifierProvider).when(
-      data: (m) => m,
-      loading: () => ThemeMode.system,
-      error: (_, __) => ThemeMode.system,
-    );
+    final themeMode = ref.watch(themeModeProvider).when(
+          data: (m) => m,
+          loading: () => ThemeMode.system,
+          error: (_, __) => ThemeMode.system,
+        );
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       //幅と高さの最小値に応じてテキストサイズを可変させるか

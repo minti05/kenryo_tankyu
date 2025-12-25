@@ -3,6 +3,7 @@ import 'package:kenryo_tankyu/features/user_archive/domain/repositories/reposito
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_db.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_db.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_db.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -14,7 +15,7 @@ UserArchiveRepository userArchiveRepository(Ref ref) {
   final pdfDataSource = ref.watch(pdfDbDataSourceProvider);
   final recommendedDataSource = ref.watch(recommendedWorksDataSourceProvider);
   final firestore = ref.watch(firebaseFirestoreProvider);
-  
+
   return UserArchiveRepositoryImpl(
     historyDataSource,
     pdfDataSource,
@@ -44,10 +45,10 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
   Future<void> changeIsFavorite(int documentID, bool nowFavoriteState) async {
     final bool newFavoriteState = !nowFavoriteState;
     final repository = ref.read(userArchiveRepositoryProvider);
-    
+
     // Repository handles both local DB and remote Firestore updates
     await repository.changeFavoriteState(documentID, newFavoriteState);
-    
+
     state = AsyncData(newFavoriteState);
     // Invalidate history provider so list updates
     ref.invalidate(searchedHistoryProvider);

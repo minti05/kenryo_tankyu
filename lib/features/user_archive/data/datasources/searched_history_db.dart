@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -56,8 +55,8 @@ class SearchedHistoryDataSource {
     if (maps.isEmpty) {
       return null;
     }
-    final List<Searched> searchedList = List.generate(
-        maps.length, (index) => Searched.fromSQLite(maps[index]));
+    final List<Searched> searchedList =
+        List.generate(maps.length, (index) => Searched.fromSQLite(maps[index]));
     return searchedList;
   }
 
@@ -120,6 +119,7 @@ class SearchedHistoryDataSource {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   Future<Searched?> getHistory(int documentID) async {
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('searched_history',

@@ -10,13 +10,13 @@ class CategoryList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeModeAsync = ref.watch(themeModeNotifierProvider);
+    final themeModeAsync = ref.watch(themeModeProvider);
     final themeMode = themeModeAsync.value ?? ThemeMode.system;
     final notifier = ref.read(searchProvider.notifier);
     return SizedBox(
       width: double.infinity,
       child: GridView.builder(
-        itemCount: Category.values.length -1,
+        itemCount: Category.values.length - 1,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(6.0),
@@ -42,22 +42,20 @@ class CategoryList extends ConsumerWidget {
                   SizedBox(
                     width: 50,
                     height: 50,
-                    child:
-                        Category.values[index] == Category.other
-                            ? themeMode == ThemeMode.dark
-                                ? Image.asset(
-                                    'assets/images/categories/${Category.values[index].name}_for_dark.png',
-                                    fit: BoxFit.contain,
-                                  )
-                                : Image.asset(
-                                    'assets/images/categories/${Category.values[index].name}_for_light.png',
-                                    fit: BoxFit.contain,
-                                  )
-                            :
-                    Image.asset(
-                      'assets/images/categories/${Category.values[index].name}.png',
-                      fit: BoxFit.contain,
-                    ),
+                    child: Category.values[index] == Category.other
+                        ? themeMode == ThemeMode.dark
+                            ? Image.asset(
+                                'assets/images/categories/${Category.values[index].name}_for_dark.png',
+                                fit: BoxFit.contain,
+                              )
+                            : Image.asset(
+                                'assets/images/categories/${Category.values[index].name}_for_light.png',
+                                fit: BoxFit.contain,
+                              )
+                        : Image.asset(
+                            'assets/images/categories/${Category.values[index].name}.png',
+                            fit: BoxFit.contain,
+                          ),
                   ),
                 ],
               ),

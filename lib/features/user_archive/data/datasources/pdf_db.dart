@@ -5,7 +5,7 @@ import 'package:kenryo_tankyu/core/constants/const.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'pdf_db.g.dart';
@@ -71,8 +71,8 @@ class PdfDbDataSource {
     final DocumentType documentType =
         DocumentType.values.firstWhere((e) => e.idSuffix == id.substring(7));
     debugPrint('path: ${enterYear.name}/${documentType.name}/$id.pdf');
-    final pathReference =
-        _firestore.ref().child('works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
+    final pathReference = _firestore.ref().child(
+        'works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
     const storage = 1024 * 1024 * 3;
 
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。

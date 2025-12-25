@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
@@ -29,8 +28,11 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
     final searched = widget.searched;
     final ableChangeFavorite = ref.watch(ableChangeFavoriteProvider);
 
-    final isFavorite =
-        ref.watch(userIsFavoriteStateProvider(searched.documentID)).asData?.value ?? false;
+    final isFavorite = ref
+            .watch(userIsFavoriteStateProvider(searched.documentID))
+            .asData
+            ?.value ??
+        false;
 
     //強制リロードをした時に、likesの値を更新している。initStateだとリロード時に反映されないため。
     ref.listen<AsyncValue<Searched>>(
@@ -58,21 +60,25 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
                 ? Colors.red
                 : Theme.of(context).colorScheme.onSurface,
           ),
-            onPressed: () async {
-              if (ableChangeFavorite) {
-                ref.read(ableChangeFavoriteProvider.notifier).set(false); //ボタン連打防止
+          onPressed: () async {
+            if (ableChangeFavorite) {
+              ref
+                  .read(ableChangeFavoriteProvider.notifier)
+                  .set(false); //ボタン連打防止
+              ref
+                  .read(
+                      userIsFavoriteStateProvider(searched.documentID).notifier)
+                  .changeIsFavorite(searched.documentID, isFavorite);
+              setState(() {
+                likes = isFavorite ? likes - 1 : likes + 1;
+              });
+              await Future.delayed(const Duration(seconds: 2));
+              if (context.mounted) {
                 ref
-                    .read(
-                        userIsFavoriteStateProvider(searched.documentID).notifier)
-                    .changeIsFavorite(searched.documentID, isFavorite);
-                setState(() {
-                  likes = isFavorite ? likes - 1 : likes + 1;
-                });
-                await Future.delayed(const Duration(seconds: 2));
-                if (context.mounted) {
-                   ref.read(ableChangeFavoriteProvider.notifier).set(true); //ボタン連打防止
-                }
-              } else {
+                    .read(ableChangeFavoriteProvider.notifier)
+                    .set(true); //ボタン連打防止
+              }
+            } else {
               const snackBar = SnackBar(
                   content: Text('データ保存中です。'),
                   backgroundColor: Colors.red,
@@ -102,8 +108,11 @@ class FavoriteForResultListPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isFavorite =
-        ref.watch(userIsFavoriteStateProvider(searched.documentID)).asData?.value ?? false;
+    final isFavorite = ref
+            .watch(userIsFavoriteStateProvider(searched.documentID))
+            .asData
+            ?.value ??
+        false;
 
     return Column(children: [
       Icon(
@@ -130,8 +139,11 @@ class FavoriteForHistory extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isFavorite =
-        ref.watch(userIsFavoriteStateProvider(searched.documentID)).asData?.value ?? false;
+    final isFavorite = ref
+            .watch(userIsFavoriteStateProvider(searched.documentID))
+            .asData
+            ?.value ??
+        false;
     return IconButton(
       icon: isFavorite
           ? const Icon(Icons.favorite, color: Colors.red)
