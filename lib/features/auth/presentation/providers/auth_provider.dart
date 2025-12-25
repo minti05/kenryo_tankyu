@@ -1,19 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
+import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/data/repositories/user_repository_impl.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/models.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final authStateChangesProvider = StreamProvider<User?>((ref) {
-  final changes = FirebaseAuth.instance.userChanges();
-  return changes;
-});
+part 'auth_provider.g.dart';
 
-final authProvider = NotifierProvider.autoDispose<AuthNotifier, Auth>(
-  AuthNotifier.new,
-);
+@riverpod
+Stream<User?> authStateChanges(Ref ref) {
+  return ref.watch(authRepositoryProvider).authStateChanges;
+}
 
-class AuthNotifier extends Notifier<Auth> {
-  Auth build(){
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  @override
+  Auth build() {
     return const Auth();
   }
 
@@ -41,4 +43,9 @@ class AuthNotifier extends Notifier<Auth> {
     state = state.copyWith(limit: state.limit - 1);
   }
 
+  Future<void> login(String rawEmail, String password, bool isDeveloper) async {
+    final email = '$rawEmail${isDeveloper ? '@developer.com' : '@kenryo.ed.jp'}';
+    await ref.read(authRepositoryProvider).signInWithEmailAndPassword(email: email, password: password);
+    await ref.read(userRepositoryProvider).updateRegisteredStatus(email: email, isRegistered: true);
+  }
 }

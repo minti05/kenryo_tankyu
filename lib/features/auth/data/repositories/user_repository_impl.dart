@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'user_repository_impl.g.dart';
 
 @riverpod
-UserRepository userRepository(UserRepositoryRef ref) {
+UserRepository userRepository(Ref ref) {
   return UserRepositoryImpl(ref.watch(firebaseFirestoreProvider));
 }
 

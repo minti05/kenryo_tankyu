@@ -6,16 +6,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'firebase_providers.g.dart';
 
 @riverpod
-FirebaseAuth firebaseAuth(FirebaseAuthRef ref) {
+FirebaseAuth firebaseAuth(Ref ref) {
   return FirebaseAuth.instance;
 }
 
 @riverpod
-FirebaseFirestore firebaseFirestore(FirebaseFirestoreRef ref) {
+FirebaseFirestore firebaseFirestore(Ref ref) {
   return FirebaseFirestore.instance;
 }
 
 @riverpod
-FirebaseStorage firebaseStorage(FirebaseStorageRef ref) {
+FirebaseStorage firebaseStorage(Ref ref) {
   return FirebaseStorage.instance;
 }

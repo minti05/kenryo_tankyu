@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class InputPasswordForLogin extends ConsumerStatefulWidget {
   final String password;
@@ -84,29 +83,21 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
 
   Future<void> _login(
       BuildContext context, WidgetRef ref, String password, bool isDeveloper) async {
-    final firebaseAuth = FirebaseAuth.instance;
-    final email = '${ref.watch(authProvider).email!}${isDeveloper ? '@developer.com' : '@kenryo.ed.jp'}';
+    final rawEmail = ref.read(authProvider).email;
+    if (rawEmail == null) return;
+    
     try {
-      await firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      // ログイン成功時にFCMトークンを取得
-      FirebaseMessaging messaging = FirebaseMessaging.instance;
-      String? fcmToken = await messaging.getToken();
-      debugPrint('FCMトークン: $fcmToken');
-
-      // ユーザー情報を更新
-      final firestore = FirebaseFirestore.instance;
-      final term = firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .limit(1);
-      await term.get().then((value) async {
-        if (value.docs.isNotEmpty) {
-          await value.docs.first.reference.update({
-            'registered': true,
-          });
-        }
-      });
+      await ref.read(authProvider.notifier).login(rawEmail, password, isDeveloper);
+      
+      // ログイン成功時にFCMトークンを取得 (Log only based on original?)
+      // Original code did get token.
+      try {
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
+        String? fcmToken = await messaging.getToken();
+        debugPrint('FCMトークン: $fcmToken');
+      } catch (e) {
+        debugPrint('FCM Token Error: $e');
+      }
 
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -136,6 +127,12 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
           ),
         );
       }
+    } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('予期せぬエラーが発生しました: $e'),
+          ),
+        );
     }
   }
 
