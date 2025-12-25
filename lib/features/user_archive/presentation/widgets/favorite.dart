@@ -1,55 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
-
-///ボタン連打防止を管理するProvider
-final ableChangeFavoriteProvider =
-    StateProvider.autoDispose<bool>((ref) => true);
-
-///documentIDごとにfavoriteかどうかを記録するProvider。
-final userIsFavoriteStateProvider = AsyncNotifierProvider.family<ChangeFavoriteNotifier, bool, int>(
-  ChangeFavoriteNotifier.new,
-);
-
-class ChangeFavoriteNotifier extends AsyncNotifier<bool> {
-  ChangeFavoriteNotifier(this.param);
-  final int param;
-
-  @override
-  Future<bool> build() async {
-    final initialState = await SearchedHistoryController.instance
-        .getFavoriteState(this.param);
-    return initialState;
-  }
-
-  Future<void> changeIsFavorite(int documentID, bool nowFavoriteState) async {
-    final bool newFavoriteState = !nowFavoriteState;
-    //dbの更新
-    await SearchedHistoryController.instance
-        .changeFavoriteState(documentID, newFavoriteState);
-    //firestoreの更新
-    final firestore = ref.read(firebaseFirestoreProvider)
-        .collection('works')
-        .doc(documentID.toString());
-    if (newFavoriteState) {
-      await firestore.update({
-        'exactLikes': FieldValue.increment(1),
-        'vagueLikes': FieldValue.increment(1)
-      });
-    } else {
-      await firestore.update({
-        'exactLikes': FieldValue.increment(-1),
-        'vagueLikes': FieldValue.increment(-1)
-      });
-    }
-    state = AsyncData(newFavoriteState);
-  }
-}
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
 
 ///ResultPageのFavoriteボタン。(Widget)
 class FavoriteForResultPage extends ConsumerStatefulWidget {
@@ -74,8 +28,7 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
   Widget build(BuildContext context) {
     final searched = widget.searched;
     final ableChangeFavorite = ref.watch(ableChangeFavoriteProvider);
-    final ableChangeFavoriteNotifier =
-        ref.read(ableChangeFavoriteProvider.notifier);
+
     final isFavorite =
         ref.watch(userIsFavoriteStateProvider(searched.documentID)).asData?.value ?? false;
 
@@ -105,21 +58,21 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
                 ? Colors.red
                 : Theme.of(context).colorScheme.onSurface,
           ),
-          onPressed: () async {
-            if (ableChangeFavorite) {
-              ableChangeFavoriteNotifier.state = false; //ボタン連打防止
-              ref
-                  .read(
-                      userIsFavoriteStateProvider(searched.documentID).notifier)
-                  .changeIsFavorite(searched.documentID, isFavorite);
-              setState(() {
-                likes = isFavorite ? likes - 1 : likes + 1;
-              });
-              await Future.delayed(const Duration(seconds: 2));
-              if (context.mounted) {
-                ableChangeFavoriteNotifier.state = true; //ボタン連打防止
-              }
-            } else {
+            onPressed: () async {
+              if (ableChangeFavorite) {
+                ref.read(ableChangeFavoriteProvider.notifier).set(false); //ボタン連打防止
+                ref
+                    .read(
+                        userIsFavoriteStateProvider(searched.documentID).notifier)
+                    .changeIsFavorite(searched.documentID, isFavorite);
+                setState(() {
+                  likes = isFavorite ? likes - 1 : likes + 1;
+                });
+                await Future.delayed(const Duration(seconds: 2));
+                if (context.mounted) {
+                   ref.read(ableChangeFavoriteProvider.notifier).set(true); //ボタン連打防止
+                }
+              } else {
               const snackBar = SnackBar(
                   content: Text('データ保存中です。'),
                   backgroundColor: Colors.red,

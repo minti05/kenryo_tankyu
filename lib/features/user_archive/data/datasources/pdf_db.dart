@@ -1,17 +1,25 @@
-
 import 'dart:typed_data';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class PdfDbController {
-  static final PdfDbController _instance = PdfDbController._();
-  PdfDbController._();
-  static PdfDbController get instance => _instance;
-  final firestore = FirebaseStorage.instance;
+part 'pdf_db.g.dart';
+
+@Riverpod(keepAlive: true)
+PdfDbDataSource pdfDbDataSource(Ref ref) {
+  final firestore = ref.watch(firebaseStorageProvider);
+  return PdfDbDataSource(firestore);
+}
+
+class PdfDbDataSource {
+  final FirebaseStorage _firestore;
+
+  PdfDbDataSource(this._firestore);
 
   Future<Database> get database async {
     try {
@@ -58,32 +66,29 @@ class PdfDbController {
     return maps[0]['pdfData'];
   }
 
-  Future<Uint8List?> getRemotePdf(String id,EnterYear enterYear) async {
+  Future<Uint8List?> getRemotePdf(String id, EnterYear enterYear) async {
     //idからpdfの種類を取得する
     final DocumentType documentType =
         DocumentType.values.firstWhere((e) => e.idSuffix == id.substring(7));
     debugPrint('path: ${enterYear.name}/${documentType.name}/$id.pdf');
-    final pathReference = firestore.ref().child('works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
+    final pathReference =
+        _firestore.ref().child('works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
     const storage = 1024 * 1024 * 3;
 
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。
     final Uint8List? remoteData = await pathReference.getData(storage);
-    remoteData != null
-        ? await PdfDbController.instance.insertPdf(id, remoteData)
-        : null;
+    remoteData != null ? await insertPdf(id, remoteData) : null;
     debugPrint(id);
     return remoteData;
   }
 
   Future<Uint8List?> getRemotePdfForTeacher(String id) async {
-    final pathReference = firestore.ref().child('teachers/$id.pdf');
+    final pathReference = _firestore.ref().child('teachers/$id.pdf');
     const storage = 1024 * 1024 * 3;
 
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。
     final Uint8List? remoteData = await pathReference.getData(storage);
-    remoteData != null
-        ? await PdfDbController.instance.insertPdf(id, remoteData)
-        : null;
+    remoteData != null ? await insertPdf(id, remoteData) : null;
     debugPrint('リモートに保管されたpdfを取得しました。');
     return remoteData;
   }

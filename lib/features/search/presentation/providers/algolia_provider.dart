@@ -1,6 +1,5 @@
 import 'dart:math';
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -10,7 +9,7 @@ import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/search/data/algolia.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
@@ -31,7 +30,8 @@ final algoliaSearchProvider =
   );
 
   try {
-    final SearchResponse response = await Application.algolia.searchIndex(request: queryHits);
+    final SearchResponse response =
+        await Application.algolia.searchIndex(request: queryHits);
     final List<Hit> hits = response.hits;
     if (hits.isEmpty) {
       //検索してもヒットしなかった場合
@@ -45,7 +45,6 @@ final algoliaSearchProvider =
     return Future.error(error, stackTrace);
   }
 });
-
 
 // 検索条件に応じたfilter文字列を返す関数
 String _filter(Search searchState) {
@@ -98,13 +97,14 @@ class SortedListNotifier extends Notifier<List<Searched>> {
         break;
     }
     state = newList;
-    }
+  }
 }
 
 final randomAlgoliaSearchProvider =
     FutureProvider.autoDispose<List<Searched>>((ref) async {
   final isForce = ref.read(forceRefreshProvider);
-  final data = await RecommendedWork.load();
+  final repository = ref.watch(userArchiveRepositoryProvider);
+  final data = await repository.loadRecommendedWorks();
   debugPrint(data.toString());
   if (isForce == false &&
       data.isNotEmpty &&
@@ -138,15 +138,18 @@ final randomAlgoliaSearchProvider =
       hitsPerPage: 1,
     );
 
-    final SearchResponse resp1 = await Application.algolia.searchIndex(request: query1);
+    final SearchResponse resp1 =
+        await Application.algolia.searchIndex(request: query1);
     final List<Hit> hits = resp1.hits;
     final objects = hits.map((e) => Searched.fromAlgolia(e, false)).toList();
     if (objects.isEmpty) {
       throw StateError('Algolia response for query1 contains no hits');
     }
-    final SearchResponse resp2 = await Application.algolia.searchIndex(request: query2);
+    final SearchResponse resp2 =
+        await Application.algolia.searchIndex(request: query2);
     final List<Hit> hits2 = resp2.hits;
-    final List<Searched> objects2 = hits2.map((e) => Searched.fromAlgolia(e, false)).toList();
+    final List<Searched> objects2 =
+        hits2.map((e) => Searched.fromAlgolia(e, false)).toList();
     if (objects2.isEmpty) {
       throw StateError('Algolia response for query2 contains no hits');
     }
