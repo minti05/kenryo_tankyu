@@ -3,14 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/theme_providers.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 
 class CategoryList extends ConsumerWidget {
   const CategoryList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+    final themeModeAsync = ref.watch(themeModeNotifierProvider);
+    final themeMode = themeModeAsync.value ?? ThemeMode.system;
     final notifier = ref.read(searchProvider.notifier);
     return SizedBox(
       width: double.infinity,

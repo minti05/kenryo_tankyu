@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/theme_providers.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:kenryo_tankyu/firebase_options.dart';
 import 'package:kenryo_tankyu/core/router/router.dart';
 import 'package:kenryo_tankyu/core/theme/theme.dart';
@@ -64,7 +64,7 @@ class _MainAppState extends ConsumerState<MainApp> {
   @override
   Widget build(BuildContext context) {
     final routerConfig = ref.watch(routesProvider);
-    final themeMode = ref.watch(themeModeProvider).when(
+    final themeMode = ref.watch(themeModeNotifierProvider).when(
       data: (m) => m,
       loading: () => ThemeMode.system,
       error: (_, __) => ThemeMode.system,

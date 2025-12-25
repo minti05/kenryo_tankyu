@@ -6,8 +6,7 @@ import 'package:kenryo_tankyu/core/constants/const.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/settings/data/repositories/device_settings_db.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -15,8 +14,8 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notificationSetting = ref.watch(notificationSettingProvider);
-    final themeMode = ref.watch(themeModeProvider);
+    final notificationSettingAsync = ref.watch(notificationSettingNotifierProvider);
+    final themeMode = ref.watch(themeModeNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('設定')),
@@ -24,14 +23,14 @@ class SettingsPage extends ConsumerWidget {
         child: ListBody(
           children: [
             SwitchListTile(
-                value: notificationSetting,
+                value: notificationSettingAsync.value ?? false,
                 onChanged: (bool value) async {
                   if (value) {
                     final fcm = ref.read(firebaseMessagingProvider);
                     final token = await fcm.getToken();
                     debugPrint(token);
                   }
-                  ref.read(notificationSettingProvider.notifier).toggle();
+                  ref.read(notificationSettingNotifierProvider.notifier).toggle();
                 },
                 secondary: const Icon(Icons.notifications_active_outlined),
                 title: const Text('通知を受け取る')),
@@ -43,7 +42,7 @@ class SettingsPage extends ConsumerWidget {
                   value: theme,
                   onChanged: (ThemeMode? value) {
                     if (value != null) {
-ref.read(themeModeProvider.notifier)
+ref.read(themeModeNotifierProvider.notifier)
                           .setThemeMode(value);
                     }
                   },

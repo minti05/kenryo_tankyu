@@ -21,4 +21,16 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<void> setThemeMode(ThemeMode themeMode) async {
     await _prefs.setString(_themeKey, themeMode.toString().split('.').last);
   }
+
+  static const _notificationKey = 'isNotification';
+
+  @override
+  Future<bool> getNotificationEnabled() async {
+    return _prefs.getBool(_notificationKey) ?? false;
+  }
+
+  @override
+  Future<void> setNotificationEnabled(bool isEnabled) async {
+    await _prefs.setBool(_notificationKey, isEnabled);
+  }
 }
