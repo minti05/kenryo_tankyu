@@ -61,7 +61,7 @@ class _EditCategoryState extends State<EditCategory> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField(
-      value: selectedCategory,
+      initialValue: selectedCategory,
       onChanged: (Category? value) {
         setState(() {
           selectedCategory = value!;
@@ -88,7 +88,7 @@ class _EditCategoryState extends State<EditCategory> {
         border: OutlineInputBorder(),
         isDense: true,
       ),
-      value: selectedSubCategory,
+      initialValue: selectedSubCategory,
       onChanged: (SubCategory? value) {
         setState(() {
           selectedSubCategory = value!;

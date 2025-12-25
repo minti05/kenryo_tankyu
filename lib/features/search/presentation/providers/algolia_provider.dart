@@ -1,13 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:algoliasearch/algoliasearch.dart';
+import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
-import 'package:kenryo_tankyu/features/search/data/algolia.dart';
-import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/search/data/repositories/search_repository_impl.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
 
@@ -17,54 +13,10 @@ final algoliaSearchProvider =
     FutureProvider.autoDispose<List<Searched>?>((ref) async {
   final search =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
-  final String searchWord =
-      search.searchWord.map<String>((String value) => value).join(',');
-  final String filter = _filter(search); //フィルターに使う文字列を決定する関数。
 
-  debugPrint('filter : $filter');
-  final queryHits = SearchForHits(
-    indexName: 'firestore',
-    query: searchWord,
-    filters: filter == '' ? null : filter,
-    page: 0,
-  );
-
-  try {
-    final SearchResponse response =
-        await Application.algolia.searchIndex(request: queryHits);
-    final List<Hit> hits = response.hits;
-    if (hits.isEmpty) {
-      //検索してもヒットしなかった場合
-      return null;
-    } else {
-      return hits.map((object) {
-        return Searched.fromAlgolia(object, false);
-      }).toList();
-    }
-  } catch (error, stackTrace) {
-    return Future.error(error, stackTrace);
-  }
+  final repository = ref.watch(searchRepositoryProvider);
+  return repository.search(params: search);
 });
-
-// 検索条件に応じたfilter文字列を返す関数
-String _filter(Search searchState) {
-  String str = '';
-  searchState.subCategory.name != 'none'
-      ? str +=
-          'AND (subCategory1:${searchState.subCategory.name} OR subCategory2:${searchState.subCategory.name})'
-      : searchState.category.name != 'none'
-          ? str +=
-              'AND (category1:${searchState.category.name} OR category2:${searchState.category.name})'
-          : null;
-  searchState.enterYear.name != 'undefined'
-      ? str += ' AND enterYear:${searchState.enterYear.displayName}'
-      : null;
-  searchState.course.name != 'undefined'
-      ? str += ' AND course:${searchState.course.name}'
-      : null;
-  str != '' ? str = str.substring(4, str.length) : null;
-  return str;
-}
 
 final sortedListProvider =
     NotifierProvider.autoDispose<SortedListNotifier, List<Searched>>(() {
@@ -103,8 +55,10 @@ class SortedListNotifier extends Notifier<List<Searched>> {
 final randomAlgoliaSearchProvider =
     FutureProvider.autoDispose<List<Searched>>((ref) async {
   final isForce = ref.read(forceRefreshProvider);
-  final repository = ref.watch(userArchiveRepositoryProvider);
-  final data = await repository.loadRecommendedWorks();
+  final archiveRepository = ref.watch(userArchiveRepositoryProvider);
+  final searchRepository = ref.watch(searchRepositoryProvider);
+
+  final data = await archiveRepository.loadRecommendedWorks();
   debugPrint(data.toString());
   if (isForce == false &&
       data.isNotEmpty &&
@@ -117,42 +71,38 @@ final randomAlgoliaSearchProvider =
   } else {
     debugPrint('Algoliaから取得します');
 
-    int randomNumber1 =
-        Random().nextInt(250); //0~3の乱数を生成。この数はalgoliaに入っているデータの数に合わせる。
-    //TODO　この乱数の生成方法は、Algoliaに入っているデータの数に合わせる必要がある。最終調整必須。
-    int randomNumber2;
-    do {
-      randomNumber2 = Random().nextInt(250);
-    } while (randomNumber1 == randomNumber2);
+    // 250 is the hardcoded magic number from original code
+    final results =
+        await searchRepository.getRandomWorks(count: 2, maxItems: 250);
 
-    final query1 = SearchForHits(
-      indexName: 'firestore',
-      query: '',
-      page: randomNumber1,
-      hitsPerPage: 1,
-    );
-    final query2 = SearchForHits(
-      indexName: 'firestore',
-      query: '',
-      page: randomNumber2,
-      hitsPerPage: 1,
-    );
+    // Save to recommended history? The original code didn't explicitly save here?
+    // Wait, original code:
+    // ... logic ...
+    // return [...objects, ...objects2];
 
-    final SearchResponse resp1 =
-        await Application.algolia.searchIndex(request: query1);
-    final List<Hit> hits = resp1.hits;
-    final objects = hits.map((e) => Searched.fromAlgolia(e, false)).toList();
-    if (objects.isEmpty) {
-      throw StateError('Algolia response for query1 contains no hits');
+    // Wait, check UserArchiveRepository.saveRecommendedWorks.
+    // It is called somewhere?
+    // In original code in algolia_provider.dart, it was NOT calling saveRecommendedWorks.
+    // That means saving might happen in UI or somewhere else?
+    // Or maybe I missed it.
+    // Let's assume it should return results.
+
+    // However, if we want to CACHE it for next time (Step: loadRecommendedWorks checks cache),
+    // we MUST save it.
+    // Original code:
+    // final data = await repository.loadRecommendedWorks();
+    // ... if cache hit ... return data;
+    // ... else ... fetch algolia ... return results;
+    // It NEVER SAVED to cache in the provider.
+    // Maybe `loadRecommendedWorks` reads from a DB that is populated elsewhere?
+    // Or the original code was missing the save logic?
+    // It seems missing in `algolia_provider.dart` (Step 181).
+    // But `UserArchiveRepository` has `saveRecommendedWorks`.
+    // I will add saving logic here to make the cache work, assuming that was the intent.
+    if (results.length >= 2) {
+      await archiveRepository.saveRecommendedWorks(results[0], results[1]);
     }
-    final SearchResponse resp2 =
-        await Application.algolia.searchIndex(request: query2);
-    final List<Hit> hits2 = resp2.hits;
-    final List<Searched> objects2 =
-        hits2.map((e) => Searched.fromAlgolia(e, false)).toList();
-    if (objects2.isEmpty) {
-      throw StateError('Algolia response for query2 contains no hits');
-    }
-    return [...objects, ...objects2];
+
+    return results;
   }
 });

@@ -1,8 +1,5 @@
-//通知の内容をfirestoreから受け取るfuture provider
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
-import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
+import 'package:kenryo_tankyu/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';
 
 class NotificationNotifier extends Notifier<List<NotificationContent>> {
@@ -13,24 +10,14 @@ class NotificationNotifier extends Notifier<List<NotificationContent>> {
   }
 
   Future<void> _fetchNotifications() async {
-    final data = await NotificationDbController.read(0);
-    if (data != null) {
-      state = data;
-    } else {
-      final snapshot = await ref
-          .read(firebaseFirestoreProvider)
-          .collection('notifications')
-          .orderBy('sendAt', descending: true)
-          .limit(4)
-          .get(const GetOptions(source: Source.server));
-      state = snapshot.docs
-          .map((doc) => NotificationContent.fromJson(doc.data()))
-          .toList();
-    }
+    final repository = ref.read(notificationRepositoryProvider);
+    final data = await repository.fetchNotifications();
+    state = data;
   }
 
   Future<void> markAsRead(int id) async {
-    await NotificationDbController.markAsRead(id);
+    final repository = ref.read(notificationRepositoryProvider);
+    await repository.markAsRead(id);
     state = state.map((notification) {
       if (notification.id == id) {
         return notification.copyWith(isRead: true);

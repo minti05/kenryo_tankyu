@@ -14,7 +14,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notification = ref.watch(notificationSettingProvider).when(
+    final notification = ref.watch(notificationEnabledProvider).when(
           data: (value) => value,
           loading: () => false, // Default to false while loading
           error: (err, stack) => false, // Default to false on error
@@ -34,7 +34,7 @@ class SettingsPage extends ConsumerWidget {
                     final token = await fcm.getToken();
                     debugPrint(token);
                   }
-                  ref.read(notificationSettingProvider.notifier).toggle();
+                  ref.read(settingsProvider.notifier).setNotification(value);
                 },
                 secondary: const Icon(Icons.notifications_active_outlined),
                 title: const Text('通知を受け取る')),
@@ -46,7 +46,7 @@ class SettingsPage extends ConsumerWidget {
                   value: theme,
                   onChanged: (ThemeMode? value) {
                     if (value != null) {
-                      ref.read(themeModeProvider.notifier).setThemeMode(value);
+                      ref.read(settingsProvider.notifier).setThemeMode(value);
                     }
                   },
                   items: const [
