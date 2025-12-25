@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -92,7 +93,7 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
       // ログイン成功時にFCMトークンを取得 (Log only based on original?)
       // Original code did get token.
       try {
-        FirebaseMessaging messaging = FirebaseMessaging.instance;
+        final messaging = ref.read(firebaseMessagingProvider);
         String? fcmToken = await messaging.getToken();
         debugPrint('FCMトークン: $fcmToken');
       } catch (e) {

@@ -132,3 +132,46 @@ final class FirebaseStorageProvider extends $FunctionalProvider<FirebaseStorage,
 }
 
 String _$firebaseStorageHash() => r'aa6946fd2a3470c4f3e2e72956076591cc63b435';
+
+@ProviderFor(firebaseMessaging)
+const firebaseMessagingProvider = FirebaseMessagingProvider._();
+
+final class FirebaseMessagingProvider extends $FunctionalProvider<
+    FirebaseMessaging,
+    FirebaseMessaging,
+    FirebaseMessaging> with $Provider<FirebaseMessaging> {
+  const FirebaseMessagingProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'firebaseMessagingProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$firebaseMessagingHash();
+
+  @$internal
+  @override
+  $ProviderElement<FirebaseMessaging> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  FirebaseMessaging create(Ref ref) {
+    return firebaseMessaging(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FirebaseMessaging value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FirebaseMessaging>(value),
+    );
+  }
+}
+
+String _$firebaseMessagingHash() => r'6abf9bf6d98c4ba311760139587b2995df4c1508';

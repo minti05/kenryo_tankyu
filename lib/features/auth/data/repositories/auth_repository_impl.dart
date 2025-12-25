@@ -29,4 +29,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signOut() {
     return _firebaseAuth.signOut();
   }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    await _firebaseAuth.currentUser?.sendEmailVerification();
+  }
+
+  @override
+  Future<void> reloadUser() async {
+    await _firebaseAuth.currentUser?.reload();
+  }
 }

@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,9 +74,8 @@ class CheckEmailPage extends ConsumerWidget {
   }
 
   _resendVerifyEmail(BuildContext context, WidgetRef ref) async{
-    final firebaseAuth = FirebaseAuth.instance;
     try {
-      await firebaseAuth.currentUser?.sendEmailVerification();
+      await ref.read(authProvider.notifier).sendVerifyEmail();
       if(!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -93,9 +92,9 @@ class CheckEmailPage extends ConsumerWidget {
   }
 
   _reload(BuildContext context, WidgetRef ref) async{
-    await FirebaseAuth.instance.currentUser?.reload();
+    await ref.read(authProvider.notifier).reloadUser();
     // ログイン成功時にFCMトークンを取得
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    final messaging = ref.read(firebaseMessagingProvider);
     try {
       String? fcmToken = await messaging.getToken();
       debugPrint('FCMトークン: $fcmToken');

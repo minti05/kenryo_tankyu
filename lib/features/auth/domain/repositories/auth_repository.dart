@@ -5,4 +5,6 @@ abstract class AuthRepository {
   User? get currentUser;
   Future<void> signInWithEmailAndPassword({required String email, required String password});
   Future<void> signOut();
+  Future<void> sendEmailVerification();
+  Future<void> reloadUser();
 }

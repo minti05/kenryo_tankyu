@@ -48,4 +48,12 @@ class AuthNotifier extends _$AuthNotifier {
     await ref.read(authRepositoryProvider).signInWithEmailAndPassword(email: email, password: password);
     await ref.read(userRepositoryProvider).updateRegisteredStatus(email: email, isRegistered: true);
   }
+
+  Future<void> sendVerifyEmail() async {
+    await ref.read(authRepositoryProvider).sendEmailVerification();
+  }
+
+  Future<void> reloadUser() async {
+    await ref.read(authRepositoryProvider).reloadUser();
+  }
 }
