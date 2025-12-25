@@ -101,6 +101,8 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
       }
 
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -129,11 +131,13 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
         );
       }
     } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('予期せぬエラーが発生しました: $e'),
-          ),
-        );
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('予期せぬエラーが発生しました: $e'),
+        ),
+      );
     }
   }
 
