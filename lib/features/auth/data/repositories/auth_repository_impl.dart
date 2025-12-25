@@ -26,8 +26,28 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> createUserWithEmailAndPassword({required String email, required String password}) {
+    return _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    await _firebaseAuth.currentUser?.updateDisplayName(name);
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) {
+    return _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
+
+  @override
   Future<void> signOut() {
     return _firebaseAuth.signOut();
+  }
+
+  @override
+  Future<void> deleteUser() async {
+    await _firebaseAuth.currentUser?.delete();
   }
 
   @override

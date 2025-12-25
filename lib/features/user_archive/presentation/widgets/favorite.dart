@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
@@ -32,7 +33,7 @@ class ChangeFavoriteNotifier extends AsyncNotifier<bool> {
     await SearchedHistoryController.instance
         .changeFavoriteState(documentID, newFavoriteState);
     //firestoreの更新
-    final firestore = FirebaseFirestore.instance
+    final firestore = ref.read(firebaseFirestoreProvider)
         .collection('works')
         .doc(documentID.toString());
     if (newFavoriteState) {

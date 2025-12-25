@@ -9,12 +9,15 @@ import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
+import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
 
 // 教師データを取得するProvider
 final getFirestoreTeacherProvider =
   FutureProvider.autoDispose<List<Teacher>>((ref) async {
   try {
-  final sharedPreferences = await SharedPreferences.getInstance();
+  final sharedPreferences = ref.read(sharedPreferencesProvider);
+  final firestore = ref.read(firebaseFirestoreProvider);
   final cachedData = sharedPreferences.getString('teacherData');
   final DateTime currentDate = DateTime.now();
 
@@ -29,7 +32,7 @@ final getFirestoreTeacherProvider =
     if (currentDate.month != lastViewed.month ||
       currentDate.year != lastViewed.year) {
     debugPrint("月が変わっているためサーバーからデータを取得します");
-    final data = await fetchAndCacheTeachers(sharedPreferences);
+    final data = await fetchAndCacheTeachers(sharedPreferences, firestore);
     debugPrint("サーバーから取得したデータ: ${data.length}");
     return parseTeacherList(data);
     }
@@ -42,7 +45,7 @@ final getFirestoreTeacherProvider =
   } else {
     // キャッシュがない場合はサーバーから取得
     debugPrint("キャッシュデータがないためサーバーからデータを取得します");
-    final data = await fetchAndCacheTeachers(sharedPreferences);
+    final data = await fetchAndCacheTeachers(sharedPreferences, firestore);
     debugPrint("サーバーから取得したデータ: ${data.length}");
     return parseTeacherList(data);
   }
@@ -53,8 +56,8 @@ final getFirestoreTeacherProvider =
 });
 
 Future<Map<String, dynamic>> fetchAndCacheTeachers(
-    SharedPreferences sharedPreferences) async {
-  final data = await getTeachersFromFirestore();
+    SharedPreferences sharedPreferences, FirebaseFirestore firestore) async {
+  final data = await getTeachersFromFirestore(firestore);
 
   final map = {
     'teachers': data['teachers'],
@@ -69,8 +72,7 @@ List<Teacher> parseTeacherList(Map<String, dynamic> data) {
   return (data['teachers'] as List).map((e) => Teacher.fromJson(e)).toList();
 }
 
-Future<Map<String, dynamic>> getTeachersFromFirestore() async {
-  final firestore = FirebaseFirestore.instance;
+Future<Map<String, dynamic>> getTeachersFromFirestore(FirebaseFirestore firestore) async {
   final snapshot = await firestore
       .collection('teachers')
       .orderBy('madeAt', descending: true)

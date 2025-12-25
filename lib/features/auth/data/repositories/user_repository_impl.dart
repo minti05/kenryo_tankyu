@@ -28,4 +28,19 @@ class UserRepositoryImpl implements UserRepository {
       });
     }
   }
+
+  @override
+  Future<Map<String, dynamic>?> verifyUser({required String email, required String affiliation}) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .where('affiliation', isEqualTo: affiliation)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.data();
+    }
+    return null;
+  }
 }

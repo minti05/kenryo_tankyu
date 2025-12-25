@@ -1,10 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
+import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
 import 'package:kenryo_tankyu/features/settings/data/repositories/device_settings_db.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,7 +27,7 @@ class SettingsPage extends ConsumerWidget {
                 value: notificationSetting,
                 onChanged: (bool value) async {
                   if (value) {
-                    final fcm = FirebaseMessaging.instance;
+                    final fcm = ref.read(firebaseMessagingProvider);
                     final token = await fcm.getToken();
                     debugPrint(token);
                   }
@@ -115,7 +116,7 @@ ref.read(themeModeProvider.notifier)
                     context: context,
                     builder: (context) {
                       final profileName =
-                          FirebaseAuth.instance.currentUser?.displayName ??
+                          ref.watch(authRepositoryProvider).currentUser?.displayName ??
                               'ゲスト';
                       return AlertDialog(
                           title: Text('待って！ $profileNameさん'),
@@ -129,7 +130,7 @@ ref.read(themeModeProvider.notifier)
                             ),
                             TextButton(
                               onPressed: () async {
-                                await FirebaseAuth.instance.signOut();
+                                await ref.read(authProvider.notifier).signOut();
                               },
                               child: const Text('はい'),
                             ),
@@ -145,7 +146,7 @@ ref.read(themeModeProvider.notifier)
                   context: context,
                   builder: (context) {
                     final profileName =
-                        FirebaseAuth.instance.currentUser?.displayName ?? 'ゲスト';
+                        ref.watch(authRepositoryProvider).currentUser?.displayName ?? 'ゲスト';
                     return AlertDialog(
                       title: Text('待って！ $profileNameさん'),
                       content: const Text('アカウントを削除してよろしいですか？'),
@@ -158,23 +159,9 @@ ref.read(themeModeProvider.notifier)
                         ),
                         TextButton(
                           onPressed: () async {
-                            // ユーザー情報を更新
-                            final email =
-                                FirebaseAuth.instance.currentUser?.email;
-                            final firestore = FirebaseFirestore.instance;
-                            final term = firestore
-                                .collection('users')
-                                .where('email', isEqualTo: email)
-                                .limit(1);
                             try {
-                              await FirebaseAuth.instance.currentUser?.delete();
-                              await term.get().then((value) async {
-                                if (value.docs.isNotEmpty) {
-                                  await value.docs.first.reference.update({
-                                    'registered': false,
-                                  });
-                                }
-                              });
+                              await ref.read(authProvider.notifier).deleteAccount();
+                              if(!context.mounted) return;
                               Navigator.of(context).pop();
                             } on FirebaseAuthException catch (e) {
                               if (e.code == 'requires-recent-login') {

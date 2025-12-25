@@ -56,4 +56,33 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> reloadUser() async {
     await ref.read(authRepositoryProvider).reloadUser();
   }
+
+  Future<void> createUser(String password) async {
+    final email = '${state.email}@kenryo.ed.jp';
+    await ref.read(authRepositoryProvider).createUserWithEmailAndPassword(email: email, password: password);
+    await ref.read(authRepositoryProvider).updateDisplayName(state.userName ?? '');
+    await ref.read(authRepositoryProvider).sendEmailVerification();
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    final fullEmail = '$email@kenryo.ed.jp';
+    await ref.read(authRepositoryProvider).sendPasswordResetEmail(email: fullEmail);
+  }
+
+  Future<void> signOut() async {
+    await ref.read(authRepositoryProvider).signOut();
+  }
+
+  Future<void> deleteAccount() async {
+    final user = ref.read(authRepositoryProvider).currentUser;
+    if (user != null && user.email != null) {
+      // 本来はTransactionなどでやるべきだが簡易的に
+      try {
+        await ref.read(userRepositoryProvider).updateRegisteredStatus(email: user.email!, isRegistered: false);
+        await ref.read(authRepositoryProvider).deleteUser();
+      } catch (e) {
+        rethrow;
+      }
+    }
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
 
@@ -22,7 +22,7 @@ final forceReloadProvider = StateProvider.autoDispose<bool>((ref) => false);
 //作品データを取得するProvider
 final getFirestoreSearchedProvider =
     FutureProvider.family.autoDispose<Searched, int>((ref, documentID) async {
-  final firestore = FirebaseFirestore.instance;
+  final firestore = ref.watch(firebaseFirestoreProvider);
   final forceReload = ref.read(forceReloadProvider); //ref.readなのは、このforceReloadが変更されてもこのproviderが自動的に発火しないようにするため。
   if (forceReload) {
     debugPrint("強制リロードするよー");

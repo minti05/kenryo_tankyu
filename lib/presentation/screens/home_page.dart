@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
 import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class HomePage extends ConsumerWidget {
@@ -14,7 +14,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileName = developer_mode ? 'ゲスト' : FirebaseAuth.instance.currentUser?.displayName ?? 'ゲスト';
+    final profileName = developer_mode ? 'ゲスト' : ref.watch(authRepositoryProvider).currentUser?.displayName ?? 'ゲスト';
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(

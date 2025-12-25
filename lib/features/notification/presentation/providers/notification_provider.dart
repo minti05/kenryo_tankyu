@@ -1,6 +1,6 @@
 //通知の内容をfirestoreから受け取るfuture provider
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';
 
@@ -16,7 +16,8 @@ class NotificationNotifier extends Notifier<List<NotificationContent>> {
     if (data != null) {
       state = data;
     } else {
-      final snapshot = await FirebaseFirestore.instance
+
+      final snapshot = await ref.read(firebaseFirestoreProvider)
           .collection('notifications')
           .orderBy('sendAt', descending: true)
           .limit(4)
