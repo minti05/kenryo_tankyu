@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/settings/data/repositories/repositories.dart';
 import 'package:kenryo_tankyu/features/settings/domain/repositories/repositories.dart';
 import 'package:kenryo_tankyu/features/settings/domain/usecases/usecases.dart';
+import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 part 'theme_providers.g.dart';
 
-@riverpod
-Future<SharedPreferences> sharedPreferences(Ref ref) =>
-    SharedPreferences.getInstance();
+
 
 @riverpod
 SettingsRepository settingsRepository(Ref ref) {
-  final sharedPreferences = ref.watch(sharedPreferencesProvider).requireValue;
+  final sharedPreferences = ref.watch(sharedPreferencesProvider);
   return SettingsRepositoryImpl(sharedPreferences);
 }
 

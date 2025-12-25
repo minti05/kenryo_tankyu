@@ -13,12 +13,9 @@ part of 'shared_preferences_provider.dart';
 const sharedPreferencesProvider = SharedPreferencesProvider._();
 
 final class SharedPreferencesProvider extends $FunctionalProvider<
-        AsyncValue<SharedPreferences>,
-        SharedPreferences,
-        FutureOr<SharedPreferences>>
-    with
-        $FutureModifier<SharedPreferences>,
-        $FutureProvider<SharedPreferences> {
+    SharedPreferences,
+    SharedPreferences,
+    SharedPreferences> with $Provider<SharedPreferences> {
   const SharedPreferencesProvider._()
       : super(
           from: null,
@@ -35,14 +32,22 @@ final class SharedPreferencesProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<SharedPreferences> $createElement(
+  $ProviderElement<SharedPreferences> $createElement(
           $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+      $ProviderElement(pointer);
 
   @override
-  FutureOr<SharedPreferences> create(Ref ref) {
+  SharedPreferences create(Ref ref) {
     return sharedPreferences(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SharedPreferences value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SharedPreferences>(value),
+    );
   }
 }
 
-String _$sharedPreferencesHash() => r'd0f94d4bd61259b4c06d24df95d1afc7eb5bd1c6';
+String _$sharedPreferencesHash() => r'1a6250efdc19e86c923ceb598a77ff74d64378e6';

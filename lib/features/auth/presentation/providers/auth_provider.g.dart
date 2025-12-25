@@ -40,7 +40,7 @@ final class AuthStateChangesProvider
   }
 }
 
-String _$authStateChangesHash() => r'2b7cdea91185426216b913040c54b42cca155f4c';
+String _$authStateChangesHash() => r'f95512f3016c4609549bf37ef775d5ac547a7179';
 
 @ProviderFor(AuthNotifier)
 const authProvider = AuthNotifierProvider._();
