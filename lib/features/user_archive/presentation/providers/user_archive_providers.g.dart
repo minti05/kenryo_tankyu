@@ -153,7 +153,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'33648334b276454917e6e58713a01374b5442170';
+    r'd84be8310ec2691e078980f9053100f1c6c8ec3a';
 
 /// documentIDごとにfavoriteかどうかを記録するProvider
 
@@ -278,4 +278,51 @@ final class SearchedHistoryFamily extends $Family
 
   @override
   String toString() => r'searchedHistoryProvider';
+}
+
+@ProviderFor(HistoryController)
+const historyControllerProvider = HistoryControllerProvider._();
+
+final class HistoryControllerProvider
+    extends $NotifierProvider<HistoryController, void> {
+  const HistoryControllerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'historyControllerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$historyControllerHash();
+
+  @$internal
+  @override
+  HistoryController create() => HistoryController();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$historyControllerHash() => r'5bb6a2466d2600e84fa82192f464ee5109583862';
+
+abstract class _$HistoryController extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    build();
+    final ref = this.ref as $Ref<void, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<void, void>, void, Object?, Object?>;
+    element.handleValue(ref, null);
+  }
 }

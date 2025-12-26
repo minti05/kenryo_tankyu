@@ -20,6 +20,7 @@ abstract class UserArchiveRepository {
   Future<void> insertPdf(String id, Uint8List pdfData);
   Future<Uint8List?> getLocalPdf(String id);
   Future<Uint8List?> getRemotePdf(String id, EnterYear enterYear);
+  Future<Uint8List?> getPdf(String id, EnterYear enterYear);
   Future<Uint8List?> getRemotePdfForTeacher(String id);
 
   // Recommended Works

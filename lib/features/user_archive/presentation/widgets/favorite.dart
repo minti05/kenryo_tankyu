@@ -26,7 +26,6 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
 
   Widget build(BuildContext context) {
     final searched = widget.searched;
-    final ableChangeFavorite = ref.watch(ableChangeFavoriteProvider);
 
     final isFavorite = ref
             .watch(userIsFavoriteStateProvider(searched.documentID))
@@ -61,29 +60,23 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
                 : Theme.of(context).colorScheme.onSurface,
           ),
           onPressed: () async {
-            if (ableChangeFavorite) {
-              ref
-                  .read(ableChangeFavoriteProvider.notifier)
-                  .set(false); //ボタン連打防止
-              ref
-                  .read(
-                      userIsFavoriteStateProvider(searched.documentID).notifier)
-                  .changeIsFavorite(searched.documentID, isFavorite);
+            final notifier = ref.read(
+                userIsFavoriteStateProvider(searched.documentID).notifier);
+            final success =
+                await notifier.toggle(searched.documentID, isFavorite);
+
+            if (success) {
               setState(() {
                 likes = isFavorite ? likes - 1 : likes + 1;
               });
-              await Future.delayed(const Duration(seconds: 2));
-              if (context.mounted) {
-                ref
-                    .read(ableChangeFavoriteProvider.notifier)
-                    .set(true); //ボタン連打防止
-              }
             } else {
-              const snackBar = SnackBar(
-                  content: Text('データ保存中です。'),
-                  backgroundColor: Colors.red,
-                  duration: Duration(seconds: 1));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              if (context.mounted) {
+                const snackBar = SnackBar(
+                    content: Text('データ保存中です。'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 1));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }
             }
           },
         ),
@@ -149,9 +142,16 @@ class FavoriteForHistory extends ConsumerWidget {
           ? const Icon(Icons.favorite, color: Colors.red)
           : const Icon(Icons.favorite_border, color: Colors.red),
       onPressed: () async {
-        ref
-            .read(userIsFavoriteStateProvider(searched.documentID).notifier)
-            .changeIsFavorite(searched.documentID, isFavorite);
+        final notifier =
+            ref.read(userIsFavoriteStateProvider(searched.documentID).notifier);
+        final success = await notifier.toggle(searched.documentID, isFavorite);
+        if (!success && context.mounted) {
+          const snackBar = SnackBar(
+              content: Text('データ保存中です。'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 1));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       },
     );
   }

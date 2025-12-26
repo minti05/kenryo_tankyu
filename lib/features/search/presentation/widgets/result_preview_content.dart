@@ -39,10 +39,8 @@ class ResultPreviewContent extends ConsumerWidget {
                       TextButton(
                         onPressed: () {
                           ref
-                              .read(userArchiveRepositoryProvider)
+                              .read(historyControllerProvider.notifier)
                               .deleteHistory(searched.documentID);
-                          ref.invalidate(searchedHistoryProvider(true));
-                          ref.invalidate(searchedHistoryProvider(false));
                           Navigator.of(context).pop();
                         },
                         child: const Text('消去'),

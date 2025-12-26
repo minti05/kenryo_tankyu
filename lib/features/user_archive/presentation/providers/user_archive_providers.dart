@@ -53,6 +53,22 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
     // Invalidate history provider so list updates
     ref.invalidate(searchedHistoryProvider);
   }
+
+  Future<bool> toggle(int documentID, bool nowFavoriteState) async {
+    final canChange = ref.read(ableChangeFavoriteProvider);
+    if (!canChange) return false;
+
+    ref.read(ableChangeFavoriteProvider.notifier).set(false);
+
+    await changeIsFavorite(documentID, nowFavoriteState);
+
+    // Don't await the delay for the return, but do await it for the flag reset
+    Future.delayed(const Duration(seconds: 2)).then((_) {
+      ref.read(ableChangeFavoriteProvider.notifier).set(true);
+    });
+
+    return true;
+  }
 }
 
 @riverpod
@@ -62,5 +78,17 @@ Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
     return repository.getFavoriteHistory();
   } else {
     return repository.getAllHistory();
+  }
+}
+
+@riverpod
+class HistoryController extends _$HistoryController {
+  @override
+  void build() {}
+
+  Future<void> deleteHistory(int id) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteHistory(id);
+    ref.invalidate(searchedHistoryProvider);
   }
 }

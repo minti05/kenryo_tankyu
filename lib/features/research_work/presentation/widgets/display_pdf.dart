@@ -77,7 +77,7 @@ class DisplayPdf extends ConsumerWidget {
                         elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(35.0),
-                          ),
+                        ),
                         child: SizedBox(
                           width: 40,
                           height: 40,
@@ -101,11 +101,7 @@ class DisplayPdf extends ConsumerWidget {
   Future<Uint8List?> _getPdf(WidgetRef ref, String id) async {
     try {
       final repository = ref.read(userArchiveRepositoryProvider);
-      final Uint8List? localData = await repository.getLocalPdf(id);
-      if (localData != null) {
-        return localData;
-      }
-      return await repository.getRemotePdf(id, searched.enterYear);
+      return await repository.getPdf(id, searched.enterYear);
     } catch (e) {
       debugPrint('PDFの取得中にエラーが発生しました: $e');
       rethrow;
