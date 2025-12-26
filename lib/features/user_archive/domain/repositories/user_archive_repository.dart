@@ -21,6 +21,7 @@ abstract class UserArchiveRepository {
   Future<Uint8List?> getLocalPdf(String id);
   Future<Uint8List?> getRemotePdf(String id, EnterYear enterYear);
   Future<Uint8List?> getPdf(String id, EnterYear enterYear);
+  Future<Uint8List?> getTeacherPdf(String id);
   Future<Uint8List?> getRemotePdfForTeacher(String id);
 
   // Recommended Works

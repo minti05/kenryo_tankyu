@@ -100,6 +100,15 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
   }
 
   @override
+  Future<Uint8List?> getTeacherPdf(String id) async {
+    final localData = await _pdfDataSource.getLocalPdf(id);
+    if (localData != null) {
+      return localData;
+    }
+    return await _pdfDataSource.getRemotePdfForTeacher(id);
+  }
+
+  @override
   Future<Uint8List?> getRemotePdfForTeacher(String id) {
     return _pdfDataSource.getRemotePdfForTeacher(id);
   }

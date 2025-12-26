@@ -92,11 +92,6 @@ class ShowTeacherPdfPage extends ConsumerWidget {
 
   Future<Uint8List?> _getPdf(WidgetRef ref, String id) async {
     final repository = ref.read(userArchiveRepositoryProvider);
-    final Uint8List? localData = await repository.getLocalPdf(id);
-    if (localData != null) {
-      return localData;
-    }
-    final Uint8List? remoteData = await repository.getRemotePdfForTeacher(id);
-    return remoteData;
+    return await repository.getTeacherPdf(id);
   }
 }
