@@ -51,7 +51,7 @@ final class UserArchiveRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$userArchiveRepositoryHash() =>
-    r'ec9aad0acb1c898be49fc89adeef8038e52dfd5d';
+    r'b8cacbb872ef809266a7a0ae3cef305fe903a0bd';
 
 /// ボタン連打防止を管理するProvider
 

@@ -1,6 +1,6 @@
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/repositories/repositories.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/repositories.dart';
-import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_db.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_db.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
@@ -14,13 +14,13 @@ UserArchiveRepository userArchiveRepository(Ref ref) {
   final historyDataSource = ref.watch(searchedHistoryDataSourceProvider);
   final pdfDataSource = ref.watch(pdfDbDataSourceProvider);
   final recommendedDataSource = ref.watch(recommendedWorksDataSourceProvider);
-  final firestore = ref.watch(firebaseFirestoreProvider);
+  final remoteDataSource = ref.watch(userArchiveRemoteDataSourceProvider);
 
   return UserArchiveRepositoryImpl(
     historyDataSource,
     pdfDataSource,
     recommendedDataSource,
-    firestore,
+    remoteDataSource,
   );
 }
 

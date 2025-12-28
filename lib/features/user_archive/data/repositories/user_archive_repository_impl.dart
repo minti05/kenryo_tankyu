@@ -1,24 +1,24 @@
 import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_db.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_db.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_db.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/repositories.dart';
 
 class UserArchiveRepositoryImpl implements UserArchiveRepository {
   final SearchedHistoryDataSource _historyDataSource;
   final PdfDbDataSource _pdfDataSource;
   final RecommendedWorksDataSource _recommendedDataSource;
-  final FirebaseFirestore _firestore;
+  final UserArchiveRemoteDataSource _remoteDataSource;
 
   UserArchiveRepositoryImpl(
     this._historyDataSource,
     this._pdfDataSource,
     this._recommendedDataSource,
-    this._firestore,
+    this._remoteDataSource,
   );
 
   @override
@@ -57,12 +57,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
 
   @override
   Future<void> updateRemoteLikes(int documentID, bool isIncrement) async {
-    final docRef = _firestore.collection('works').doc(documentID.toString());
-    final increment = isIncrement ? 1 : -1;
-    await docRef.update({
-      'exactLikes': FieldValue.increment(increment),
-      'vagueLikes': FieldValue.increment(increment)
-    });
+    await _remoteDataSource.updateRemoteLikes(documentID, isIncrement);
   }
 
   @override
