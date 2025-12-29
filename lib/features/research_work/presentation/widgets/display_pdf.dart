@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
@@ -18,46 +17,45 @@ class DisplayPdf extends ConsumerWidget {
         children: [
           Consumer(builder: (context, ref, child) {
             final nowWatchingPdf = ref.watch(stringProvider);
-            return FutureBuilder<Uint8List?>(
-              future: _getPdf(ref, nowWatchingPdf),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    return Text(snapshot.error.toString());
-                  }
-                  if (snapshot.data == null) {
-                    return const Text('データがありません。');
-                  }
-                  return Stack(
-                    children: [
-                      PDFView(
-                        pdfData: snapshot.data!,
-                        enableSwipe: true,
-                        autoSpacing: true,
-                        pageFling: false,
-                        pageSnap: false,
-                      ),
-                      Consumer(builder: (context, ref, child) {
-                        final showFullScreen =
-                            ref.watch(showFullScreenButtonProvider);
-                        final notifier =
-                            ref.read(showFullScreenButtonProvider.notifier);
-                        return GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            notifier.state = !showFullScreen;
-                          },
-                          child: const SizedBox(
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        );
-                      })
-                    ],
-                  );
+            final pdfAsync =
+                ref.watch(pdfProvider(nowWatchingPdf, searched.enterYear));
+
+            return pdfAsync.when(
+              data: (pdfData) {
+                if (pdfData == null) {
+                  return const Center(child: Text('データがありません。'));
                 }
-                return const Center(child: CircularProgressIndicator());
+                return Stack(
+                  children: [
+                    PDFView(
+                      pdfData: pdfData,
+                      enableSwipe: true,
+                      autoSpacing: true,
+                      pageFling: false,
+                      pageSnap: false,
+                    ),
+                    Consumer(builder: (context, ref, child) {
+                      final showFullScreen =
+                          ref.watch(showFullScreenButtonProvider);
+                      final notifier =
+                          ref.read(showFullScreenButtonProvider.notifier);
+                      return GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          notifier.state = !showFullScreen;
+                        },
+                        child: const SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      );
+                    })
+                  ],
+                );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) =>
+                  Center(child: Text('PDFの取得中にエラーが発生しました: $error')),
             );
           }),
           Align(
@@ -96,15 +94,5 @@ class DisplayPdf extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Future<Uint8List?> _getPdf(WidgetRef ref, String id) async {
-    try {
-      final repository = ref.read(userArchiveRepositoryProvider);
-      return await repository.getPdf(id, searched.enterYear);
-    } catch (e) {
-      debugPrint('PDFの取得中にエラーが発生しました: $e');
-      rethrow;
-    }
   }
 }

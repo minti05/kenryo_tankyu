@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
+
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,18 +8,18 @@ import 'package:path/path.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'pdf_db.g.dart';
+part 'pdf_local_data_source.g.dart';
 
 @Riverpod(keepAlive: true)
-PdfDbDataSource pdfDbDataSource(Ref ref) {
-  final firestore = ref.watch(firebaseStorageProvider);
-  return PdfDbDataSource(firestore);
+PdfLocalDataSource pdfLocalDataSource(Ref ref) {
+  final storage = ref.watch(firebaseStorageProvider);
+  return PdfLocalDataSource(storage);
 }
 
-class PdfDbDataSource {
-  final FirebaseStorage _firestore;
+class PdfLocalDataSource {
+  final FirebaseStorage _storage;
 
-  PdfDbDataSource(this._firestore);
+  PdfLocalDataSource(this._storage);
 
   Future<Database> get database async {
     try {
@@ -70,26 +70,26 @@ class PdfDbDataSource {
     //idからpdfの種類を取得する
     final DocumentType documentType =
         DocumentType.values.firstWhere((e) => e.idSuffix == id.substring(7));
-    debugPrint('path: ${enterYear.name}/${documentType.name}/$id.pdf');
-    final pathReference = _firestore.ref().child(
+
+    final pathReference = _storage.ref().child(
         'works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
     const storage = 1024 * 1024 * 3;
 
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。
     final Uint8List? remoteData = await pathReference.getData(storage);
     remoteData != null ? await insertPdf(id, remoteData) : null;
-    debugPrint(id);
+
     return remoteData;
   }
 
   Future<Uint8List?> getRemotePdfForTeacher(String id) async {
-    final pathReference = _firestore.ref().child('teachers/$id.pdf');
+    final pathReference = _storage.ref().child('teachers/$id.pdf');
     const storage = 1024 * 1024 * 3;
 
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。
     final Uint8List? remoteData = await pathReference.getData(storage);
     remoteData != null ? await insertPdf(id, remoteData) : null;
-    debugPrint('リモートに保管されたpdfを取得しました。');
+
     return remoteData;
   }
 }

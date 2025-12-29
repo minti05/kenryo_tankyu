@@ -3,14 +3,14 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'searched_history_db.g.dart';
+part 'searched_history_local_data_source.g.dart';
 
 @Riverpod(keepAlive: true)
-SearchedHistoryDataSource searchedHistoryDataSource(Ref ref) {
-  return SearchedHistoryDataSource();
+SearchedHistoryLocalDataSource searchedHistoryLocalDataSource(Ref ref) {
+  return SearchedHistoryLocalDataSource();
 }
 
-class SearchedHistoryDataSource {
+class SearchedHistoryLocalDataSource {
   Future<Database> get database async {
     try {
       return openDatabase(

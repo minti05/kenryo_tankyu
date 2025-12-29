@@ -20,7 +20,7 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
   @override
   void initState() {
     super.initState();
-    debugPrint("現在のlikesは${widget.searched.vagueLikes}");
+
     likes = widget.searched.vagueLikes;
   }
 
@@ -34,8 +34,8 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
         false;
 
     //強制リロードをした時に、likesの値を更新している。initStateだとリロード時に反映されないため。
-    ref.listen<AsyncValue<Searched>>(
-        getFirestoreSearchedProvider(searched.documentID), (previous, next) {
+    ref.listen<AsyncValue<Searched>>(searchedItemProvider(searched.documentID),
+        (previous, next) {
       next.whenData((searched) {
         setState(() {
           likes = searched.vagueLikes;

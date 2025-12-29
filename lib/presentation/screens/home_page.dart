@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
-import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class HomePage extends ConsumerWidget {

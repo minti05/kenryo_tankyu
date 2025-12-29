@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
-import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -172,8 +172,8 @@ class SettingsPage extends ConsumerWidget {
                                   .deleteAccount();
                               if (!context.mounted) return;
                               Navigator.of(context).pop();
-                            } on FirebaseAuthException catch (e) {
-                              if (e.code == 'requires-recent-login') {
+                            } on AuthFailure catch (e) {
+                              if (e is RequiresRecentLogin) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('再認証が必要です。再度ログインしてください。'),
@@ -182,7 +182,7 @@ class SettingsPage extends ConsumerWidget {
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('エラーが発生しました: ${e.message}'),
+                                    content: Text('エラーが発生しました: $e'),
                                   ),
                                 );
                               }

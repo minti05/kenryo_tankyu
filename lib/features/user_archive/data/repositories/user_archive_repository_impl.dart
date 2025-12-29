@@ -2,16 +2,16 @@ import 'dart:typed_data';
 
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_db.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_db.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_db.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
 
 class UserArchiveRepositoryImpl implements UserArchiveRepository {
-  final SearchedHistoryDataSource _historyDataSource;
-  final PdfDbDataSource _pdfDataSource;
-  final RecommendedWorksDataSource _recommendedDataSource;
+  final SearchedHistoryLocalDataSource _historyDataSource;
+  final PdfLocalDataSource _pdfDataSource;
+  final RecommendedWorksLocalDataSource _recommendedDataSource;
   final UserArchiveRemoteDataSource _remoteDataSource;
 
   UserArchiveRepositoryImpl(

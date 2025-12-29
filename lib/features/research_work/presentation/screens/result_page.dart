@@ -43,7 +43,7 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(isFullScreenProvider) ? 1 : 0; //全画面表示かどうか
     final AsyncValue<Searched> searched =
-        ref.watch(getFirestoreSearchedProvider(widget.documentID));
+        ref.watch(searchedItemProvider(widget.documentID));
 
     return searched.when(
       data: (searched) {

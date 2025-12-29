@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider
 
 class InputPasswordForLogin extends ConsumerStatefulWidget {
   final String password;
-  final bool isDeveloper; 
+  final bool isDeveloper;
   const InputPasswordForLogin(this.password, this.isDeveloper, {super.key});
 
   @override
@@ -66,7 +66,8 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
                     ref.watch(authProvider).email != null &&
                     _controller.text != ''
                 ? () async {
-                    await _login(context, ref, _controller.text, widget.isDeveloper);
+                    await _login(
+                        context, ref, _controller.text, widget.isDeveloper);
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -82,14 +83,16 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
     );
   }
 
-  Future<void> _login(
-      BuildContext context, WidgetRef ref, String password, bool isDeveloper) async {
+  Future<void> _login(BuildContext context, WidgetRef ref, String password,
+      bool isDeveloper) async {
     final rawEmail = ref.read(authProvider).email;
     if (rawEmail == null) return;
-    
+
     try {
-      await ref.read(authProvider.notifier).login(rawEmail, password, isDeveloper);
-      
+      await ref
+          .read(authProvider.notifier)
+          .login(rawEmail, password, isDeveloper);
+
       // ログイン成功時にFCMトークンを取得 (Log only based on original?)
       // Original code did get token.
       try {
@@ -99,40 +102,39 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
       } catch (e) {
         debugPrint('FCM Token Error: $e');
       }
-
-    } on FirebaseAuthException catch (e) {
+    } on AuthFailure catch (e) {
       if (!mounted) return;
-      
-      if (e.code == 'user-not-found') {
+
+      if (e is UserNotFound) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('メールアドレスが見つかりませんでした'),
           ),
         );
-      } else if (e.code == 'wrong-password') {
+      } else if (e is WrongPassword) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-        content: Column(
-          children: [
-            const Text('パスワードが間違っています'),
-            ElevatedButton(
-            onPressed: () =>
-            context.go('/welcome/login/reset_password'),
-            child: const Text('パスワードをリセットする')),
-          ],
-        ),
+            content: Column(
+              children: [
+                const Text('パスワードが間違っています'),
+                ElevatedButton(
+                    onPressed: () =>
+                        context.go('/welcome/login/reset_password'),
+                    child: const Text('パスワードをリセットする')),
+              ],
+            ),
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('エラーが発生しました: ${e.message}'),
+            content: Text('エラーが発生しました: $e'),
           ),
         );
       }
     } catch (e) {
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('予期せぬエラーが発生しました: $e'),

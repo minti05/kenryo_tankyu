@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/auth/data/repositories/user_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +53,8 @@ class VerifyNamePage extends ConsumerWidget {
                                 .bodyMedium!
                                 .copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 5),
-                        InputEmail(ref.read(authProvider).email ?? '', true, false),
+                        InputEmail(
+                            ref.read(authProvider).email ?? '', true, false),
                         Consumer(builder: (context, ref, child) {
                           final limit = auth.limit;
                           switch (limit) {
@@ -104,37 +105,34 @@ class VerifyNamePage extends ConsumerWidget {
     final auth = ref.watch(authProvider);
     final notifier = ref.read(authProvider.notifier);
     final emailAddress = '${auth.email}@kenryo.ed.jp';
-    
-    final userData = await ref.read(userRepositoryProvider).verifyUser(
-      email: emailAddress, 
-      affiliation: auth.affiliation?.name ?? ''
-    );
-    
-    if (userData != null) {
-        final userName = userData['name'];
-        //登録済みかどうかを確認。登録済みならログイン画面への誘導をする。未登録ならアカウント作成画面へ。
-        final alreadyRegistered = userData['registered'];
-        if (alreadyRegistered) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Column(
-                children: [
-                  const Text('このメールアドレスは既に登録されています'),
-                  ElevatedButton(
-                      onPressed: () => context.go('/welcome/login'),
-                      child: const Text('ログイン画面に移動')),
-                ],
-              ),
-            ),
-          );
-        } else {
-          debugPrint("ここまで来てるよー");
-          notifier.changeUserName(userName);
-          context.go('/welcome/verify_name/create_password');
-        }
-      } else {
-        notifier.decrementLimit();
-      }
-  }
-  }
 
+    final userData = await ref.read(userRepositoryProvider).verifyUser(
+        email: emailAddress, affiliation: auth.affiliation?.name ?? '');
+
+    if (userData != null) {
+      final userName = userData['name'];
+      //登録済みかどうかを確認。登録済みならログイン画面への誘導をする。未登録ならアカウント作成画面へ。
+      final alreadyRegistered = userData['registered'];
+      if (alreadyRegistered) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              children: [
+                const Text('このメールアドレスは既に登録されています'),
+                ElevatedButton(
+                    onPressed: () => context.go('/welcome/login'),
+                    child: const Text('ログイン画面に移動')),
+              ],
+            ),
+          ),
+        );
+      } else {
+        debugPrint("ここまで来てるよー");
+        notifier.changeUserName(userName);
+        context.go('/welcome/verify_name/create_password');
+      }
+    } else {
+      notifier.decrementLimit();
+    }
+  }
+}

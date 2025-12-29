@@ -4,18 +4,18 @@ import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-part 'recommended_works_db.g.dart';
+part 'recommended_works_local_data_source.g.dart';
 
 @Riverpod(keepAlive: true)
-RecommendedWorksDataSource recommendedWorksDataSource(Ref ref) {
+RecommendedWorksLocalDataSource recommendedWorksLocalDataSource(Ref ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
-  return RecommendedWorksDataSource(prefs);
+  return RecommendedWorksLocalDataSource(prefs);
 }
 
-class RecommendedWorksDataSource {
+class RecommendedWorksLocalDataSource {
   final SharedPreferences _prefs;
 
-  RecommendedWorksDataSource(this._prefs);
+  RecommendedWorksLocalDataSource(this._prefs);
 
   Future<void> save(Searched searched1, Searched searched2) async {
     final json1 = jsonEncode(searched1.toSQLite());
