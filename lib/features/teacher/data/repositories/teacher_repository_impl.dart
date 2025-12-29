@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/teacher/data/datasources/teacher_local_data_source.dart';
 import 'package:kenryo_tankyu/features/teacher/data/datasources/teacher_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
@@ -43,8 +45,7 @@ class TeacherRepositoryImpl implements TeacherRepository {
         return _parseTeacherList(data);
       }
     } catch (e) {
-      debugPrint("教師データ取得エラー: $e");
-      return [];
+      throw _mapException(e);
     }
   }
 
@@ -61,6 +62,23 @@ class TeacherRepositoryImpl implements TeacherRepository {
 
   List<Teacher> _parseTeacherList(Map<String, dynamic> data) {
     return (data['teachers'] as List).map((e) => Teacher.fromJson(e)).toList();
+  }
+
+  Failure _mapException(dynamic e) {
+    if (e is SocketException) {
+      return const NetworkFailure();
+    }
+    if (e is FirebaseException) {
+      if (e.code == 'unavailable' || e.code == 'network-request-failed') {
+        return const NetworkFailure();
+      }
+      return ServerFailure(
+          message: e.message ?? 'サーバーエラーが発生しました。', code: e.code);
+    }
+    if (e is Failure) {
+      return e;
+    }
+    return UnknownFailure(message: e.toString());
   }
 }
 
