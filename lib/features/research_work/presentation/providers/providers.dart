@@ -1,1 +1,0 @@
-export 'searched_provider.dart';

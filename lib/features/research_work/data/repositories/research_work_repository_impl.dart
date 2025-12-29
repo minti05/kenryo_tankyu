@@ -1,5 +1,5 @@
 import 'package:kenryo_tankyu/features/research_work/data/datasources/research_work_data_source.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/repositories/research_work_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

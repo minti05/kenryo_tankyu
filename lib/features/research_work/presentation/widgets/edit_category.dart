@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
 enum RadioValue { category1, category2 }
 
@@ -60,7 +61,7 @@ class _EditCategoryState extends State<EditCategory> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField(
-      value: selectedCategory,
+      initialValue: selectedCategory,
       onChanged: (Category? value) {
         setState(() {
           selectedCategory = value!;
@@ -87,7 +88,7 @@ class _EditCategoryState extends State<EditCategory> {
         border: OutlineInputBorder(),
         isDense: true,
       ),
-      value: selectedSubCategory,
+      initialValue: selectedSubCategory,
       onChanged: (SubCategory? value) {
         setState(() {
           selectedSubCategory = value!;

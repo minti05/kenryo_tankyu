@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lazy_indexed_stack/flutter_lazy_indexed_stack.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/widgets/widgets.dart';
-import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/screens/pdf_expand_page.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/header_for_result.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_title.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_details_table.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/pdf_choice_chip.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/display_pdf.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
 
 class ResultPage extends ConsumerStatefulWidget {

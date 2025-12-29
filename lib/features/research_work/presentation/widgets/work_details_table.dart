@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
 class WorkDetailsTable extends StatelessWidget {
   final Searched searched;

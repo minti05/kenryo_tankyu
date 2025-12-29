@@ -4,11 +4,14 @@ import 'package:algoliasearch/algoliasearch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/core/utils/utils.dart';
+import "package:kenryo_tankyu/core/constants/work/info_value.dart";
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
+import 'package:kenryo_tankyu/core/utils/date_time_converter.dart';
 
 part 'searched.freezed.dart';
 part 'searched.g.dart';
+
 ///ルール
 ///この「Searched」型では、探究作品を検索したときのデータの保管、検索結果のfirestoreのデータの保管、ローカルDBとしてのデータの保管、ユーザーがいいねしているかどうかなど、全てを管理しています。
 ///ローカルDBとしての保管としても利用するので、保守がちょいめんどくさいです。
@@ -50,16 +53,19 @@ abstract class Searched with _$Searched {
   ///Algoliaから取得したsnapshotは、objectIDとisFavoriteのみjson形式ではないため、無理やりcopyWithで変換して付け加えている。
   factory Searched.fromAlgolia(Hit doc, bool isFavorite) {
     debugPrint(doc.toString());
-    final Map<String, dynamic> data = doc.map((key, value) => MapEntry(key, value));
-    return Searched.fromJson(data)
-        .copyWith(documentID: int.parse(doc.objectID), isFavorite: isFavorite,isCached: false);
+    final Map<String, dynamic> data =
+        doc.map((key, value) => MapEntry(key, value));
+    return Searched.fromJson(data).copyWith(
+        documentID: int.parse(doc.objectID),
+        isFavorite: isFavorite,
+        isCached: false);
   }
   factory Searched.fromFirestore(DocumentSnapshot doc, bool isFavorite) {
     final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Searched.fromJson(data)
-        .copyWith(documentID: int.parse(doc.id), isFavorite: isFavorite, isCached: false);
+    return Searched.fromJson(data).copyWith(
+        documentID: int.parse(doc.id), isFavorite: isFavorite, isCached: false);
   }
-  factory Searched.fromSQLite(Map<String,dynamic> json) {
+  factory Searched.fromSQLite(Map<String, dynamic> json) {
     final mutableJson = Map<String, dynamic>.from(json);
     //SQLiteから取得したデータは、0,1で保存されているため、bool型に変換する。
     //searchedはimmutableなので、mutableJsonを作成してから新たなインスタンスを生成している。
@@ -84,5 +90,3 @@ abstract class Searched with _$Searched {
     return json;
   }
 }
-
-

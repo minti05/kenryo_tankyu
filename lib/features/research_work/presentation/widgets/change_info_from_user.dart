@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/core/constants/feature_value.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/cannot_view_pdf.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/edit_category.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/edit_work_info.dart';
