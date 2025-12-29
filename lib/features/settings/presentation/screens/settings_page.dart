@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
-import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:url_launcher/url_launcher.dart';

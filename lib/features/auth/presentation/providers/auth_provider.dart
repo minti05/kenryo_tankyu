@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
-import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:kenryo_tankyu/features/auth/data/repositories/user_repository_impl.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
