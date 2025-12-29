@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
@@ -34,12 +31,22 @@ class ShowTeacherPdfPage extends ConsumerWidget {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<Uint8List?>(
-              future: _getPdf(ref, selectedTeacher.filename),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    final error = snapshot.error;
+            child: ref.watch(teacherPdfProvider(selectedTeacher.filename)).when(
+                  data: (data) {
+                    if (data == null) {
+                      return const Center(child: Text('データがありません。'));
+                    }
+                    return PDFView(
+                      pdfData: data,
+                      enableSwipe: true,
+                      autoSpacing: true,
+                      pageFling: true,
+                      pageSnap: false,
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) {
                     if (error is ServerFailure &&
                         error.code == 'object-not-found') {
                       return const Center(
@@ -47,29 +54,12 @@ class ShowTeacherPdfPage extends ConsumerWidget {
                               style: TextStyle(fontSize: 20.0)));
                     }
                     return CommonErrorView(
-                      error: error ?? 'エラーが発生しました。',
-                      onRetry: () {
-                        // setState が使えないので画面全体をリビルドするか、
-                        // 本来は Provider を経由すべき。
-                        // 現状は FutureBuilder なので簡易的に。
-                        (context as Element).markNeedsBuild();
-                      },
+                      error: error,
+                      onRetry: () => ref.invalidate(
+                          teacherPdfProvider(selectedTeacher.filename)),
                     );
-                  }
-                  if (snapshot.data == null) {
-                    return const Text('データがありません。');
-                  }
-                  return PDFView(
-                    pdfData: snapshot.data!,
-                    enableSwipe: true,
-                    autoSpacing: true,
-                    pageFling: true,
-                    pageSnap: false,
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
+                  },
+                ),
           ),
         ],
       ),
@@ -96,10 +86,5 @@ class ShowTeacherPdfPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<Uint8List?> _getPdf(WidgetRef ref, String id) async {
-    final repository = ref.read(userArchiveRepositoryProvider);
-    return await repository.getTeacherPdf(id);
   }
 }

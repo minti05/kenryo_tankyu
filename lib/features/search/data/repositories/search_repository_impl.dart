@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 
 import 'package:algoliasearch/algoliasearch.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
@@ -9,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_repository_impl.g.dart';
 
-class SearchRepositoryImpl implements SearchRepository {
+class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
   SearchRepositoryImpl(this._dataSource);
 
   final SearchDataSource _dataSource;
@@ -43,8 +44,8 @@ class SearchRepositoryImpl implements SearchRepository {
           return Searched.fromAlgolia(object, false);
         }).toList();
       }
-    } catch (error, stackTrace) {
-      return Future.error(error, stackTrace);
+    } catch (error) {
+      throw mapException(error);
     }
   }
 
@@ -63,16 +64,20 @@ class SearchRepositoryImpl implements SearchRepository {
       pages.add(Random().nextInt(maxItems));
     }
 
-    for (final page in pages) {
-      final query = SearchForHits(
-        indexName: 'firestore',
-        query: '',
-        page: page,
-        hitsPerPage: 1,
-      );
-      final resp = await _dataSource.searchIndex(request: query);
-      final hits = resp.hits;
-      results.addAll(hits.map((e) => Searched.fromAlgolia(e, false)));
+    try {
+      for (final page in pages) {
+        final query = SearchForHits(
+          indexName: 'firestore',
+          query: '',
+          page: page,
+          hitsPerPage: 1,
+        );
+        final resp = await _dataSource.searchIndex(request: query);
+        final hits = resp.hits;
+        results.addAll(hits.map((e) => Searched.fromAlgolia(e, false)));
+      }
+    } catch (e) {
+      throw mapException(e);
     }
     return results;
   }

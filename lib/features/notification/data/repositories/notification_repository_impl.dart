@@ -1,7 +1,4 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_local_data_source.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';
@@ -10,7 +7,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notification_repository_impl.g.dart';
 
-class NotificationRepositoryImpl implements NotificationRepository {
+class NotificationRepositoryImpl
+    with ErrorMapper
+    implements NotificationRepository {
   NotificationRepositoryImpl(this._localDataSource, this._remoteDataSource);
 
   final NotificationLocalDataSource _localDataSource;
@@ -26,7 +25,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
         return await _remoteDataSource.fetchLatestNotifications();
       }
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -35,25 +34,8 @@ class NotificationRepositoryImpl implements NotificationRepository {
     try {
       await _localDataSource.markAsRead(id);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
-  }
-
-  Failure _mapException(dynamic e) {
-    if (e is SocketException) {
-      return const NetworkFailure();
-    }
-    if (e is FirebaseException) {
-      if (e.code == 'unavailable' || e.code == 'network-request-failed') {
-        return const NetworkFailure();
-      }
-      return ServerFailure(
-          message: e.message ?? 'サーバーエラーが発生しました。', code: e.code);
-    }
-    if (e is Failure) {
-      return e;
-    }
-    return UnknownFailure(message: e.toString());
   }
 }
 

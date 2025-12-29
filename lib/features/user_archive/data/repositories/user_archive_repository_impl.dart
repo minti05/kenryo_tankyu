@@ -1,19 +1,16 @@
-import 'dart:io';
 import 'dart:typed_data';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import "package:kenryo_tankyu/core/constants/work/info_value.dart";
-import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
+import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
-import 'package:sqflite/sqflite.dart';
 
-class UserArchiveRepositoryImpl implements UserArchiveRepository {
+class UserArchiveRepositoryImpl
+    with ErrorMapper
+    implements UserArchiveRepository {
   final SearchedHistoryLocalDataSource _historyDataSource;
   final PdfLocalDataSource _pdfDataSource;
   final RecommendedWorksLocalDataSource _recommendedDataSource;
@@ -31,7 +28,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _historyDataSource.getAllHistory();
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -40,7 +37,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _historyDataSource.getFavoriteHistory();
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -49,7 +46,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       await _historyDataSource.insertHistory(searched);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -58,7 +55,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _historyDataSource.getHistory(documentID);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -67,7 +64,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       await _historyDataSource.deleteHistory(documentID);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -77,7 +74,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
       await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
       await updateRemoteLikes(documentID, nextIsFavorite);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -86,7 +83,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       await _remoteDataSource.updateRemoteLikes(documentID, isIncrement);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -95,7 +92,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _historyDataSource.getFavoriteState(documentID);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -104,7 +101,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _historyDataSource.getSomeFavoriteState(documentIDs);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -113,7 +110,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       await _pdfDataSource.insertPdf(id, pdfData);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -122,7 +119,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _pdfDataSource.getLocalPdf(id);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -131,7 +128,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _pdfDataSource.getRemotePdf(id, enterYear);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -144,7 +141,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
       }
       return await _pdfDataSource.getRemotePdf(id, enterYear);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -157,7 +154,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
       }
       return await _pdfDataSource.getRemotePdfForTeacher(id);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -166,7 +163,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _pdfDataSource.getRemotePdfForTeacher(id);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -176,7 +173,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       await _recommendedDataSource.save(searched1, searched2);
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -185,27 +182,7 @@ class UserArchiveRepositoryImpl implements UserArchiveRepository {
     try {
       return await _recommendedDataSource.load();
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
-  }
-
-  Failure _mapException(dynamic e) {
-    if (e is SocketException) {
-      return const NetworkFailure();
-    }
-    if (e is DatabaseException) {
-      return DatabaseFailure(message: e.toString());
-    }
-    if (e is FirebaseException) {
-      if (e.code == 'unavailable' || e.code == 'network-request-failed') {
-        return const NetworkFailure();
-      }
-      return ServerFailure(
-          message: e.message ?? 'サーバーエラーが発生しました。', code: e.code);
-    }
-    if (e is Failure) {
-      return e;
-    }
-    return UnknownFailure(message: e.toString());
   }
 }

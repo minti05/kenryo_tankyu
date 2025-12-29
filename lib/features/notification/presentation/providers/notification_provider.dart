@@ -21,31 +21,37 @@ class NotificationNotifier
     }
   }
 
-  Future<void> markAsRead(int id) async {
-    // 成功時のみ状態を更新する
+  Future<bool> markAsRead(int id) async {
     try {
       final repository = ref.read(notificationRepositoryProvider);
       await repository.markAsRead(id);
 
       state.whenData((notifications) {
         state = AsyncValue.data(notifications.map((notification) {
-          // Note: id in model is String but repository might use int for Local DB.
-          // Checking notification_content.dart shows id is String.
-          // But repository markAsRead takes int id?
-          // Wait, NotificationRepository.markAsRead takes int id.
-          // NotificationContent.id is String.
-          // This seems like a type mismatch in existing code.
-          // For now, I'll keep it as is or try to match them.
           if (notification.id == id.toString()) {
             return notification.copyWith(isRead: true);
           }
           return notification;
         }).toList());
       });
+      return true;
     } catch (e) {
-      // markAsRead のエラーは画面全体を止めるほどではないかもしれないが、
-      // 必要があれば各UIでエラーハンドリングする
-      rethrow;
+      // エラーログ出力などを行い、上位には成功/失敗を返すのみにする
+      return false;
+    }
+  }
+
+  Future<bool> markAsReadAll() async {
+    try {
+      // TODO: リポジトリに指定がない場合は全件更新を検討
+      // 現状は state にあるものをすべて true にする
+      state.whenData((notifications) {
+        state = AsyncValue.data(
+            notifications.map((n) => n.copyWith(isRead: true)).toList());
+      });
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 

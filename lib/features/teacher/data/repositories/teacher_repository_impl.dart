@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/teacher/data/datasources/teacher_local_data_source.dart';
 import 'package:kenryo_tankyu/features/teacher/data/datasources/teacher_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
@@ -12,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'teacher_repository_impl.g.dart';
 
-class TeacherRepositoryImpl implements TeacherRepository {
+class TeacherRepositoryImpl with ErrorMapper implements TeacherRepository {
   TeacherRepositoryImpl(this._localDataSource, this._remoteDataSource);
 
   final TeacherLocalDataSource _localDataSource;
@@ -45,7 +43,7 @@ class TeacherRepositoryImpl implements TeacherRepository {
         return _parseTeacherList(data);
       }
     } catch (e) {
-      throw _mapException(e);
+      throw mapException(e);
     }
   }
 
@@ -62,23 +60,6 @@ class TeacherRepositoryImpl implements TeacherRepository {
 
   List<Teacher> _parseTeacherList(Map<String, dynamic> data) {
     return (data['teachers'] as List).map((e) => Teacher.fromJson(e)).toList();
-  }
-
-  Failure _mapException(dynamic e) {
-    if (e is SocketException) {
-      return const NetworkFailure();
-    }
-    if (e is FirebaseException) {
-      if (e.code == 'unavailable' || e.code == 'network-request-failed') {
-        return const NetworkFailure();
-      }
-      return ServerFailure(
-          message: e.message ?? 'サーバーエラーが発生しました。', code: e.code);
-    }
-    if (e is Failure) {
-      return e;
-    }
-    return UnknownFailure(message: e.toString());
   }
 }
 
