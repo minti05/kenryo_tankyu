@@ -10,6 +10,7 @@ import 'package:kenryo_tankyu/core/theme/theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kenryo_tankyu/presentation/widget/connectivity_banner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -97,6 +98,9 @@ class _MainAppState extends ConsumerState<MainApp> {
             useMaterial3: true,
             colorScheme: lightColorScheme,
           ),
+          builder: (context, child) {
+            return ConnectivityBanner(child: child!);
+          },
         );
       }),
     );

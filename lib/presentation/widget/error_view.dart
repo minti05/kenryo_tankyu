@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 
 /// ページやリスト内で使用する共通のエラー表示ウィジェット
-class CommonErrorView extends StatelessWidget {
+class CommonErrorView extends ConsumerWidget {
   final Object error;
   final VoidCallback? onRetry;
 
@@ -13,10 +15,16 @@ class CommonErrorView extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    String message = 'エラーが発生しました。';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isConnected = ref.watch(isConnectedProvider);
 
-    if (error is Failure) {
+    String message = 'エラーが発生しました。';
+    IconData icon = Icons.error_outline;
+
+    if (!isConnected) {
+      message = 'インターネットに接続されていません。';
+      icon = Icons.wifi_off;
+    } else if (error is Failure) {
       message = (error as Failure).message;
     } else {
       message = error.toString();
@@ -28,9 +36,9 @@ class CommonErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              color: Colors.red,
+            Icon(
+              icon,
+              color: isConnected ? Colors.red : Colors.grey,
               size: 48,
             ),
             const SizedBox(height: 16),
@@ -39,6 +47,13 @@ class CommonErrorView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            if (!isConnected) ...[
+              const SizedBox(height: 8),
+              const Text(
+                '再接続を待機しています...',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
             if (onRetry != null) ...[
               const SizedBox(height: 24),
               ElevatedButton.icon(

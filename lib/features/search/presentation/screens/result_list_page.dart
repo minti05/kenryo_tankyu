@@ -7,6 +7,7 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/result_header
 import 'package:kenryo_tankyu/features/search/presentation/widgets/sidebar.dart';
 
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
+import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 
 class ResultListPage extends ConsumerWidget {
   ResultListPage({super.key});
@@ -48,13 +49,16 @@ class ResultListPage extends ConsumerWidget {
             Expanded(
               child: Consumer(
                 builder: (context, ref, child) {
+                  final isConnected = ref.watch(isConnectedProvider);
                   final asyncValue = ref.watch(algoliaSearchProvider);
                   final sortedList = ref.watch(sortedListProvider);
+
                   return asyncValue.when(
                     data: (data) {
                       if (data == null) {
                         return Center(
                             child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text('データがヒットしませんでした'),
                             const SizedBox(height: 20),
@@ -63,16 +67,8 @@ class ResultListPage extends ConsumerWidget {
                                     ref.invalidate(algoliaSearchProvider),
                                 child: const Text('リロードする')),
                           ],
-                        )); //TODO ユーザーに検索条件を変えさせるようにする。変えないと再読み込みできないようにしたい。
+                        ));
                       } else {
-                        /*
-                        ///検索履歴に保存
-                        ///algoliaSearchProvider内で行うように変更したため削除
-                        ref.read(searchHistoryControllerProvider).insertHistory(
-                            provider.copyWith(
-                                savedAt: DateTime.now(),
-                                numberOfHits: data.length));
-                         */
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -91,14 +87,41 @@ class ResultListPage extends ConsumerWidget {
                         );
                       }
                     },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 16),
+                          if (!isConnected) ...[
+                            const Text('インターネットに接続されていません'),
+                            const Text('再接続を待機しています...',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
+                          ] else
+                            const Text('検索中...'),
+                        ],
+                      ),
+                    ),
                     error: (error, stackTrace) {
                       return Center(
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text('エラーが発生しました'),
-                            Text(error.toString()),
+                            Icon(Icons.cloud_off,
+                                size: 64, color: Colors.grey[400]),
+                            const SizedBox(height: 16),
+                            const Text('検索中にエラーが発生しました'),
+                            Text(error.toString(),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () =>
+                                  ref.invalidate(algoliaSearchProvider),
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('再試行'),
+                            ),
                           ],
                         ),
                       );

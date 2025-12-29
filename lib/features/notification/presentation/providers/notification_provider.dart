@@ -1,16 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';
+import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 
 class NotificationNotifier
     extends Notifier<AsyncValue<List<NotificationContent>>> {
   @override
   AsyncValue<List<NotificationContent>> build() {
+    // 接続状態を監視し、回復時に再取得
+    ref.listen(isConnectedProvider, (previous, next) {
+      if (previous == false && next == true) {
+        refresh();
+      }
+    });
+
     _fetchNotifications();
     return const AsyncLoading();
   }
 
   Future<void> _fetchNotifications() async {
+    final isConnected = ref.read(isConnectedProvider);
+    if (!isConnected) {
+      state = AsyncValue.error(const NetworkFailure(), StackTrace.current);
+      return;
+    }
+
     state = const AsyncLoading();
     try {
       final repository = ref.read(notificationRepositoryProvider);
