@@ -1,11 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/auth_app_bar.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/input_email.dart';
-
 
 class ResetPasswordPage extends ConsumerWidget {
   const ResetPasswordPage({super.key});
@@ -26,9 +25,9 @@ class ResetPasswordPage extends ConsumerWidget {
               const Spacer(flex: 1),
               Text('パスワードをリセット',
                   style: Theme.of(context)
-                        .textTheme
-                        .titleLarge!
-                        .copyWith(fontWeight: FontWeight.bold)),
+                      .textTheme
+                      .titleLarge!
+                      .copyWith(fontWeight: FontWeight.bold)),
               Card(
                 margin: const EdgeInsets.all(20),
                 shape: RoundedRectangleBorder(
@@ -41,17 +40,19 @@ class ResetPasswordPage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                       Text('メールアドレスを入力',style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold)),
+                      Text('メールアドレスを入力',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 5),
-                      InputEmail(ref.watch(authProvider).email ?? '', true, false),
+                      InputEmail(
+                          ref.watch(authProvider).email ?? '', true, false),
                       const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
                             onPressed: email != null && email.isNotEmpty
-                                ? () => _sendResetMail(context,ref, email)
+                                ? () => _sendResetMail(context, ref, email)
                                 : null,
                             child: const Text('リセットメールを送信')),
                       ),
@@ -62,8 +63,7 @@ class ResetPasswordPage extends ConsumerWidget {
               const SizedBox(height: 20),
               confirmVerifiedEmail
                   ? ElevatedButton(
-                      onPressed: () =>
-                          context.go('/welcome/login'),
+                      onPressed: () => context.go('/welcome/login'),
                       child: const Text('ログインし直す'))
                   : const SizedBox(),
               const Spacer(flex: 2),
@@ -74,12 +74,13 @@ class ResetPasswordPage extends ConsumerWidget {
     );
   }
 
-  Future _sendResetMail(BuildContext context,WidgetRef ref, String email) async {
+  Future _sendResetMail(
+      BuildContext context, WidgetRef ref, String email) async {
     try {
       await ref.read(authProvider.notifier).sendPasswordResetEmail(email);
       ref.read(authProvider.notifier).changeVerifyEmail();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+    } on AuthFailure catch (e) {
+      if (e is UserNotFound) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Column(
@@ -95,7 +96,7 @@ class ResetPasswordPage extends ConsumerWidget {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('エラーが発生しました。${e.code}'),
+            content: Text('エラーが発生しました。$e'),
           ),
         );
       }

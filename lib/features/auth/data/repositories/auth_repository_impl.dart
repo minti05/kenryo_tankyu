@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenryo_tankyu/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/auth/domain/repositories/auth_repository.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _dataSource;
@@ -14,16 +15,28 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signInWithEmailAndPassword(
-      {required String email, required String password}) {
-    return _dataSource.signInWithEmailAndPassword(
-        email: email, password: password);
+      {required String email, required String password}) async {
+    try {
+      await _dataSource.signInWithEmailAndPassword(
+          email: email, password: password);
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      throw UnknownAuthFailure(message: e.toString());
+    }
   }
 
   @override
   Future<void> createUserWithEmailAndPassword(
-      {required String email, required String password}) {
-    return _dataSource.createUserWithEmailAndPassword(
-        email: email, password: password);
+      {required String email, required String password}) async {
+    try {
+      await _dataSource.createUserWithEmailAndPassword(
+          email: email, password: password);
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      throw UnknownAuthFailure(message: e.toString());
+    }
   }
 
   @override
@@ -53,6 +66,31 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> reloadUser() async {
-    await _dataSource.reloadUser();
+    try {
+      await _dataSource.reloadUser();
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      throw UnknownAuthFailure(message: e.toString());
+    }
+  }
+
+  AuthFailure _mapFirebaseException(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return const UserNotFound();
+      case 'wrong-password':
+        return const WrongPassword();
+      case 'email-already-in-use':
+        return const EmailAlreadyInUse();
+      case 'invalid-email':
+        return const InvalidEmail();
+      case 'weak-password':
+        return const WeakPassword();
+      case 'requires-recent-login':
+        return const RequiresRecentLogin();
+      default:
+        return UnknownAuthFailure(code: e.code, message: e.message);
+    }
   }
 }
