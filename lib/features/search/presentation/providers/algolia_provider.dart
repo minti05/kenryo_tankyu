@@ -7,6 +7,8 @@ import 'package:kenryo_tankyu/features/search/data/repositories/search_repositor
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
+
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 final algoliaSearchProvider =
@@ -15,7 +17,17 @@ final algoliaSearchProvider =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
 
   final repository = ref.watch(searchRepositoryProvider);
-  return repository.search(params: search);
+  final historyRepository = ref.watch(searchHistoryRepositoryProvider);
+
+  final result = await repository.search(params: search);
+
+  if (result != null) {
+    // Save history side effect
+    await historyRepository.insertHistory(
+        search.copyWith(savedAt: DateTime.now(), numberOfHits: result.length));
+  }
+
+  return result;
 });
 
 final sortedListProvider =

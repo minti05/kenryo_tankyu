@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
 
-class SearchHistoryController {
-  static final SearchHistoryController _instance = SearchHistoryController._();
-  SearchHistoryController._();
-  static SearchHistoryController get instance => _instance;
+part 'search_history_data_source.g.dart';
+
+class SearchHistoryDataSource {
+  static final SearchHistoryDataSource _instance = SearchHistoryDataSource._();
+  SearchHistoryDataSource._();
+  static SearchHistoryDataSource get instance => _instance;
 
   Future<Database> get database async {
     try {
@@ -61,4 +64,9 @@ class SearchHistoryController {
       return Search.fromJson(maps[i]);
     });
   }
+}
+
+@riverpod
+SearchHistoryDataSource searchHistoryDataSource(Ref ref) {
+  return SearchHistoryDataSource.instance;
 }
