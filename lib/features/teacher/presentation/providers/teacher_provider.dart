@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/features/teacher/data/repositories/teacher_repository_impl.dart';
 
 // 教師データを取得するProvider

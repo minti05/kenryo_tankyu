@@ -1,9 +1,9 @@
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/repositories/repositories.dart';
-import 'package:kenryo_tankyu/features/user_archive/domain/repositories/repositories.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/repositories/user_archive_repository_impl.dart';
+import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_db.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_db.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_db.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

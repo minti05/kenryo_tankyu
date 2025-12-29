@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
+import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 
 class WelcomePage extends ConsumerWidget {
   const WelcomePage({super.key});

@@ -2,8 +2,8 @@ import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
+import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class CheckEmailPage extends ConsumerWidget {
   const CheckEmailPage({super.key});

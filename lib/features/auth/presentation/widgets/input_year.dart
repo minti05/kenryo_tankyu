@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
+import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class InputYear extends ConsumerWidget {
   const InputYear({super.key});

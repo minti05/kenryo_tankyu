@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 
 class SubCategoryChip extends ConsumerWidget {
   const SubCategoryChip({super.key});

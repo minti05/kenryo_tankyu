@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 
 class LibraryList extends ConsumerWidget {
   final bool onlyFavorite;

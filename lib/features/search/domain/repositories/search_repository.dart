@@ -1,5 +1,5 @@
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
-import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 
 abstract class SearchRepository {
   Future<List<Searched>?> search({

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages

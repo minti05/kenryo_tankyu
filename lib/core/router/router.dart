@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
-import 'package:kenryo_tankyu/features/auth/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/krgp/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/notification/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/search/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/features/teacher/presentation/screens/screens.dart';
-import 'package:kenryo_tankyu/presentation/screens/screens.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/screens/welcome_page.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/screens/create_password_page.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/screens/verify_name_page.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/screens/login_page.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/screens/reset_password_page.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/screens/verify_email_page.dart';
+import 'package:kenryo_tankyu/features/krgp/presentation/screens/krgp_home_page.dart';
+import 'package:kenryo_tankyu/features/krgp/presentation/screens/krgp_year_page.dart';
+import 'package:kenryo_tankyu/features/notification/presentation/screens/notification_page.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/screens/result_page.dart';
+import 'package:kenryo_tankyu/features/search/presentation/screens/result_list_page.dart';
+import 'package:kenryo_tankyu/features/search/presentation/screens/search_page.dart';
+import 'package:kenryo_tankyu/features/search/presentation/screens/sub_category_select_page.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/screens/settings_page.dart';
+import 'package:kenryo_tankyu/features/teacher/presentation/screens/show_teacher_pdf.dart';
+import 'package:kenryo_tankyu/features/teacher/presentation/screens/teacher_select_page.dart';
+import 'package:kenryo_tankyu/presentation/screens/home_page.dart';
+import 'package:kenryo_tankyu/presentation/screens/explore_page.dart';
+import 'package:kenryo_tankyu/presentation/screens/library_page.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 import 'package:kenryo_tankyu/test/test_file_select.dart';
 import 'package:kenryo_tankyu/test/test_for_aoi.dart';
@@ -52,7 +63,8 @@ final routesProvider = Provider<GoRouter>((ref) {
                 ]),
             GoRoute(
                 path: 'login',
-                builder: (context, state) => LoginPage(isDeveloper: state.extra as bool),
+                builder: (context, state) =>
+                    LoginPage(isDeveloper: state.extra as bool),
                 routes: [
                   GoRoute(
                     path: 'reset_password',

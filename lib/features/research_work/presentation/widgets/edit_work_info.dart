@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import "package:kenryo_tankyu/core/constants/work/info_value.dart";
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
 class EditWorkInfo extends StatefulWidget {
   final Searched searched;

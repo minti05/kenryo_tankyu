@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
 
 import 'package:kenryo_tankyu/features/teacher/presentation/providers/teacher_provider.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 
 class ShowTeacherPdfPage extends ConsumerWidget {
   const ShowTeacherPdfPage({super.key});

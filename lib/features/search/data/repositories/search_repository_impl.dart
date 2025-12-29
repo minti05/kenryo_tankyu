@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:algoliasearch/algoliasearch.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/data/datasources/search_data_source.dart';
-import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:kenryo_tankyu/features/search/domain/repositories/search_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

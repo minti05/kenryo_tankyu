@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
+import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_list.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
-
 
 class ResultHeader extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
@@ -73,13 +73,12 @@ class ResultHeaderState extends ConsumerState<ResultHeader> {
     //ユーザーが入力した単語が入っている場合→キーワード入力画面(/search)まで戻る
     //サブカテゴリーが入っている場合→サブカテゴリ選択画面(/subCategory)まで戻る
     //カテゴリのみ選択されている場合→カテゴリ選択画面(/explore)まで戻る
-    if(searchStatus.searchWord.isNotEmpty){
+    if (searchStatus.searchWord.isNotEmpty) {
       context.go('/search');
-    } else if(searchStatus.subCategory != SubCategory.none){
+    } else if (searchStatus.subCategory != SubCategory.none) {
       notifier.deleteParameter('subCategory');
       context.go('/subCategory');
-    }
-    else if(searchStatus.category != Category.none){
+    } else if (searchStatus.category != Category.none) {
       notifier.deleteAllParameters();
       footerNotifier.state = 1;
       context.go('/explore');

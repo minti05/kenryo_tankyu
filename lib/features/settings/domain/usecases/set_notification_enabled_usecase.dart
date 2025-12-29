@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/settings/domain/repositories/repositories.dart';
+import 'package:kenryo_tankyu/features/settings/domain/repositories/settings_repository.dart';
 
 class SetNotificationEnabledUsecase {
   final SettingsRepository _repository;

@@ -1,5 +1,5 @@
 import 'package:algoliasearch/algoliasearch.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
+import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 
 class Application {
   static final algolia = SearchClient(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
+import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 
 class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double percent;

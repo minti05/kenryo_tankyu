@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'research_work_data_source.g.dart';

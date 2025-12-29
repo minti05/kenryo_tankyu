@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/search/data/datasources/datasources.dart';
-import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
+import "package:kenryo_tankyu/core/constants/work/search_value.dart";
+import 'package:kenryo_tankyu/features/search/data/datasources/search_history_db.dart';
+
+import 'package:kenryo_tankyu/features/search/presentation/widgets/result_list_preview.dart'; // ResultList is here
+import 'package:kenryo_tankyu/features/search/presentation/widgets/result_header.dart';
+import 'package:kenryo_tankyu/features/search/presentation/widgets/sidebar.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 
 class ResultListPage extends ConsumerWidget {
   ResultListPage({super.key});
@@ -38,8 +42,7 @@ class ResultListPage extends ConsumerWidget {
                   },
                 ),
                 IconButton(
-                    onPressed: () =>
-                        _scaffoldKey.currentState?.openEndDrawer(),
+                    onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
                     icon: const Icon(Icons.tune)),
               ],
             ),
@@ -76,8 +79,9 @@ class ResultListPage extends ConsumerWidget {
                               padding: const EdgeInsets.only(
                                   left: 8.0, top: 4.0, bottom: 4.0),
                               child: Text(
-                                data.length == 20? '20件以上ヒットしました':
-                                '${data.length.toString()}件ヒットしました',
+                                data.length == 20
+                                    ? '20件以上ヒットしました'
+                                    : '${data.length.toString()}件ヒットしました',
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
