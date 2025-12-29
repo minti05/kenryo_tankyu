@@ -20,7 +20,7 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
   @override
   void initState() {
     super.initState();
-    debugPrint("現在のlikesは${widget.searched.vagueLikes}");
+
     likes = widget.searched.vagueLikes;
   }
 

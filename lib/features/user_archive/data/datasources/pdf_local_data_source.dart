@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
+
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:sqflite/sqflite.dart';
@@ -70,7 +70,7 @@ class PdfLocalDataSource {
     //idからpdfの種類を取得する
     final DocumentType documentType =
         DocumentType.values.firstWhere((e) => e.idSuffix == id.substring(7));
-    debugPrint('path: ${enterYear.name}/${documentType.name}/$id.pdf');
+
     final pathReference = _storage.ref().child(
         'works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
     const storage = 1024 * 1024 * 3;
@@ -78,7 +78,7 @@ class PdfLocalDataSource {
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。
     final Uint8List? remoteData = await pathReference.getData(storage);
     remoteData != null ? await insertPdf(id, remoteData) : null;
-    debugPrint(id);
+
     return remoteData;
   }
 
@@ -89,7 +89,7 @@ class PdfLocalDataSource {
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。
     final Uint8List? remoteData = await pathReference.getData(storage);
     remoteData != null ? await insertPdf(id, remoteData) : null;
-    debugPrint('リモートに保管されたpdfを取得しました。');
+
     return remoteData;
   }
 }

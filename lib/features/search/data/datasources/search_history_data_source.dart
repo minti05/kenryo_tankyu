@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -59,10 +58,7 @@ class SearchHistoryDataSource {
     if (maps.isEmpty) {
       return null;
     }
-    return List.generate(maps.length, (i) {
-      debugPrint(maps[i].toString());
-      return Search.fromJson(maps[i]);
-    });
+    return List.generate(maps.length, (i) => Search.fromJson(maps[i]));
   }
 }
 
