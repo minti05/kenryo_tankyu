@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/settings/data/datasources/datasources.dart';
-import 'package:kenryo_tankyu/features/settings/domain/repositories/repositories.dart';
+import 'package:kenryo_tankyu/features/settings/domain/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_repository_impl.g.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/features/auth/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/auth_app_bar.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/input_email.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/input_password_for_login.dart';
