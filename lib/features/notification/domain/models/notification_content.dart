@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kenryo_tankyu/core/utils/utils.dart';
+import 'package:kenryo_tankyu/core/utils/date_time_converter.dart';
 
 part 'notification_content.freezed.dart';
 part 'notification_content.g.dart';
@@ -13,7 +13,8 @@ abstract class NotificationContent with _$NotificationContent {
   const factory NotificationContent({
     required String id, //firestoreで自動で割り振られるID
     @NotificationTypeEnumConverter() required NotificationType type,
-    required String headerImagePath, //firestore databaseに保存されているpngファイル名（.pngを抜いて）
+    required String
+        headerImagePath, //firestore databaseに保存されているpngファイル名（.pngを抜いて）
     required String title,
     required String contents,
     @DateTimeConverter() required DateTime sendAt,
@@ -23,9 +24,9 @@ abstract class NotificationContent with _$NotificationContent {
 
   factory NotificationContent.fromJson(Map<String, dynamic> json) =>
       _$NotificationContentFromJson(json);
-  
-  factory NotificationContent.fromSQLite(Map<String,dynamic> json) {
-    final mutableJson = Map<String,dynamic>.from(json);
+
+  factory NotificationContent.fromSQLite(Map<String, dynamic> json) {
+    final mutableJson = Map<String, dynamic>.from(json);
     mutableJson['isRead'] = mutableJson['isRead'] == 1;
     final notification = NotificationContent.fromJson(mutableJson);
     return notification;
@@ -33,7 +34,7 @@ abstract class NotificationContent with _$NotificationContent {
 
   factory NotificationContent.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    final mutableJson = Map<String,dynamic>.from(data);
+    final mutableJson = Map<String, dynamic>.from(data);
     mutableJson['isRead'] = false;
     mutableJson['savedAt'] = DateTime.now();
     mutableJson['id'] = doc.id;
@@ -41,19 +42,21 @@ abstract class NotificationContent with _$NotificationContent {
     return notification;
   }
 
-  Map<String,dynamic> toSQLite() {
+  Map<String, dynamic> toSQLite() {
     final json = toJson();
     json['isRead'] = json['isRead'] ? 1 : 0;
     return json;
   }
 }
 
-enum NotificationType { //TODO アイコン吟味
+enum NotificationType {
+  //TODO アイコン吟味
   system(icon: Icons.notifications_active_rounded),
   update(icon: Icons.update),
   info(icon: Icons.info),
   warning(icon: Icons.warning),
-  other(icon: Icons.more_horiz),;
+  other(icon: Icons.more_horiz),
+  ;
 
   final IconData icon;
   const NotificationType({required this.icon});
