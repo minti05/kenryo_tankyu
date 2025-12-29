@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
-
-final searchHistoryProvider =
-    FutureProvider.autoDispose<List<Search>?>((ref) async {
-  return await SearchHistoryController.instance.getAllHistory();
-});
 
 class SearchHistoryController {
   static final SearchHistoryController _instance = SearchHistoryController._();
@@ -20,21 +14,19 @@ class SearchHistoryController {
       return openDatabase(
         join(await getDatabasesPath(), 'search_history.db'),
         onCreate: (db, version) {
-          return db.execute(
-            'CREATE TABLE search_history('
-            'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-            'category TEXT NOT NULL DEFAULT "", '
-            'subCategory TEXT NOT NULL DEFAULT "", '
-            'enterYear INTEGER NOT NULL DEFAULT 0, '
-            'eventName TEXT NOT NULL DEFAULT "", '
-            'course TEXT NOT NULL DEFAULT "", '
-            'searchWord TEXT NOT NULL DEFAULT "", '
-            'savedAt TEXT NOT NULL, '
-            'numberOfHits INTEGER NOT NULL DEFAULT 0, '
-            'CHECK(category != "" OR subCategory != "" OR enterYear != 0 OR eventName != "" OR course != "" OR searchWord != "") '
-            'UNIQUE(category, subCategory, enterYear, eventName, course, searchWord) '
-            ');'
-          );
+          return db.execute('CREATE TABLE search_history('
+              'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'category TEXT NOT NULL DEFAULT "", '
+              'subCategory TEXT NOT NULL DEFAULT "", '
+              'enterYear INTEGER NOT NULL DEFAULT 0, '
+              'eventName TEXT NOT NULL DEFAULT "", '
+              'course TEXT NOT NULL DEFAULT "", '
+              'searchWord TEXT NOT NULL DEFAULT "", '
+              'savedAt TEXT NOT NULL, '
+              'numberOfHits INTEGER NOT NULL DEFAULT 0, '
+              'CHECK(category != "" OR subCategory != "" OR enterYear != 0 OR eventName != "" OR course != "" OR searchWord != "") '
+              'UNIQUE(category, subCategory, enterYear, eventName, course, searchWord) '
+              ');');
         },
         version: 21,
       );

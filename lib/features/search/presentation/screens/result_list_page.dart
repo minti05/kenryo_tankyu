@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:kenryo_tankyu/core/constants/work/search_value.dart";
-import 'package:kenryo_tankyu/features/search/data/datasources/search_history_db.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_list_preview.dart'; // ResultList is here
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_header.dart';
@@ -68,7 +68,7 @@ class ResultListPage extends ConsumerWidget {
                         )); //TODO ユーザーに検索条件を変えさせるようにする。変えないと再読み込みできないようにしたい。
                       } else {
                         ///検索履歴に保存
-                        SearchHistoryController.instance.insertHistory(
+                        ref.read(searchHistoryControllerProvider).insertHistory(
                             provider.copyWith(
                                 savedAt: DateTime.now(),
                                 numberOfHits: data.length));

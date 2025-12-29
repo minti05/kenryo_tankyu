@@ -6,7 +6,7 @@ import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
-import 'package:kenryo_tankyu/features/search/data/datasources/search_history_db.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 
 class SearchHistoryList extends ConsumerWidget {
   const SearchHistoryList({super.key});
@@ -42,7 +42,10 @@ class SearchHistoryList extends ConsumerWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis),
                               ),
-                              Text(search.numberOfHits == 20 ? '20件+':' ${search.numberOfHits}件',
+                              Text(
+                                  search.numberOfHits == 20
+                                      ? '20件+'
+                                      : ' ${search.numberOfHits}件',
                                   style: const TextStyle(fontSize: 12)),
                             ],
                           ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/constants/work/sub_category_value.dart';
-import 'package:kenryo_tankyu/features/search/data/datasources/search_history_db.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 
@@ -100,7 +100,8 @@ class SearchPage extends ConsumerWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  SearchHistoryController.instance
+                                  ref
+                                      .read(searchHistoryControllerProvider)
                                       .deleteAllHistory();
                                   ref.invalidate(searchHistoryProvider);
                                   Navigator.of(context).pop();
