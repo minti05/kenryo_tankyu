@@ -1,6 +1,6 @@
 import 'dart:typed_data';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 
 abstract class UserArchiveRepository {
   // History

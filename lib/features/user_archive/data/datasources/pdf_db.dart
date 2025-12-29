@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
+import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';

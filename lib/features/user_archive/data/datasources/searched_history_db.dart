@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
