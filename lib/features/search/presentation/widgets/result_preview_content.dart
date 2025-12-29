@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/image_chip.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite.dart';
 
 class ResultPreviewContent extends ConsumerWidget {
@@ -38,9 +38,9 @@ class ResultPreviewContent extends ConsumerWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          SearchedHistoryController.instance
+                          ref
+                              .read(historyControllerProvider.notifier)
                               .deleteHistory(searched.documentID);
-                          ref.invalidate(searchedHistoryProvider);
                           Navigator.of(context).pop();
                         },
                         child: const Text('消去'),

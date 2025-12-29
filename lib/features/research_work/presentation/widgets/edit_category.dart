@@ -37,8 +37,7 @@ class _EditCategoryState extends State<EditCategory> {
     );
   }
 
-
-  Widget _buildRadioListTile( Searched searched) {
+  Widget _buildRadioListTile(Searched searched) {
     return RadioGroup(
       groupValue: selectedRadio,
       onChanged: (RadioValue? value) {
@@ -47,12 +46,12 @@ class _EditCategoryState extends State<EditCategory> {
       child: Column(
         children: [
           RadioListTile(
-              title:
-                  Text('${searched.category1.displayName} - ${searched.subCategory1.displayName}'),
+              title: Text(
+                  '${searched.category1.displayName} - ${searched.subCategory1.displayName}'),
               value: RadioValue.category1),
           RadioListTile(
-              title:
-                  Text('${searched.category2.displayName} - ${searched.subCategory2.displayName}'),
+              title: Text(
+                  '${searched.category2.displayName} - ${searched.subCategory2.displayName}'),
               value: RadioValue.category2),
         ],
       ),

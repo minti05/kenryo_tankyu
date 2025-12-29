@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:kenryo_tankyu/features/settings/data/datasources/datasources.dart';
 import 'package:kenryo_tankyu/features/settings/domain/repositories/repositories.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'settings_repository_impl.g.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
-  const SettingsRepositoryImpl(this._prefs);
+  const SettingsRepositoryImpl(this._dataSource);
 
-  final SharedPreferences _prefs;
-  static const _themeKey = 'themeModeCode';
+  final SettingsDataSource _dataSource;
 
   @override
   Future<ThemeMode> getThemeMode() async {
-    final themeCode = _prefs.getString(_themeKey) ?? 'system';
+    final themeCode = _dataSource.getThemeCode() ?? 'system';
     return ThemeMode.values.firstWhere(
       (e) => e.toString() == 'ThemeMode.$themeCode',
       orElse: () => ThemeMode.system,
@@ -19,6 +21,22 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<void> setThemeMode(ThemeMode themeMode) async {
-    await _prefs.setString(_themeKey, themeMode.toString().split('.').last);
+    await _dataSource.setThemeCode(themeMode.toString().split('.').last);
   }
+
+  @override
+  Future<bool> getNotificationEnabled() async {
+    return _dataSource.getNotificationEnabled() ?? false;
+  }
+
+  @override
+  Future<void> setNotificationEnabled(bool isEnabled) async {
+    await _dataSource.setNotificationEnabled(isEnabled);
+  }
+}
+
+@riverpod
+SettingsRepository settingsRepository(Ref ref) {
+  final dataSource = ref.watch(settingsDataSourceProvider);
+  return SettingsRepositoryImpl(dataSource);
 }

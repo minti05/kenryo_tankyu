@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kenryo_tankyu/features/auth/data/repositories/user_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -104,16 +104,16 @@ class VerifyNamePage extends ConsumerWidget {
     final auth = ref.watch(authProvider);
     final notifier = ref.read(authProvider.notifier);
     final emailAddress = '${auth.email}@kenryo.ed.jp';
-    final firestore = FirebaseFirestore.instance;
-    final searchTerms = firestore
-        .collection('users')
-        .where('email', isEqualTo: emailAddress)
-        .where('affiliation', isEqualTo: auth.affiliation?.name);
-    await searchTerms.get().then((value) async {
-      if (value.docs.isNotEmpty) {
-        final userName = value.docs[0].get('name');
+    
+    final userData = await ref.read(userRepositoryProvider).verifyUser(
+      email: emailAddress, 
+      affiliation: auth.affiliation?.name ?? ''
+    );
+    
+    if (userData != null) {
+        final userName = userData['name'];
         //登録済みかどうかを確認。登録済みならログイン画面への誘導をする。未登録ならアカウント作成画面へ。
-        final alreadyRegistered = value.docs[0].get('registered');
+        final alreadyRegistered = userData['registered'];
         if (alreadyRegistered) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -135,6 +135,6 @@ class VerifyNamePage extends ConsumerWidget {
       } else {
         notifier.decrementLimit();
       }
-    });
   }
-}
+  }
+

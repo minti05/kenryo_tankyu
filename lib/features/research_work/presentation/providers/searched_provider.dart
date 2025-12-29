@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:kenryo_tankyu/features/research_work/data/repositories/research_work_repository_impl.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+part 'searched_provider.g.dart';
 
 //全画面表示ボタンを表示するかしないかを管理するprovider
 final showFullScreenButtonProvider =
@@ -19,41 +19,42 @@ final isSameScreenProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 final forceReloadProvider = StateProvider.autoDispose<bool>((ref) => false);
 
-//作品データを取得するProvider
-final getFirestoreSearchedProvider =
-    FutureProvider.family.autoDispose<Searched, int>((ref, documentID) async {
-  final firestore = FirebaseFirestore.instance;
-  final forceReload = ref.read(forceReloadProvider); //ref.readなのは、このforceReloadが変更されてもこのproviderが自動的に発火しないようにするため。
-  if (forceReload) {
-    debugPrint("強制リロードするよー");
-    final serverSnapshot =
-        await firestore.collection('works').doc(documentID.toString()).get();
-    final isFavorite =
-        await SearchedHistoryController.instance.getFavoriteState(documentID);
-    final data = Searched.fromFirestore(serverSnapshot, isFavorite);
+@riverpod
+Future<Searched> researchWork(Ref ref, int documentID) async {
+  final repository = ref.watch(researchWorkRepositoryProvider);
+  final archiveRepo = ref.watch(userArchiveRepositoryProvider);
+  final forceReload = ref.read(forceReloadProvider);
 
-    debugPrint("取得データ　${data.toString()}");
-    ref.read(forceReloadProvider.notifier).state = false;
-    //firestoreから取得した時のみ、履歴に追加
-    SearchedHistoryController.instance.insertHistory(data);
-    return data.copyWith(isCached: false);
+  // Helper to fetch from server and update history
+  Future<Searched> fetchFromServer() async {
+    final data = await repository.getWork(documentID.toString());
+    final isFavorite = await archiveRepo.getFavoriteState(documentID);
+    final combined = data.copyWith(isFavorite: isFavorite, isCached: false);
+
+    // reset force flag if it was true? Legacy code did this.
+    if (forceReload) {
+      ref.read(forceReloadProvider.notifier).state = false;
+    }
+
+    // Update history
+    await archiveRepo.insertHistory(combined);
+    return combined;
+  }
+
+  if (forceReload) {
+    return fetchFromServer();
   } else {
-    final Searched? data =
-        await SearchedHistoryController.instance.getHistory(documentID);
-    if (data != null) {
-      debugPrint("キャッシュデータだよー ${data.toString()}");
-      return data;
+    final cached = await archiveRepo.getHistory(documentID);
+    if (cached != null) {
+      return cached;
     } else {
-      final serverSnapshot =
-          await firestore.collection('works').doc(documentID.toString()).get();
-      final isFavorite =
-          await SearchedHistoryController.instance.getFavoriteState(documentID);
-      final data = Searched.fromFirestore(serverSnapshot, isFavorite);
-      SearchedHistoryController.instance.insertHistory(data);
-      return data;
+      return fetchFromServer();
     }
   }
-});
+}
+
+// Keeping the old name for backward compatibility or refactoring UI in next steps
+final getFirestoreSearchedProvider = researchWorkProvider;
 
 //choiceChipの選択肢を管理する簡易的なProvider
 final intProvider = StateProvider.autoDispose((ref) => 0);

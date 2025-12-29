@@ -3,19 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/theme_providers.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 
 class CategoryList extends ConsumerWidget {
   const CategoryList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+    final themeModeAsync = ref.watch(themeModeProvider);
+    final themeMode = themeModeAsync.value ?? ThemeMode.system;
     final notifier = ref.read(searchProvider.notifier);
     return SizedBox(
       width: double.infinity,
       child: GridView.builder(
-        itemCount: Category.values.length -1,
+        itemCount: Category.values.length - 1,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(6.0),
@@ -41,22 +42,20 @@ class CategoryList extends ConsumerWidget {
                   SizedBox(
                     width: 50,
                     height: 50,
-                    child:
-                        Category.values[index] == Category.other
-                            ? themeMode == ThemeMode.dark
-                                ? Image.asset(
-                                    'assets/images/categories/${Category.values[index].name}_for_dark.png',
-                                    fit: BoxFit.contain,
-                                  )
-                                : Image.asset(
-                                    'assets/images/categories/${Category.values[index].name}_for_light.png',
-                                    fit: BoxFit.contain,
-                                  )
-                            :
-                    Image.asset(
-                      'assets/images/categories/${Category.values[index].name}.png',
-                      fit: BoxFit.contain,
-                    ),
+                    child: Category.values[index] == Category.other
+                        ? themeMode == ThemeMode.dark
+                            ? Image.asset(
+                                'assets/images/categories/${Category.values[index].name}_for_dark.png',
+                                fit: BoxFit.contain,
+                              )
+                            : Image.asset(
+                                'assets/images/categories/${Category.values[index].name}_for_light.png',
+                                fit: BoxFit.contain,
+                              )
+                        : Image.asset(
+                            'assets/images/categories/${Category.values[index].name}.png',
+                            fit: BoxFit.contain,
+                          ),
                   ),
                 ],
               ),

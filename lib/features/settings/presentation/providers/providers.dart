@@ -1,1 +1,1 @@
-export 'theme_providers.dart';
+export 'settings_providers.dart';

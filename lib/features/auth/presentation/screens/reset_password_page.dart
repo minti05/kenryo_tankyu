@@ -75,10 +75,8 @@ class ResetPasswordPage extends ConsumerWidget {
   }
 
   Future _sendResetMail(BuildContext context,WidgetRef ref, String email) async {
-    final firebaseAuth = FirebaseAuth.instance;
-    email = '$email@kenryo.ed.jp';
     try {
-      await firebaseAuth.sendPasswordResetEmail(email: email);
+      await ref.read(authProvider.notifier).sendPasswordResetEmail(email);
       ref.read(authProvider.notifier).changeVerifyEmail();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

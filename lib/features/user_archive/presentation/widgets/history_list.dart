@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
 
 class LibraryList extends ConsumerWidget {
   final bool onlyFavorite;
@@ -20,13 +20,14 @@ class LibraryList extends ConsumerWidget {
                     Text('$strありません。'),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                        onPressed: () => ref.invalidate(searchedHistoryProvider),
+                        onPressed: () => ref
+                            .invalidate(searchedHistoryProvider(onlyFavorite)),
                         child: const Text('リロードする')),
                   ],
                 )
               : RefreshIndicator(
                   onRefresh: () async {
-                    ref.invalidate(searchedHistoryProvider);
+                    ref.invalidate(searchedHistoryProvider(onlyFavorite));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -36,7 +37,10 @@ class LibraryList extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         return Consumer(builder: (context, ref, child) {
                           final searched = searcheds[index];
-                          return ResultPreviewContent(searched: searched, forLibrary: true,);
+                          return ResultPreviewContent(
+                            searched: searched,
+                            forLibrary: true,
+                          );
                         });
                       },
                       separatorBuilder: (BuildContext context, int index) {

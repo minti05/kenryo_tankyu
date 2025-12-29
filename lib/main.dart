@@ -3,19 +3,34 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/theme_providers.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:kenryo_tankyu/firebase_options.dart';
 import 'package:kenryo_tankyu/core/router/router.dart';
 import 'package:kenryo_tankyu/core/theme/theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 依存性の事前初期化 (Strict Initialization)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final sharedPreferences = await SharedPreferences.getInstance();
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const ProviderScope(child: MainApp()));
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const MainApp(),
+    ),
+  );
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -50,10 +65,10 @@ class _MainAppState extends ConsumerState<MainApp> {
   Widget build(BuildContext context) {
     final routerConfig = ref.watch(routesProvider);
     final themeMode = ref.watch(themeModeProvider).when(
-      data: (m) => m,
-      loading: () => ThemeMode.system,
-      error: (_, __) => ThemeMode.system,
-    );
+          data: (m) => m,
+          loading: () => ThemeMode.system,
+          error: (_, __) => ThemeMode.system,
+        );
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       //幅と高さの最小値に応じてテキストサイズを可変させるか

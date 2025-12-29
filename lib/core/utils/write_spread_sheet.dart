@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:flutter/services.dart';
+import 'package:kenryo_tankyu/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
 class EditSpreadSheet {
@@ -22,7 +22,7 @@ class EditSpreadSheet {
   Future<void> editSpreadSheet(BuildContext context, WidgetRef ref,
       Searched searched, String? selected) async {
     int number = 0;
-    String? userEmail =  FirebaseAuth.instance.currentUser?.email;
+    String? userEmail =  ref.read(authRepositoryProvider).currentUser?.email;
     List<String> values = [];
     await addDataToSheet(
         sheetListRange[number], values, userEmail?? 'guest', searched.documentID);

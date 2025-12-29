@@ -173,13 +173,8 @@ class _InputPasswordState extends ConsumerState<InputPassword> {
   Future<void> _createAccountWithEmailAndPassword(
       BuildContext context, WidgetRef ref, String password) async {
     ref.read(authProvider.notifier).changePassword(password);
-    final firebaseAuth = FirebaseAuth.instance;
-    final email = '${ref.watch(authProvider).email!}@kenryo.ed.jp';
     try {
-      await firebaseAuth
-          .createUserWithEmailAndPassword(email: email, password: password);
-      await firebaseAuth.currentUser?.updateDisplayName(ref.watch(authProvider).userName);
-      await firebaseAuth.currentUser?.sendEmailVerification();
+      await ref.read(authProvider.notifier).createUser(password);
       if(!context.mounted) return;
     } on FirebaseAuthException catch (e) {
       if(e.code == 'email-already-in-use') {

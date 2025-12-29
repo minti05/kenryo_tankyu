@@ -1,8 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 //現在のフッターの状態を管理するproider
@@ -20,7 +21,7 @@ class _FooterState extends ConsumerState<Footer> {
   @override
   void initState() {
     super.initState();
-    FirebaseMessaging.instance.getInitialMessage();
+    ref.read(firebaseMessagingProvider).getInitialMessage();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Got a message whilst in the foreground!');

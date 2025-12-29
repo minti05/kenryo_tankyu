@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/providers.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/datasources.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
 
 class DisplayPdf extends ConsumerWidget {
   final Searched searched;
@@ -19,7 +19,7 @@ class DisplayPdf extends ConsumerWidget {
           Consumer(builder: (context, ref, child) {
             final nowWatchingPdf = ref.watch(stringProvider);
             return FutureBuilder<Uint8List?>(
-              future: _getPdf(nowWatchingPdf),
+              future: _getPdf(ref, nowWatchingPdf),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasError) {
@@ -98,13 +98,10 @@ class DisplayPdf extends ConsumerWidget {
     );
   }
 
-  Future<Uint8List?> _getPdf(String id) async {
+  Future<Uint8List?> _getPdf(WidgetRef ref, String id) async {
     try {
-      final Uint8List? localData = await PdfDbController.instance.getLocalPdf(id);
-      if (localData != null) {
-        return localData;
-      }
-      return await PdfDbController.instance.getRemotePdf(id, searched.enterYear);
+      final repository = ref.read(userArchiveRepositoryProvider);
+      return await repository.getPdf(id, searched.enterYear);
     } catch (e) {
       debugPrint('PDFの取得中にエラーが発生しました: $e');
       rethrow;

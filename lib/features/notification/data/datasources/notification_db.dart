@@ -5,8 +5,8 @@ import 'package:sqflite/sqflite.dart';
 
 class NotificationDbController {
   //特定の日付以降のデータを取得する（多分使わない？？）
-  static Future<List<NotificationContent>> readFromFirestore(DateTime fromWhen) async {
-    final QuerySnapshot snapshot = await FirebaseFirestore.instance
+  static Future<List<NotificationContent>> readFromFirestore(DateTime fromWhen, FirebaseFirestore firestore) async {
+    final QuerySnapshot snapshot = await firestore
         .collection('notification')
         .where('sendAt', isGreaterThanOrEqualTo: fromWhen).limit(4)
         .get();
@@ -14,8 +14,8 @@ class NotificationDbController {
   } 
 
   //最新順に取得する
-  static Future<List<NotificationContent>> readFromFirestoreLatest() async {
-    final QuerySnapshot snapshot = await FirebaseFirestore.instance
+  static Future<List<NotificationContent>> readFromFirestoreLatest(FirebaseFirestore firestore) async {
+    final QuerySnapshot snapshot = await firestore
         .collection('notification')
         .orderBy('sendAt', descending: true).limit(4)
         .get();

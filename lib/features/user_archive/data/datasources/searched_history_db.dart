@@ -1,25 +1,16 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final searchedHistoryProvider = FutureProvider.family
-    .autoDispose<List<Searched>?, bool>((ref, onlyShowFavorite) async {
-  return onlyShowFavorite
-      ? await SearchedHistoryController.instance.getFavoriteHistory()
-      : await SearchedHistoryController.instance.getAllHistory();
-});
+part 'searched_history_db.g.dart';
 
-class SearchedHistoryController {
-  //シングルトンインスタンスを作成
-  //外部からこのコンストラクタを呼び出すことはできません (`_` を接頭辞につけることでプライベートにします)
-  static final SearchedHistoryController _instance =
-      SearchedHistoryController._();
-  SearchedHistoryController._();
-  // シングルトンインスタンスにアクセスするための公開メソッド↓
-  static SearchedHistoryController get instance => _instance;
-  //こうすることのメリットは、このクラスのインスタンスが1つしか生成されないことを保証することができること。？？？？
+@Riverpod(keepAlive: true)
+SearchedHistoryDataSource searchedHistoryDataSource(Ref ref) {
+  return SearchedHistoryDataSource();
+}
 
+class SearchedHistoryDataSource {
   Future<Database> get database async {
     try {
       return openDatabase(
@@ -64,8 +55,8 @@ class SearchedHistoryController {
     if (maps.isEmpty) {
       return null;
     }
-    final List<Searched> searchedList = List.generate(
-        maps.length, (index) => Searched.fromSQLite(maps[index]));
+    final List<Searched> searchedList =
+        List.generate(maps.length, (index) => Searched.fromSQLite(maps[index]));
     return searchedList;
   }
 
@@ -128,6 +119,7 @@ class SearchedHistoryController {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   Future<Searched?> getHistory(int documentID) async {
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('searched_history',
