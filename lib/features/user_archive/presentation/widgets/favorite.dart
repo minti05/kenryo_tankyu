@@ -63,7 +63,7 @@ class _FavoriteForResultPageState extends ConsumerState<FavoriteForResultPage> {
             final notifier = ref.read(
                 userIsFavoriteStateProvider(searched.documentID).notifier);
             final success =
-                await notifier.toggle(searched.documentID, isFavorite);
+                await notifier.toggle(searched.documentID, isFavorite, context);
 
             if (success) {
               setState(() {
@@ -144,7 +144,8 @@ class FavoriteForHistory extends ConsumerWidget {
       onPressed: () async {
         final notifier =
             ref.read(userIsFavoriteStateProvider(searched.documentID).notifier);
-        final success = await notifier.toggle(searched.documentID, isFavorite);
+        final success =
+            await notifier.toggle(searched.documentID, isFavorite, context);
         if (!success && context.mounted) {
           const snackBar = SnackBar(
               content: Text('データ保存中です。'),

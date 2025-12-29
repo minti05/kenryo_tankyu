@@ -8,6 +8,8 @@ import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
 
 import 'package:kenryo_tankyu/features/teacher/presentation/providers/teacher_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class ShowTeacherPdfPage extends ConsumerWidget {
   const ShowTeacherPdfPage({super.key});
@@ -37,16 +39,22 @@ class ShowTeacherPdfPage extends ConsumerWidget {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasError) {
-                    if (snapshot.error
-                        .toString()
-                        .contains('object-not-found')) {
+                    final error = snapshot.error;
+                    if (error is ServerFailure &&
+                        error.code == 'object-not-found') {
                       return const Center(
                           child: Text('これから出てくる予定だよ！',
                               style: TextStyle(fontSize: 20.0)));
-                    } else {
-                      return Center(
-                          child: Text('エラーが発生しました。${snapshot.error}'));
                     }
+                    return CommonErrorView(
+                      error: error ?? 'エラーが発生しました。',
+                      onRetry: () {
+                        // setState が使えないので画面全体をリビルドするか、
+                        // 本来は Provider を経由すべき。
+                        // 現状は FutureBuilder なので簡易的に。
+                        (context as Element).markNeedsBuild();
+                      },
+                    );
                   }
                   if (snapshot.data == null) {
                     return const Text('データがありません。');
