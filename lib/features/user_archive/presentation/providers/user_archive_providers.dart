@@ -1,19 +1,23 @@
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/repositories/user_archive_repository_impl.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_db.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_db.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_db.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
+import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'dart:typed_data';
 
 part 'user_archive_providers.g.dart';
 
 @riverpod
 UserArchiveRepository userArchiveRepository(Ref ref) {
-  final historyDataSource = ref.watch(searchedHistoryDataSourceProvider);
-  final pdfDataSource = ref.watch(pdfDbDataSourceProvider);
-  final recommendedDataSource = ref.watch(recommendedWorksDataSourceProvider);
+  final historyDataSource = ref.watch(searchedHistoryLocalDataSourceProvider);
+  final pdfDataSource = ref.watch(pdfLocalDataSourceProvider);
+  final recommendedDataSource =
+      ref.watch(recommendedWorksLocalDataSourceProvider);
   final remoteDataSource = ref.watch(userArchiveRemoteDataSourceProvider);
 
   return UserArchiveRepositoryImpl(
@@ -52,6 +56,8 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
     state = AsyncData(newFavoriteState);
     // Invalidate history provider so list updates
     ref.invalidate(searchedHistoryProvider);
+    // Invalidate full work details as well
+    ref.invalidate(researchWorkProvider(documentID));
   }
 
   Future<bool> toggle(int documentID, bool nowFavoriteState) async {
@@ -91,4 +97,16 @@ class HistoryController extends _$HistoryController {
     await repository.deleteHistory(id);
     ref.invalidate(searchedHistoryProvider);
   }
+}
+
+@riverpod
+Future<Uint8List?> pdf(Ref ref, String id, EnterYear enterYear) async {
+  final repository = ref.watch(userArchiveRepositoryProvider);
+  return repository.getPdf(id, enterYear);
+}
+
+@riverpod
+Future<Uint8List?> teacherPdf(Ref ref, String id) async {
+  final repository = ref.watch(userArchiveRepositoryProvider);
+  return repository.getTeacherPdf(id);
 }

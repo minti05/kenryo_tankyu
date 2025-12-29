@@ -51,7 +51,7 @@ final class UserArchiveRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$userArchiveRepositoryHash() =>
-    r'b8cacbb872ef809266a7a0ae3cef305fe903a0bd';
+    r'c6db8d55d13a427585aad30fe5e7eb0f4dc33f40';
 
 /// ボタン連打防止を管理するProvider
 
@@ -153,7 +153,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'd84be8310ec2691e078980f9053100f1c6c8ec3a';
+    r'eb87de2793a191986064b1386f096d537e8c8abd';
 
 /// documentIDごとにfavoriteかどうかを記録するProvider
 
@@ -325,4 +325,169 @@ abstract class _$HistoryController extends $Notifier<void> {
         AnyNotifier<void, void>, void, Object?, Object?>;
     element.handleValue(ref, null);
   }
+}
+
+@ProviderFor(pdf)
+const pdfProvider = PdfFamily._();
+
+final class PdfProvider extends $FunctionalProvider<AsyncValue<Uint8List?>,
+        Uint8List?, FutureOr<Uint8List?>>
+    with $FutureModifier<Uint8List?>, $FutureProvider<Uint8List?> {
+  const PdfProvider._(
+      {required PdfFamily super.from,
+      required (
+        String,
+        EnterYear,
+      )
+          super.argument})
+      : super(
+          retry: null,
+          name: r'pdfProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pdfHash();
+
+  @override
+  String toString() {
+    return r'pdfProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Uint8List?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Uint8List?> create(Ref ref) {
+    final argument = this.argument as (
+      String,
+      EnterYear,
+    );
+    return pdf(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PdfProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$pdfHash() => r'e8b84067365598b0b1df27f7834970290ee121d5';
+
+final class PdfFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<Uint8List?>,
+            (
+              String,
+              EnterYear,
+            )> {
+  const PdfFamily._()
+      : super(
+          retry: null,
+          name: r'pdfProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  PdfProvider call(
+    String id,
+    EnterYear enterYear,
+  ) =>
+      PdfProvider._(argument: (
+        id,
+        enterYear,
+      ), from: this);
+
+  @override
+  String toString() => r'pdfProvider';
+}
+
+@ProviderFor(teacherPdf)
+const teacherPdfProvider = TeacherPdfFamily._();
+
+final class TeacherPdfProvider extends $FunctionalProvider<
+        AsyncValue<Uint8List?>, Uint8List?, FutureOr<Uint8List?>>
+    with $FutureModifier<Uint8List?>, $FutureProvider<Uint8List?> {
+  const TeacherPdfProvider._(
+      {required TeacherPdfFamily super.from, required String super.argument})
+      : super(
+          retry: null,
+          name: r'teacherPdfProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$teacherPdfHash();
+
+  @override
+  String toString() {
+    return r'teacherPdfProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Uint8List?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Uint8List?> create(Ref ref) {
+    final argument = this.argument as String;
+    return teacherPdf(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TeacherPdfProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$teacherPdfHash() => r'057e15f2884799ab0241d6aacd45317bb29b587f';
+
+final class TeacherPdfFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Uint8List?>, String> {
+  const TeacherPdfFamily._()
+      : super(
+          retry: null,
+          name: r'teacherPdfProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  TeacherPdfProvider call(
+    String id,
+  ) =>
+      TeacherPdfProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'teacherPdfProvider';
 }
