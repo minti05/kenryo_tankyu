@@ -54,7 +54,7 @@ Future<Searched> researchWork(Ref ref, int documentID) async {
 }
 
 // Keeping the old name for backward compatibility or refactoring UI in next steps
-final getFirestoreSearchedProvider = researchWorkProvider;
+final searchedItemProvider = researchWorkProvider;
 
 //choiceChipの選択肢を管理する簡易的なProvider
 final intProvider = StateProvider.autoDispose((ref) => 0);

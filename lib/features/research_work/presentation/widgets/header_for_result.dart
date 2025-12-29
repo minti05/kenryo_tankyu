@@ -14,44 +14,46 @@ class HeaderForResultPage extends ConsumerWidget
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(getFirestoreSearchedProvider(searched.documentID));
+    final data = ref.watch(searchedItemProvider(searched.documentID));
     final String cachedText = searched.isCached ? '(オフラインから取得)' : '(オンラインから取得)';
     debugPrint(cachedText);
     return AppBar(
       actions: [
-        data.when(data: (searched){
-          return PopupMenuButton(
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem(
-                  onTap: (){
-                    //forceReloadProviderをtrueにして、再取得させる
-                    ref.read(forceReloadProvider.notifier).state = true;
-                    ref.invalidate(getFirestoreSearchedProvider(searched.documentID));
-                  },
-                  child: Text('リロードする$cachedText'),
-                ),
-                PopupMenuItem(
-                  onTap: ()=> Navigator.of(context).push(OverlayDialog(searched)),
-                  child: const Text('情報の変更を提案'),
-                ),
-                PopupMenuItem(
-                  onTap: () async {
-                    final data = ClipboardData(text: _setClipboard(searched));
-                    await Clipboard.setData(data);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('クリップボードにコピーしました')),
-                    );
-                  },
-                  child: const Text('情報をクリップボードにコピー'),
-                ),
-              ];
-            },
-          );
-        },
-        loading: () => const CircularProgressIndicator(),
-        error: (error, stackTrace) => const Text('エラーが発生しました。'),
-      ),
+        data.when(
+          data: (searched) {
+            return PopupMenuButton(
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    onTap: () {
+                      //forceReloadProviderをtrueにして、再取得させる
+                      ref.read(forceReloadProvider.notifier).state = true;
+                      ref.invalidate(searchedItemProvider(searched.documentID));
+                    },
+                    child: Text('リロードする$cachedText'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () =>
+                        Navigator.of(context).push(OverlayDialog(searched)),
+                    child: const Text('情報の変更を提案'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () async {
+                      final data = ClipboardData(text: _setClipboard(searched));
+                      await Clipboard.setData(data);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('クリップボードにコピーしました')),
+                      );
+                    },
+                    child: const Text('情報をクリップボードにコピー'),
+                  ),
+                ];
+              },
+            );
+          },
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stackTrace) => const Text('エラーが発生しました。'),
+        ),
       ],
     );
   }
