@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/providers.dart';
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 
 class WorkImageChip extends ConsumerWidget {
   final Searched searched;
@@ -40,8 +40,7 @@ class WorkImageChip extends ConsumerWidget {
           child: SizedBox(
               height: 25,
               width: 25,
-              child: Image.asset(
-                  _filePathName(searched.category2, themeMode))),
+              child: Image.asset(_filePathName(searched.category2, themeMode))),
         ),
       ],
     );
@@ -51,8 +50,7 @@ class WorkImageChip extends ConsumerWidget {
     return SizedBox(
       height: 40,
       width: 40,
-      child: Image.asset(
-          _filePathName(searched.category1, themeMode)),
+      child: Image.asset(_filePathName(searched.category1, themeMode)),
     );
   }
 

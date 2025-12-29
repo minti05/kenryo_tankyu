@@ -2,9 +2,11 @@
 
 import 'dart:convert';
 
-import 'package:kenryo_tankyu/core/constants/const.dart';
+import "package:kenryo_tankyu/core/constants/work/info_value.dart";
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kenryo_tankyu/core/utils/utils.dart';
+import 'package:kenryo_tankyu/core/utils/date_time_converter.dart';
 
 part 'search.freezed.dart';
 part 'search.g.dart';
@@ -19,8 +21,6 @@ part 'search.g.dart';
 
 @freezed
 abstract class Search with _$Search {
-
-
   @JsonSerializable(explicitToJson: true)
   const Search._();
 
@@ -35,7 +35,7 @@ abstract class Search with _$Search {
     @DateTimeConverter() DateTime? savedAt,
   }) = _Search;
 
-  factory Search.fromJson(Map<String,dynamic> json) => _$SearchFromJson(json);
+  factory Search.fromJson(Map<String, dynamic> json) => _$SearchFromJson(json);
 }
 
 class SearchWordConverter implements JsonConverter<List<String>, String> {

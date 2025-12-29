@@ -2,12 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/search/data/datasources/datasources.dart';
-import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
-import 'package:kenryo_tankyu/features/search/presentation/presentation.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/presentation/widget/widget.dart';
+import 'package:kenryo_tankyu/features/search/data/datasources/search_history_db.dart';
+import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
+import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 
+import 'package:kenryo_tankyu/features/search/presentation/widgets/search_header.dart';
+import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_list.dart';
+import 'package:kenryo_tankyu/features/search/presentation/widgets/search_history_list.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
+import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class SearchPage extends ConsumerWidget {
   const SearchPage({super.key});
@@ -20,11 +23,9 @@ class SearchPage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Column(
           children: [
-            Consumer(
-              builder: (context, ref, child) {
-                return _SelectedChipList(ref,context);
-              }
-            ),
+            Consumer(builder: (context, ref, child) {
+              return _SelectedChipList(ref, context);
+            }),
             Consumer(
               builder: (context, ref, child) {
                 final suggestCategory = ref.watch(suggestCategoryProvider);
@@ -60,9 +61,10 @@ class SearchPage extends ConsumerWidget {
                   return ListTile(
                     title: const Text('またはカテゴリから選ぶ'),
                     trailing: const Icon(Icons.navigate_next),
-                    onTap: () { 
+                    onTap: () {
                       ref.read(footerProvider.notifier).state = 1;
-                      context.go('/explore');},
+                      context.go('/explore');
+                    },
                   );
                 }
               },
@@ -132,8 +134,8 @@ class SearchPage extends ConsumerWidget {
       context.pushReplacement('/resultList');
     }
   }
-  
-  Widget _SelectedChipList(WidgetRef ref,BuildContext context) {
+
+  Widget _SelectedChipList(WidgetRef ref, BuildContext context) {
     final Search data = ref.watch(searchProvider);
     final bool isAllEmpty = data.searchWord.isEmpty &&
         data.category == Category.none &&
@@ -153,7 +155,8 @@ class SearchPage extends ConsumerWidget {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('現在の検索条件', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('現在の検索条件',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 SearchChipList(false),
               ],
             ),

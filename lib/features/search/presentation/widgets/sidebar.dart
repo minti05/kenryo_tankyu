@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/drop_button.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/sub_category_chip.dart';
 
@@ -28,9 +29,10 @@ class SideBar extends ConsumerWidget {
                         icon: const Icon(Icons.clear)),
                     const Expanded(child: Text('絞り込み')),
                     ElevatedButton(
-                        onPressed: () =>
-                            ref.read(searchProvider.notifier).deleteAllParameters(),
-                        child: const Text('条件をクリア')), 
+                        onPressed: () => ref
+                            .read(searchProvider.notifier)
+                            .deleteAllParameters(),
+                        child: const Text('条件をクリア')),
                   ],
                 ),
                 Consumer(builder: (context, ref, child) {
@@ -42,36 +44,48 @@ class SideBar extends ConsumerWidget {
                       SearchDropButton(
                           name: 'カテゴリ',
                           selectedText: data.category.displayName,
-                          choices: Category.values.map((e) => e.displayName).toList()),
+                          choices: Category.values
+                              .map((e) => e.displayName)
+                              .toList()),
                       const SizedBox(height: 15.0),
                       SearchDropButton(
-                          name: '期間', selectedText: data.enterYear.displayName.toString(), choices: EnterYear.values.map((e) => e.displayName.toString()).toList()),
+                          name: '期間',
+                          selectedText: data.enterYear.displayName.toString(),
+                          choices: EnterYear.values
+                              .map((e) => e.displayName.toString())
+                              .toList()),
                       const SizedBox(height: 15.0),
                       SearchDropButton(
                           name: 'イベント名',
                           selectedText: data.eventName.displayName,
-                          choices: EventName.values.map((e) => e.displayName).toList()),
+                          choices: EventName.values
+                              .map((e) => e.displayName)
+                              .toList()),
                       const SizedBox(height: 15.0),
                       SearchDropButton(
                           name: '学科指定',
                           selectedText: data.course.displayName,
-                          choices: Course.values.map((e) => e.displayName).toList()),
+                          choices:
+                              Course.values.map((e) => e.displayName).toList()),
                       const SizedBox(height: 15.0),
                       const Text('サブカテゴリを選択'),
                       data.category != Category.none
                           ? const SubCategoryChip()
-                          : const Text('カテゴリを選択してください',style: TextStyle(fontSize: 20),),
+                          : const Text(
+                              'カテゴリを選択してください',
+                              style: TextStyle(fontSize: 20),
+                            ),
                     ],
                   );
                 }),
-
                 const Spacer(),
                 Center(
                   child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                         ref.invalidate(algoliaSearchProvider);
-                      }, child: const Text('再検索する')),
+                      },
+                      child: const Text('再検索する')),
                 ),
               ],
             ),

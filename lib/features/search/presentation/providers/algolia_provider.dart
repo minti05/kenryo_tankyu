@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/data/repositories/search_repository_impl.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/providers.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 

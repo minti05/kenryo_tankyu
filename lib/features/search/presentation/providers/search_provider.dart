@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/search/domain/models/models.dart';
+import "package:kenryo_tankyu/core/constants/work/info_value.dart";
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
+import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 
 final suggestCategoryProvider = StateProvider<Category>((ref) => Category.none);
 final suggestSubCategoryProvider = StateProvider<SubCategory>((ref) => SubCategory.none);

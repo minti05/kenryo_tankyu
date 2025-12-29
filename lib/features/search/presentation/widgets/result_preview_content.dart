@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kenryo_tankyu/core/constants/const.dart';
-import 'package:kenryo_tankyu/features/research_work/domain/models/models.dart';
+import "package:kenryo_tankyu/core/constants/work/category_value.dart";
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/image_chip.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/providers/providers.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite.dart';
 
 class ResultPreviewContent extends ConsumerWidget {
