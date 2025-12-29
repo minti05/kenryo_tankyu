@@ -16,7 +16,9 @@ class ResearchWorkRepositoryImpl
   @override
   Future<Searched> getWork(String documentID) async {
     try {
-      return await _dataSource.fetchWork(documentID);
+      return await _dataSource
+          .fetchWork(documentID)
+          .timeout(const Duration(seconds: 5));
     } catch (e) {
       throw mapException(e);
     }

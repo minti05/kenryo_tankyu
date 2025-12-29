@@ -81,7 +81,9 @@ class UserArchiveRepositoryImpl
   @override
   Future<void> updateRemoteLikes(int documentID, bool isIncrement) async {
     try {
-      await _remoteDataSource.updateRemoteLikes(documentID, isIncrement);
+      await _remoteDataSource
+          .updateRemoteLikes(documentID, isIncrement)
+          .timeout(const Duration(seconds: 5));
     } catch (e) {
       throw mapException(e);
     }
@@ -126,7 +128,9 @@ class UserArchiveRepositoryImpl
   @override
   Future<Uint8List?> getRemotePdf(String id, EnterYear enterYear) async {
     try {
-      return await _pdfDataSource.getRemotePdf(id, enterYear);
+      return await _pdfDataSource
+          .getRemotePdf(id, enterYear)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       throw mapException(e);
     }
@@ -139,7 +143,9 @@ class UserArchiveRepositoryImpl
       if (localData != null) {
         return localData;
       }
-      return await _pdfDataSource.getRemotePdf(id, enterYear);
+      return await _pdfDataSource
+          .getRemotePdf(id, enterYear)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       throw mapException(e);
     }
@@ -152,7 +158,9 @@ class UserArchiveRepositoryImpl
       if (localData != null) {
         return localData;
       }
-      return await _pdfDataSource.getRemotePdfForTeacher(id);
+      return await _pdfDataSource
+          .getRemotePdfForTeacher(id)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       throw mapException(e);
     }
@@ -161,7 +169,9 @@ class UserArchiveRepositoryImpl
   @override
   Future<Uint8List?> getRemotePdfForTeacher(String id) async {
     try {
-      return await _pdfDataSource.getRemotePdfForTeacher(id);
+      return await _pdfDataSource
+          .getRemotePdfForTeacher(id)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       throw mapException(e);
     }

@@ -22,7 +22,9 @@ class NotificationRepositoryImpl
       if (localData != null && localData.isNotEmpty) {
         return localData;
       } else {
-        return await _remoteDataSource.fetchLatestNotifications();
+        return await _remoteDataSource
+            .fetchLatestNotifications()
+            .timeout(const Duration(seconds: 5));
       }
     } catch (e) {
       throw mapException(e);

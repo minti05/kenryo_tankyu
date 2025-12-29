@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/auth/domain/repositories/auth_repository.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 
-class AuthRepositoryImpl implements AuthRepository {
+class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
   final AuthRemoteDataSource _dataSource;
   AuthRepositoryImpl(this._dataSource);
 
@@ -17,12 +18,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signInWithEmailAndPassword(
       {required String email, required String password}) async {
     try {
-      await _dataSource.signInWithEmailAndPassword(
-          email: email, password: password);
+      await _dataSource
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(const Duration(seconds: 10));
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseException(e);
     } catch (e) {
-      throw UnknownAuthFailure(message: e.toString());
+      throw mapException(e);
     }
   }
 
@@ -30,52 +32,84 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> createUserWithEmailAndPassword(
       {required String email, required String password}) async {
     try {
-      await _dataSource.createUserWithEmailAndPassword(
-          email: email, password: password);
+      await _dataSource
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .timeout(const Duration(seconds: 10));
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseException(e);
     } catch (e) {
-      throw UnknownAuthFailure(message: e.toString());
+      throw mapException(e);
     }
   }
 
   @override
   Future<void> updateDisplayName(String name) async {
-    await _dataSource.updateDisplayName(name);
+    try {
+      await _dataSource
+          .updateDisplayName(name)
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   @override
-  Future<void> sendPasswordResetEmail({required String email}) {
-    return _dataSource.sendPasswordResetEmail(email: email);
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await _dataSource
+          .sendPasswordResetEmail(email: email)
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   @override
-  Future<void> signOut() {
-    return _dataSource.signOut();
+  Future<void> signOut() async {
+    try {
+      await _dataSource.signOut().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   @override
   Future<void> deleteUser() async {
-    await _dataSource.deleteUser();
+    try {
+      await _dataSource.deleteUser().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   @override
   Future<void> sendEmailVerification() async {
-    await _dataSource.sendEmailVerification();
+    try {
+      await _dataSource
+          .sendEmailVerification()
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   @override
   Future<void> reloadUser() async {
     try {
-      await _dataSource.reloadUser();
+      await _dataSource.reloadUser().timeout(const Duration(seconds: 5));
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseException(e);
     } catch (e) {
-      throw UnknownAuthFailure(message: e.toString());
+      throw mapException(e);
     }
   }
 
   AuthFailure _mapFirebaseException(FirebaseAuthException e) {
+    if (e.code == 'unavailable' || e.code == 'network-request-failed') {
+      // この場合は AuthFailure のどれかにマッピングするか、Failure を投げる
+      // 基盤側と合わせるなら Failure を投げたいが、Repository のシグネチャが AuthFailure を期待している場合がある
+      // 今回は既存の AuthFailure に Network 系のものがないので、Unknown に入れるか追加を検討。
+    }
     switch (e.code) {
       case 'user-not-found':
         return const UserNotFound();

@@ -34,8 +34,9 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
     );
 
     try {
-      final SearchResponse response =
-          await _dataSource.searchIndex(request: queryHits);
+      final SearchResponse response = await _dataSource
+          .searchIndex(request: queryHits)
+          .timeout(const Duration(seconds: 5));
       final List<Hit> hits = response.hits;
       if (hits.isEmpty) {
         return null;
@@ -72,7 +73,9 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
           page: page,
           hitsPerPage: 1,
         );
-        final resp = await _dataSource.searchIndex(request: query);
+        final resp = await _dataSource
+            .searchIndex(request: query)
+            .timeout(const Duration(seconds: 5));
         final hits = resp.hits;
         results.addAll(hits.map((e) => Searched.fromAlgolia(e, false)));
       }

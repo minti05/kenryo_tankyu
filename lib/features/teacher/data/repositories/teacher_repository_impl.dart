@@ -48,7 +48,9 @@ class TeacherRepositoryImpl with ErrorMapper implements TeacherRepository {
   }
 
   Future<Map<String, dynamic>> _fetchAndCache() async {
-    final data = await _remoteDataSource.fetchTeachers();
+    final data = await _remoteDataSource
+        .fetchTeachers()
+        .timeout(const Duration(seconds: 5));
     final map = {
       'teachers': data['teachers'],
       'lastViewed': DateTime.now().toIso8601String(),

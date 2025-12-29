@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
@@ -6,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 /// リポジトリ層で例外を Failure に変換するための Mixin
 mixin ErrorMapper {
   Failure mapException(dynamic e) {
-    if (e is SocketException) {
+    if (e is SocketException || e is TimeoutException) {
       return const NetworkFailure();
     }
 
