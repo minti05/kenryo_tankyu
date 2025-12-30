@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,10 +13,19 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   Future<void> setThemeMode(ThemeMode mode) async {
     await ref.read(settingsRepositoryProvider).setThemeMode(mode);
+    ref.invalidate(themeModeProvider);
   }
 
   Future<void> setNotification(bool enabled) async {
     await ref.read(settingsRepositoryProvider).setNotificationEnabled(enabled);
+    ref.invalidate(notificationEnabledProvider);
+  }
+
+  Future<void> setHasShownNotificationDialog(bool hasShown) async {
+    await ref
+        .read(settingsRepositoryProvider)
+        .setHasShownNotificationDialog(hasShown);
+    ref.invalidate(hasShownNotificationDialogProvider);
   }
 }
 
@@ -29,4 +37,9 @@ Future<ThemeMode> themeMode(Ref ref) {
 @riverpod
 Future<bool> notificationEnabled(Ref ref) {
   return ref.watch(settingsRepositoryProvider).getNotificationEnabled();
+}
+
+@riverpod
+Future<bool> hasShownNotificationDialog(Ref ref) {
+  return ref.watch(settingsRepositoryProvider).getHasShownNotificationDialog();
 }

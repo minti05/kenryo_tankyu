@@ -51,4 +51,4 @@ final class SettingsDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$settingsDataSourceHash() =>
-    r'0573753c6a3c131df954b07e74eace08dc486b8d';
+    r'acf1261f5c77bf4974c44154836a8ad4aea5be01';

@@ -45,7 +45,7 @@ final class ConnectivityProvider extends $FunctionalProvider<
   }
 }
 
-String _$connectivityHash() => r'f18900083489763ed4066a1c33ea0447ca0093fc';
+String _$connectivityHash() => r'69c6e2db8337a9ff832358c4a079a4846fa6f28c';
 
 @ProviderFor(isConnected)
 const isConnectedProvider = IsConnectedProvider._();
@@ -85,4 +85,4 @@ final class IsConnectedProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$isConnectedHash() => r'964e634bbb78ece9fe7b257f1c9b470584c741db';
+String _$isConnectedHash() => r'2a70184c41fefe3e01892efe80261d10126ec690';

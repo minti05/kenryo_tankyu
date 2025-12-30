@@ -5,29 +5,39 @@ import 'package:sqflite/sqflite.dart';
 
 class NotificationDbController {
   //特定の日付以降のデータを取得する（多分使わない？？）
-  static Future<List<NotificationContent>> readFromFirestore(DateTime fromWhen, FirebaseFirestore firestore) async {
+  static Future<List<NotificationContent>> readFromFirestore(
+      DateTime fromWhen, FirebaseFirestore firestore) async {
     final QuerySnapshot snapshot = await firestore
         .collection('notification')
-        .where('sendAt', isGreaterThanOrEqualTo: fromWhen).limit(4)
+        .where('sendAt', isGreaterThanOrEqualTo: fromWhen)
+        .limit(4)
         .get();
-    return snapshot.docs.map((doc) => NotificationContent.fromFirestore(doc)).toList();
-  } 
+    return snapshot.docs
+        .map((doc) => NotificationContent.fromFirestore(doc))
+        .toList();
+  }
 
   //最新順に取得する
-  static Future<List<NotificationContent>> readFromFirestoreLatest(FirebaseFirestore firestore) async {
+  static Future<List<NotificationContent>> readFromFirestoreLatest(
+      FirebaseFirestore firestore) async {
     final QuerySnapshot snapshot = await firestore
         .collection('notification')
-        .orderBy('sendAt', descending: true).limit(4)
+        .orderBy('sendAt', descending: true)
+        .limit(4)
         .get();
-    return snapshot.docs.map((doc) => NotificationContent.fromFirestore(doc)).toList();
+    return snapshot.docs
+        .map((doc) => NotificationContent.fromFirestore(doc))
+        .toList();
   }
+
+  static const String tableSettings = 'app_settings';
 
   static Future<Database> get database async {
     try {
       return openDatabase(
         join(await getDatabasesPath(), 'notification.db'),
-        onCreate: (db, version) {
-          return db.execute(
+        onCreate: (db, version) async {
+          await db.execute(
             'CREATE TABLE notification('
             'id INTEGER PRIMARY KEY AUTOINCREMENT,'
             'type TEXT NOT NULL, '
@@ -40,12 +50,53 @@ class NotificationDbController {
             'CHECK(title != "" OR contents != "") '
             ');',
           );
+          await db.execute(
+            'CREATE TABLE $tableSettings('
+            'key TEXT PRIMARY KEY,'
+            'value TEXT'
+            ');',
+          );
         },
-        version: 2,
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2) {
+            // バージョン2での変更があればここに記述
+          }
+          if (oldVersion < 3) {
+            await db.execute(
+              'CREATE TABLE $tableSettings('
+              'key TEXT PRIMARY KEY,'
+              'value TEXT'
+              ');',
+            );
+          }
+        },
+        version: 3,
       );
     } catch (error, stackTrace) {
       return Future.error(error, stackTrace);
     }
+  }
+
+  // 設定値の保存
+  static Future<void> upsertSetting(String key, String value) async {
+    final Database db = await database;
+    await db.insert(
+      tableSettings,
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // 設定値の取得
+  static Future<String?> getSetting(String key) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableSettings,
+      where: 'key = ?',
+      whereArgs: [key],
+    );
+    if (maps.isEmpty) return null;
+    return maps.first['value'] as String;
   }
 
   static Future<void> insert(NotificationContent notification) async {

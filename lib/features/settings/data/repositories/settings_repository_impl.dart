@@ -12,9 +12,10 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<ThemeMode> getThemeMode() async {
-    final themeCode = _dataSource.getThemeCode() ?? 'system';
+    final themeCode = await _dataSource.getThemeCode();
+    final effectiveThemeCode = themeCode ?? 'system';
     return ThemeMode.values.firstWhere(
-      (e) => e.toString() == 'ThemeMode.$themeCode',
+      (e) => e.toString() == 'ThemeMode.$effectiveThemeCode',
       orElse: () => ThemeMode.system,
     );
   }
@@ -26,12 +27,24 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<bool> getNotificationEnabled() async {
-    return _dataSource.getNotificationEnabled() ?? false;
+    final enabled = await _dataSource.getNotificationEnabled();
+    return enabled ?? false;
   }
 
   @override
   Future<void> setNotificationEnabled(bool isEnabled) async {
     await _dataSource.setNotificationEnabled(isEnabled);
+  }
+
+  @override
+  Future<bool> getHasShownNotificationDialog() async {
+    final hasShown = await _dataSource.getHasShownNotificationDialog();
+    return hasShown ?? false;
+  }
+
+  @override
+  Future<void> setHasShownNotificationDialog(bool hasShown) async {
+    await _dataSource.setHasShownNotificationDialog(hasShown);
   }
 }
 
