@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
@@ -6,13 +6,19 @@ import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart
 import 'package:kenryo_tankyu/features/search/data/repositories/search_repository_impl.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
-
+import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 final algoliaSearchProvider =
     FutureProvider.autoDispose<List<Searched>?>((ref) async {
+  final isConnected = ref.watch(isConnectedProvider);
+  if (!isConnected) {
+    throw const NetworkFailure();
+  }
+
   final search =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
 
@@ -87,30 +93,6 @@ final randomAlgoliaSearchProvider =
     final results =
         await searchRepository.getRandomWorks(count: 2, maxItems: 250);
 
-    // Save to recommended history? The original code didn't explicitly save here?
-    // Wait, original code:
-    // ... logic ...
-    // return [...objects, ...objects2];
-
-    // Wait, check UserArchiveRepository.saveRecommendedWorks.
-    // It is called somewhere?
-    // In original code in algolia_provider.dart, it was NOT calling saveRecommendedWorks.
-    // That means saving might happen in UI or somewhere else?
-    // Or maybe I missed it.
-    // Let's assume it should return results.
-
-    // However, if we want to CACHE it for next time (Step: loadRecommendedWorks checks cache),
-    // we MUST save it.
-    // Original code:
-    // final data = await repository.loadRecommendedWorks();
-    // ... if cache hit ... return data;
-    // ... else ... fetch algolia ... return results;
-    // It NEVER SAVED to cache in the provider.
-    // Maybe `loadRecommendedWorks` reads from a DB that is populated elsewhere?
-    // Or the original code was missing the save logic?
-    // It seems missing in `algolia_provider.dart` (Step 181).
-    // But `UserArchiveRepository` has `saveRecommendedWorks`.
-    // I will add saving logic here to make the cache work, assuming that was the intent.
     if (results.length >= 2) {
       await archiveRepository.saveRecommendedWorks(results[0], results[1]);
     }

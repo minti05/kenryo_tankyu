@@ -1,7 +1,7 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/teacher/data/datasources/teacher_local_data_source.dart';
 import 'package:kenryo_tankyu/features/teacher/data/datasources/teacher_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'teacher_repository_impl.g.dart';
 
-class TeacherRepositoryImpl implements TeacherRepository {
+class TeacherRepositoryImpl with ErrorMapper implements TeacherRepository {
   TeacherRepositoryImpl(this._localDataSource, this._remoteDataSource);
 
   final TeacherLocalDataSource _localDataSource;
@@ -43,13 +43,14 @@ class TeacherRepositoryImpl implements TeacherRepository {
         return _parseTeacherList(data);
       }
     } catch (e) {
-      debugPrint("教師データ取得エラー: $e");
-      return [];
+      throw mapException(e);
     }
   }
 
   Future<Map<String, dynamic>> _fetchAndCache() async {
-    final data = await _remoteDataSource.fetchTeachers();
+    final data = await _remoteDataSource
+        .fetchTeachers()
+        .timeout(const Duration(seconds: 5));
     final map = {
       'teachers': data['teachers'],
       'lastViewed': DateTime.now().toIso8601String(),

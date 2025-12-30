@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class LibraryList extends ConsumerWidget {
   final bool onlyFavorite;
@@ -56,7 +57,11 @@ class LibraryList extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (Object error, StackTrace stackTrace) {
-          return Center(child: Text(error.toString()));
+          return CommonErrorView(
+            error: error,
+            onRetry: () =>
+                ref.invalidate(searchedHistoryProvider(onlyFavorite)),
+          );
         });
   }
 }

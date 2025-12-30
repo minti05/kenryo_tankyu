@@ -8,6 +8,7 @@ import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_reposito
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -30,9 +31,43 @@ class SettingsPage extends ConsumerWidget {
                 value: notification,
                 onChanged: (bool value) async {
                   if (value) {
+                    final status = await Permission.notification.status;
+                    if (status.isPermanentlyDenied) {
+                      if (context.mounted) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('通知が許可されていません'),
+                            content:
+                                const Text('通知を受け取るには、システム設定から通知を許可してください。'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('キャンセル'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  openAppSettings();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('設定を開く'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return;
+                    }
+
+                    if (status.isDenied) {
+                      final requestStatus =
+                          await Permission.notification.request();
+                      if (!requestStatus.isGranted) return;
+                    }
+
                     final fcm = ref.read(firebaseMessagingProvider);
                     final token = await fcm.getToken();
-                    debugPrint(token);
+                    debugPrint('FCM Token: $token');
                   }
                   ref.read(settingsProvider.notifier).setNotification(value);
                 },

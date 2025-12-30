@@ -1,13 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/teacher/domain/models/teacher.dart';
 
 import 'package:kenryo_tankyu/features/teacher/presentation/providers/teacher_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class ShowTeacherPdfPage extends ConsumerWidget {
   const ShowTeacherPdfPage({super.key});
@@ -32,36 +31,35 @@ class ShowTeacherPdfPage extends ConsumerWidget {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<Uint8List?>(
-              future: _getPdf(ref, selectedTeacher.filename),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    if (snapshot.error
-                        .toString()
-                        .contains('object-not-found')) {
+            child: ref.watch(teacherPdfProvider(selectedTeacher.filename)).when(
+                  data: (data) {
+                    if (data == null) {
+                      return const Center(child: Text('データがありません。'));
+                    }
+                    return PDFView(
+                      pdfData: data,
+                      enableSwipe: true,
+                      autoSpacing: true,
+                      pageFling: true,
+                      pageSnap: false,
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) {
+                    if (error is ServerFailure &&
+                        error.code == 'object-not-found') {
                       return const Center(
                           child: Text('これから出てくる予定だよ！',
                               style: TextStyle(fontSize: 20.0)));
-                    } else {
-                      return Center(
-                          child: Text('エラーが発生しました。${snapshot.error}'));
                     }
-                  }
-                  if (snapshot.data == null) {
-                    return const Text('データがありません。');
-                  }
-                  return PDFView(
-                    pdfData: snapshot.data!,
-                    enableSwipe: true,
-                    autoSpacing: true,
-                    pageFling: true,
-                    pageSnap: false,
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
+                    return CommonErrorView(
+                      error: error,
+                      onRetry: () => ref.invalidate(
+                          teacherPdfProvider(selectedTeacher.filename)),
+                    );
+                  },
+                ),
           ),
         ],
       ),
@@ -88,10 +86,5 @@ class ShowTeacherPdfPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<Uint8List?> _getPdf(WidgetRef ref, String id) async {
-    final repository = ref.read(userArchiveRepositoryProvider);
-    return await repository.getTeacherPdf(id);
   }
 }

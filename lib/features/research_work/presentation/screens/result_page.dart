@@ -9,6 +9,7 @@ import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_t
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_details_table.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/pdf_choice_chip.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/display_pdf.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 import 'package:screen_capture_event/screen_capture_event.dart';
 
 class ResultPage extends ConsumerStatefulWidget {
@@ -74,11 +75,15 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
       },
       loading: () => Scaffold(
         appBar: AppBar(),
-        body: Center(child: const CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, stack) => Scaffold(
         appBar: AppBar(),
-        body: Center(child: Text(error.toString())),
+        body: CommonErrorView(
+          error: error,
+          onRetry: () =>
+              ref.invalidate(searchedItemProvider(widget.documentID)),
+        ),
       ),
     );
   }

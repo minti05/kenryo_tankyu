@@ -1,46 +1,63 @@
-import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'datasources.g.dart';
 
 abstract class SettingsDataSource {
-  String? getThemeCode();
+  Future<String?> getThemeCode();
   Future<void> setThemeCode(String themeCode);
-  bool? getNotificationEnabled();
+  Future<bool?> getNotificationEnabled();
   Future<void> setNotificationEnabled(bool isEnabled);
+  Future<bool?> getHasShownNotificationDialog();
+  Future<void> setHasShownNotificationDialog(bool hasShown);
 }
 
 class SettingsDataSourceImpl implements SettingsDataSource {
-  SettingsDataSourceImpl(this._prefs);
-  final SharedPreferences _prefs;
+  SettingsDataSourceImpl();
 
   static const _themeKey = 'themeModeCode';
   static const _notificationKey = 'isNotification';
+  static const _hasShownNotificationDialogKey = 'hasShownNotificationDialog';
 
   @override
-  String? getThemeCode() {
-    return _prefs.getString(_themeKey);
+  Future<String?> getThemeCode() async {
+    return await NotificationDbController.getSetting(_themeKey);
   }
 
   @override
   Future<void> setThemeCode(String themeCode) async {
-    await _prefs.setString(_themeKey, themeCode);
+    await NotificationDbController.upsertSetting(_themeKey, themeCode);
   }
 
   @override
-  bool? getNotificationEnabled() {
-    return _prefs.getBool(_notificationKey);
+  Future<bool?> getNotificationEnabled() async {
+    final value = await NotificationDbController.getSetting(_notificationKey);
+    if (value == null) return null;
+    return value == 'true';
   }
 
   @override
   Future<void> setNotificationEnabled(bool isEnabled) async {
-    await _prefs.setBool(_notificationKey, isEnabled);
+    await NotificationDbController.upsertSetting(
+        _notificationKey, isEnabled.toString());
+  }
+
+  @override
+  Future<bool?> getHasShownNotificationDialog() async {
+    final value = await NotificationDbController.getSetting(
+        _hasShownNotificationDialogKey);
+    if (value == null) return null;
+    return value == 'true';
+  }
+
+  @override
+  Future<void> setHasShownNotificationDialog(bool hasShown) async {
+    await NotificationDbController.upsertSetting(
+        _hasShownNotificationDialogKey, hasShown.toString());
   }
 }
 
 @riverpod
 SettingsDataSource settingsDataSource(Ref ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return SettingsDataSourceImpl(prefs);
+  return SettingsDataSourceImpl();
 }

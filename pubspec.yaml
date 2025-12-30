@@ -66,6 +66,7 @@ dependencies:
   flutter_lazy_indexed_stack: ^0.1.0
   algoliasearch: ^1.38.0
   algolia_helper_flutter: ^1.4.0
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:

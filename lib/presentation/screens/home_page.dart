@@ -7,13 +7,40 @@ import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_pro
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
-class HomePage extends ConsumerWidget {
+import 'package:kenryo_tankyu/features/notification/presentation/widgets/notification_permission_dialog.dart';
+import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
+
+class HomePage extends ConsumerStatefulWidget {
   static HomePage builder(BuildContext context, GoRouterState state) =>
       const HomePage();
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationPermission();
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    // 描画完了後にダイアログを表示
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final hasShown =
+          await ref.read(hasShownNotificationDialogProvider.future);
+      if (!hasShown) {
+        if (mounted) {
+          await showNotificationPermissionDialog(context);
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profileName = developer_mode
         ? 'ゲスト'
         : ref.watch(authRepositoryProvider).currentUser?.displayName ?? 'ゲスト';
@@ -80,33 +107,9 @@ class HomePage extends ConsumerWidget {
             const SizedBox(height: 8),
             const ContentCarousel(),
             const SizedBox(height: 16),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     const Text('お知らせ',
-            //         style:
-            //             TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            //     TextButton(
-            //       onPressed: () => context.push('/notifications'),
-            //       style: TextButton.styleFrom(
-            //           side: const BorderSide(color: Colors.grey)),
-            //       child: const Text('もっと見る'),
-            //     )
-            //   ],
-            // ),
-            // const SizedBox(height: 8),
-            // Card(
-            //   margin: EdgeInsets.symmetric(horizontal: 8.0),
-            //   child: SizedBox(
-            //     height: 400,
-            //     child: NotificationList(notifications: [testNotificationValue]),
-            //   ),
-            // ),
           ],
         ),
       ),
     );
   }
 }
-
-// now let's test on android emulator

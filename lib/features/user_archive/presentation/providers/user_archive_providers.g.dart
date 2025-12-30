@@ -153,7 +153,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'eb87de2793a191986064b1386f096d537e8c8abd';
+    r'9f0f34dfbd030358810094267d9fa98a2a03a557';
 
 /// documentIDごとにfavoriteかどうかを記録するProvider
 
