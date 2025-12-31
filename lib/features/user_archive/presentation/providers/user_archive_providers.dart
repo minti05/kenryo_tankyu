@@ -41,7 +41,6 @@ class AbleChangeFavorite extends _$AbleChangeFavorite {
   void set(bool value) => state = value;
 }
 
-/// documentIDごとにfavoriteかどうかを記録するProvider
 @riverpod
 class UserIsFavoriteState extends _$UserIsFavoriteState {
   @override
@@ -50,49 +49,44 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
     return repository.getFavoriteState(documentID);
   }
 
-  Future<void> changeIsFavorite(int documentID, bool nowFavoriteState) async {
-    final bool newFavoriteState = !nowFavoriteState;
+  /// お気に入り状態を反転させる
+  /// [documentID] 対象のドキュメントID
+  /// [context] エラーダイアログ表示用。Widget側でmountedチェックをしてから渡すこと。
+  Future<void> toggle(int documentID, BuildContext context) async {
+    // すでに処理中の場合は何もしない（連打防止）
+    if (state.isLoading) return;
+
     final repository = ref.read(userArchiveRepositoryProvider);
+    final previousState = state;
+    final bool currentIsFavorite = state.asData?.value ?? false;
+    final bool nextIsFavorite = !currentIsFavorite;
 
-    // Repository handles both local DB and remote Firestore updates
-    await repository.changeFavoriteState(documentID, newFavoriteState);
+    // ローディング状態に移行
+    state = const AsyncLoading<bool>();
 
-    state = AsyncValue.data(newFavoriteState);
-    // Invalidate history provider so list updates
-    ref.invalidate(searchedHistoryProvider);
-    // Invalidate full work details as well
-    ref.invalidate(researchWorkProvider(documentID));
-  }
+    state = await AsyncValue.guard(() async {
+      // Repository handles both local DB and remote Firestore updates
+      await repository.changeFavoriteState(documentID, nextIsFavorite);
 
-  Future<bool> toggle(
-      int documentID, bool nowFavoriteState, BuildContext context) async {
-    final canChange = ref.read(ableChangeFavoriteProvider);
-    if (!canChange) return false;
+      // 関連するProviderを無効化
+      ref.invalidate(searchedHistoryProvider);
+      ref.invalidate(researchWorkProvider(documentID));
 
-    ref.read(ableChangeFavoriteProvider.notifier).set(false);
-
-    try {
-      await changeIsFavorite(documentID, nowFavoriteState);
-    } on Failure catch (e) {
-      if (context.mounted) {
-        showErrorDialog(context, e);
-      }
-      ref.read(ableChangeFavoriteProvider.notifier).set(true);
-      return false;
-    } catch (e) {
-      if (context.mounted) {
-        showErrorDialog(context, UnknownFailure(message: e.toString()));
-      }
-      ref.read(ableChangeFavoriteProvider.notifier).set(true);
-      return false;
-    }
-
-    // Don't await the delay for the return, but do await it for the flag reset
-    Future.delayed(const Duration(seconds: 2)).then((_) {
-      ref.read(ableChangeFavoriteProvider.notifier).set(true);
+      return nextIsFavorite;
     });
 
-    return true;
+    // エラーハンドリング
+    if (state.hasError && context.mounted) {
+      final error = state.error;
+      if (error is Failure) {
+        showErrorDialog(context, error);
+      } else {
+        showErrorDialog(context, UnknownFailure(message: error.toString()));
+      }
+      // エラー時は前の状態に戻す（楽観的UIに近い挙動にする場合などは検討が必要だが、
+      // ここではRepositoryの失敗＝状態不整合なので、確実に取得し直すか前の値に戻す）
+      state = previousState;
+    }
   }
 }
 
