@@ -29,6 +29,7 @@ class SearchedHistoryLocalDataSource {
             'course TEXT NOT NULL, '
             'title TEXT NOT NULL, '
             'author TEXT NOT NULL, '
+            'likes INTEGER NOT NULL, '
             'vagueLikes INTEGER NOT NULL, '
             'exactLikes INTEGER NOT NULL, '
             'existsSlide INTEGER NOT NULL, '
@@ -41,7 +42,13 @@ class SearchedHistoryLocalDataSource {
             ');',
           );
         },
-        version: 7,
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 8) {
+            await db.execute(
+                'ALTER TABLE searched_history ADD COLUMN likes INTEGER NOT NULL DEFAULT 0');
+          }
+        },
+        version: 8,
       );
     } catch (error, stackTrace) {
       return Future.error(error, stackTrace);
