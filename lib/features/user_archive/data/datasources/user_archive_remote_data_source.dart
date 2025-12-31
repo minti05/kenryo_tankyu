@@ -17,6 +17,8 @@ class UserArchiveRemoteDataSourceImpl implements UserArchiveRemoteDataSource {
   Future<void> updateRemoteLikes(int documentID, bool isIncrement) async {
     final docRef = _firestore.collection('works').doc(documentID.toString());
     final increment = isIncrement ? 1 : -1;
+    // TODO: 将来的には Firestore 側も 'likes' に統一する可能性があるが、
+    // 現状は既存の 'exactLikes' と 'vagueLikes' の両方を更新して整合性を保つ。
     await docRef.update({
       'exactLikes': FieldValue.increment(increment),
       'vagueLikes': FieldValue.increment(increment)
