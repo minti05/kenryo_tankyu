@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
   @override
   Future<void> build() async {
@@ -13,19 +13,25 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   Future<void> setThemeMode(ThemeMode mode) async {
     await ref.read(settingsRepositoryProvider).setThemeMode(mode);
-    ref.invalidate(themeModeProvider);
+    if (ref.mounted) {
+      ref.invalidate(themeModeProvider);
+    }
   }
 
   Future<void> setNotification(bool enabled) async {
     await ref.read(settingsRepositoryProvider).setNotificationEnabled(enabled);
-    ref.invalidate(notificationEnabledProvider);
+    if (ref.mounted) {
+      ref.invalidate(notificationEnabledProvider);
+    }
   }
 
   Future<void> setHasShownNotificationDialog(bool hasShown) async {
     await ref
         .read(settingsRepositoryProvider)
         .setHasShownNotificationDialog(hasShown);
-    ref.invalidate(hasShownNotificationDialogProvider);
+    if (ref.mounted) {
+      ref.invalidate(hasShownNotificationDialogProvider);
+    }
   }
 }
 

@@ -15,12 +15,10 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notification = ref.watch(notificationEnabledProvider).when(
-          data: (value) => value,
-          loading: () => false, // Default to false while loading
-          error: (err, stack) => false, // Default to false on error
-        );
-    final themeMode = ref.watch(themeModeProvider);
+    final notificationAsync = ref.watch(notificationEnabledProvider);
+    // ロード中も直前の値を保持することでトグルのスナップバックを防ぐ
+    final notification = notificationAsync.value ?? false;
+    final themeModeAsync = ref.watch(themeModeProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('設定')),
@@ -28,55 +26,58 @@ class SettingsPage extends ConsumerWidget {
         child: ListBody(
           children: [
             SwitchListTile(
-                value: notification,
-                onChanged: (bool value) async {
-                  if (value) {
-                    final status = await Permission.notification.status;
-                    if (status.isPermanentlyDenied) {
+              value: notification,
+              onChanged: (bool value) async {
+                if (value) {
+                  final status = await Permission.notification.status;
+                  debugPrint('Current notification status: $status');
+
+                  if (status.isPermanentlyDenied ||
+                      (status.isDenied && !status.isLimited)) {
+                    // iOSで一度拒否されると request() ではダイアログが出ないことがあるため、状態を確認
+                    final requestStatus =
+                        await Permission.notification.request();
+                    debugPrint('Notification request result: $requestStatus');
+
+                    if (!requestStatus.isGranted &&
+                        !requestStatus.isProvisional) {
                       if (context.mounted) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('通知が許可されていません'),
-                            content:
-                                const Text('通知を受け取るには、システム設定から通知を許可してください。'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('キャンセル'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  openAppSettings();
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('設定を開く'),
-                              ),
-                            ],
-                          ),
-                        );
+                        _showPermissionDeniedDialog(context);
                       }
                       return;
                     }
-
-                    if (status.isDenied) {
-                      final requestStatus =
-                          await Permission.notification.request();
-                      if (!requestStatus.isGranted) return;
-                    }
-
-                    final fcm = ref.read(firebaseMessagingProvider);
-                    final token = await fcm.getToken();
-                    debugPrint('FCM Token: $token');
                   }
-                  ref.read(settingsProvider.notifier).setNotification(value);
-                },
-                secondary: const Icon(Icons.notifications_active_outlined),
-                title: const Text('通知を受け取る')),
+
+                  // FCMトークンの取得を試みる（ブロックしない）
+                  ref
+                      .read(firebaseMessagingProvider)
+                      .getToken()
+                      .then((token) => debugPrint('FCM Token: $token'))
+                      .catchError((e) => debugPrint('FCM Token Error: $e'));
+                }
+
+                try {
+                  debugPrint('Updating notification setting to: $value');
+                  await ref
+                      .read(settingsProvider.notifier)
+                      .setNotification(value);
+                  debugPrint('Notification setting updated successfully');
+                } catch (e) {
+                  debugPrint('Error updating notification setting: $e');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('設定の更新に失敗しました: $e')),
+                    );
+                  }
+                }
+              },
+              secondary: const Icon(Icons.notifications_active_outlined),
+              title: const Text('通知を受け取る'),
+            ),
             ListTile(
               title: const Text('テーマ設定'),
               leading: const Icon(Icons.light_mode),
-              trailing: themeMode.when(
+              trailing: themeModeAsync.when(
                 data: (theme) => DropdownButton<ThemeMode>(
                   value: theme,
                   onChanged: (ThemeMode? value) {
@@ -99,7 +100,11 @@ class SettingsPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                loading: () => const CircularProgressIndicator(),
+                loading: () => const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
                 error: (err, stack) => const Text('エラー'),
               ),
             ),
@@ -233,6 +238,29 @@ class SettingsPage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showPermissionDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('通知が許可されていません'),
+        content: const Text('通知を受け取るには、システム設定から通知を許可してください。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () {
+              openAppSettings();
+              Navigator.pop(context);
+            },
+            child: const Text('設定を開く'),
+          ),
+        ],
       ),
     );
   }

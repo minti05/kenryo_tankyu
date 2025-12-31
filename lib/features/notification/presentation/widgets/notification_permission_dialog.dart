@@ -30,7 +30,10 @@ class NotificationPermissionDialog extends ConsumerWidget {
             await ref
                 .read(settingsProvider.notifier)
                 .setHasShownNotificationDialog(true);
+
+            if (!context.mounted) return;
             await ref.read(settingsProvider.notifier).setNotification(false);
+
             if (context.mounted) Navigator.of(context).pop();
           },
           child: const Text('二度と表示しない', style: TextStyle(color: Colors.grey)),
@@ -51,6 +54,8 @@ class NotificationPermissionDialog extends ConsumerWidget {
 
             // OSの権限リクエスト
             final status = await Permission.notification.request();
+
+            if (!context.mounted) return;
 
             if (status.isGranted) {
               await ref.read(settingsProvider.notifier).setNotification(true);
