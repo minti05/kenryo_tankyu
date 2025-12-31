@@ -5,7 +5,7 @@ import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_
 
 /// 全画面共通の「お気に入り」ボタン。
 /// AsyncValue.isLoading を監視して、通信中の連打防止と視覚的フィードバックを行います。
-class FavoriteButton extends ConsumerWidget {
+class FavoriteButton extends ConsumerStatefulWidget {
   final Searched searched;
   final bool showLikes;
   final bool isLarge;
@@ -18,80 +18,81 @@ class FavoriteButton extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final favoriteState =
-        ref.watch(userIsFavoriteStateProvider(searched.documentID));
+  ConsumerState<FavoriteButton> createState() => _FavoriteButtonState();
+}
 
-    // データがない（初期状態など）場合は、モデルの初期値を使用する
-    final isFavorite = favoriteState.asData?.value ?? searched.isFavorite;
+class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
+  // 楽観的UIのためのローカル状態
+  bool? _isFavoriteLocal;
+  int? _likesLocal;
+
+  @override
+  Widget build(BuildContext context) {
+    final favoriteState =
+        ref.watch(userIsFavoriteStateProvider(widget.searched.documentID));
+
+    // 通信が完了したらローカルの状態を同期/リセット
+    if (!favoriteState.isLoading) {
+      _isFavoriteLocal = null;
+      _likesLocal = null;
+    }
+
+    final isFavorite = _isFavoriteLocal ??
+        favoriteState.asData?.value ??
+        widget.searched.isFavorite;
+    final likes = _likesLocal ?? widget.searched.likes;
     final isLoading = favoriteState.isLoading;
 
     final color =
         isFavorite ? Colors.red : Theme.of(context).colorScheme.onSurface;
     final icon = isFavorite ? Icons.favorite : Icons.favorite_border;
 
-    if (isLarge) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          border: Border.all(color: color),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.red),
-                    )
-                  : Icon(icon, color: color),
-              onPressed: isLoading
-                  ? null
-                  : () => ref
-                      .read(userIsFavoriteStateProvider(searched.documentID)
-                          .notifier)
-                      .toggle(searched.documentID, context),
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: color, size: widget.isLarge ? 28 : 24),
+        if (widget.showLikes && !widget.searched.isCached) ...[
+          const SizedBox(height: 4),
+          Text(
+            likes.toString(),
+            style: TextStyle(
+              color: color,
+              fontSize: widget.isLarge ? 14 : 12,
             ),
-            if (showLikes && !searched.isCached) ...[
-              const SizedBox(height: 4),
-              Text(
-                searched.likes.toString(),
-                style: TextStyle(color: color),
-              ),
-            ],
-          ],
-        ),
-      );
-    }
+          ),
+        ],
+      ],
+    );
 
-    // 小さいボタン表示（リスト画面など）
+    final buttonBase = Opacity(
+      opacity: isLoading ? 0.5 : 1.0,
+      child: widget.isLarge
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: color.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: content,
+            )
+          : content,
+    );
+
     return InkWell(
       onTap: isLoading
           ? null
-          : () => ref
-              .read(userIsFavoriteStateProvider(searched.documentID).notifier)
-              .toggle(searched.documentID, context),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isLoading ? color.withValues(alpha: 0.5) : color,
-          ),
-          if (showLikes && !searched.isCached)
-            Text(
-              searched.likes.toString(),
-              style: TextStyle(
-                color: isLoading ? color.withValues(alpha: 0.5) : color,
-                fontSize: 12,
-              ),
-            ),
-        ],
-      ),
+          : () {
+              // 楽観的UIの更新
+              setState(() {
+                _isFavoriteLocal = !isFavorite;
+                _likesLocal = isFavorite ? likes - 1 : likes + 1;
+              });
+              ref
+                  .read(userIsFavoriteStateProvider(widget.searched.documentID)
+                      .notifier)
+                  .toggle(widget.searched.documentID, context);
+            },
+      child: buttonBase,
     );
   }
 }

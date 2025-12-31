@@ -46,33 +46,34 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
     final AsyncValue<Searched> searched =
         ref.watch(searchedItemProvider(widget.documentID));
 
-    return searched.when(
-      data: (searched) {
-        return LazyIndexedStack(
-          index: currentIndex,
-          children: [
-            //詳細画面
-            Scaffold(
-              appBar: HeaderForResultPage(searched: searched),
-              body: Padding(
-                padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
-                child: Column(children: [
-                  WorkTitle(searched: searched),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: WorkDetailsTable(searched: searched),
-                  ),
-                  PdfChoiceChip(searched: searched),
-                  DisplayPdf(searched: searched),
-                ]),
-              ),
+    // データがあれば、ローディング中（refresh中）でも元々のコンテンツを表示し続ける
+    if (searched.hasValue) {
+      final searchedData = searched.requireValue;
+      return LazyIndexedStack(
+        index: currentIndex,
+        children: [
+          Scaffold(
+            appBar: HeaderForResultPage(searched: searchedData),
+            body: Padding(
+              padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
+              child: Column(children: [
+                WorkTitle(searched: searchedData),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: WorkDetailsTable(searched: searchedData),
+                ),
+                PdfChoiceChip(searched: searchedData),
+                DisplayPdf(searched: searchedData),
+              ]),
             ),
+          ),
+          PdfExpandPage(searched: searchedData),
+        ],
+      );
+    }
 
-            //全画面表示
-            PdfExpandPage(searched: searched),
-          ],
-        );
-      },
+    return searched.when(
+      data: (_) => const SizedBox.shrink(), // すでに上で処理済みだが型合わせのために必要
       loading: () => Scaffold(
         appBar: AppBar(),
         body: const Center(child: CircularProgressIndicator()),
