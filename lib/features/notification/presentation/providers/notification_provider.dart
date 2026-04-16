@@ -52,6 +52,7 @@ class NotificationNotifier
       return true;
     } catch (e) {
       // エラーログ出力などを行い、上位には成功/失敗を返すのみにする
+      debugPrint('markAsRead error: $e');
       return false;
     }
   }
