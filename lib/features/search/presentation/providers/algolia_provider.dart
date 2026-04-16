@@ -89,6 +89,10 @@ final randomAlgoliaSearchProvider =
   } else {
     debugPrint('Algoliaから取得します');
 
+    if (!isConnected) {
+      throw const NetworkFailure();
+    }
+
     // 250 is the hardcoded magic number from original code
     final results =
         await searchRepository.getRandomWorks(count: 2, maxItems: 250);
