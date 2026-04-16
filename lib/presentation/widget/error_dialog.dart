@@ -1,3 +1,4 @@
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
 
@@ -92,6 +93,13 @@ class ErrorDialog extends StatelessWidget {
     if (failure is NetworkFailure) return 'ネットワークエラー';
     if (failure is DatabaseFailure) return 'データベースエラー';
     if (failure is ServerFailure) return 'サーバーエラー';
+    if (failure is InvalidEmail) return 'メールアドレス形式エラー';
+    if (failure is WrongPassword) return 'パスワード間違い';
+    if (failure is UserNotFound) return 'ユーザーが見つかりません';
+    if (failure is EmailAlreadyInUse) return 'メールアドレス重複';
+    if (failure is WeakPassword) return 'パスワード強度不足';
+    if (failure is RequiresRecentLogin) return '再認証が必要';
+    if (failure is UnknownAuthFailure) return '認証エラー';
     return 'エラーが発生しました';
   }
 }

@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -79,27 +79,10 @@ class ResetPasswordPage extends ConsumerWidget {
     try {
       await ref.read(authProvider.notifier).sendPasswordResetEmail(email);
       ref.read(authProvider.notifier).changeVerifyEmail();
-    } on AuthFailure catch (e) {
-      if (e is UserNotFound) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              children: [
-                const Text('ユーザーが見つかりませんでした'),
-                ElevatedButton(
-                    onPressed: () => context.go('/welcome'),
-                    child: const Text('アカウントを新規作成する')),
-              ],
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('エラーが発生しました。$e'),
-          ),
-        );
-      }
+    } on Failure catch (e) {
+      if (!context.mounted) return;
+
+      showErrorDialog(context, e);
     }
   }
 }

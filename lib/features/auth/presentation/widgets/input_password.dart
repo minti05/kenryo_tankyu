@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -176,26 +176,10 @@ class _InputPasswordState extends ConsumerState<InputPassword> {
     try {
       await ref.read(authProvider.notifier).createUser(password);
       if (!context.mounted) return;
-    } on AuthFailure catch (e) {
-      if (e is EmailAlreadyInUse) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              children: [
-                const Text('このメールアドレスは既に登録されています'),
-                ElevatedButton(
-                    onPressed: () => context.go('/welcome/login'),
-                    child: const Text('ログイン画面に移動')),
-              ],
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('エラーが発生しました。$e。'),
-          ),
-        );
+    } on Failure catch (e) {
+      if (!context.mounted) return;
+
+      showErrorDialog(context, e);
       }
     }
   }

@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -212,20 +212,10 @@ class SettingsPage extends ConsumerWidget {
                                   .deleteAccount();
                               if (!context.mounted) return;
                               Navigator.of(context).pop();
-                            } on AuthFailure catch (e) {
-                              if (e is RequiresRecentLogin) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('再認証が必要です。再度ログインしてください。'),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('エラーが発生しました: $e'),
-                                  ),
-                                );
-                              }
+                            } on Failure catch (e) {
+                              if (!context.mounted) return;
+
+                              showErrorDialog(context, e);
                             }
                           },
                           child: const Text('はい'),

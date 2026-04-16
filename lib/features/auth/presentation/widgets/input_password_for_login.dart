@@ -1,4 +1,4 @@
-import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 
 import 'package:flutter/material.dart';
@@ -102,36 +102,10 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
       } catch (e) {
         debugPrint('FCM Token Error: $e');
       }
-    } on AuthFailure catch (e) {
+    } on Failure catch (e) {
       if (!mounted) return;
 
-      if (e is UserNotFound) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('メールアドレスが見つかりませんでした'),
-          ),
-        );
-      } else if (e is WrongPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              children: [
-                const Text('パスワードが間違っています'),
-                ElevatedButton(
-                    onPressed: () =>
-                        context.go('/welcome/login/reset_password'),
-                    child: const Text('パスワードをリセットする')),
-              ],
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('エラーが発生しました: $e'),
-          ),
-        );
-      }
+      showErrorDialog(context, e);
     } catch (e) {
       if (!mounted) return;
 
