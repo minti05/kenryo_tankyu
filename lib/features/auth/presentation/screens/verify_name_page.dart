@@ -1,3 +1,5 @@
+import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -102,6 +104,7 @@ class VerifyNamePage extends ConsumerWidget {
   }
 
   _verifyName(BuildContext context, WidgetRef ref) async {
+  try {
     final auth = ref.watch(authProvider);
     final notifier = ref.read(authProvider.notifier);
     final emailAddress = '${auth.email}@kenryo.ed.jp';
@@ -111,7 +114,6 @@ class VerifyNamePage extends ConsumerWidget {
 
     if (userData != null) {
       final userName = userData['name'];
-      //登録済みかどうかを確認。登録済みならログイン画面への誘導をする。未登録ならアカウント作成画面へ。
       final alreadyRegistered = userData['registered'];
       if (alreadyRegistered) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -134,5 +136,12 @@ class VerifyNamePage extends ConsumerWidget {
     } else {
       notifier.decrementLimit();
     }
+  } on Failure catch (e) {
+    if (!context.mounted) return;
+    showErrorDialog(context, e);
+  } catch (e) {
+    if (!context.mounted) return;
+    debugPrint('Unexpected error: $e');
   }
+}
 }
