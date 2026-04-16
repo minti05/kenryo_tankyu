@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,18 @@ import 'package:kenryo_tankyu/presentation/widget/connectivity_banner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // グローバルエラーハンドラーの設定
+  FlutterError.onError = (FlutterErrorDetails details) {
+    debugPrint('FlutterError: ${details.exception}');
+    debugPrintStack(stackTrace: details.stack);
+  };
+
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stackTrace) {
+    debugPrint('PlatformError: $error');
+    debugPrintStack(stackTrace: stackTrace);
+    return true;
+  };
 
   // 依存性の事前初期化 (Strict Initialization)
   await Firebase.initializeApp(
