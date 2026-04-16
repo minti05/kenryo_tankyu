@@ -6,6 +6,7 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/result_previe
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 import 'package:kenryo_tankyu/features/notification/presentation/widgets/notification_permission_dialog.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
@@ -80,7 +81,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 return asyncValue.when(
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) => Text('Error: $error'),
+                    error: (error, stackTrace) => CommonErrorView(error: error),
                     data: (data) {
                       return Column(
                         children: [
