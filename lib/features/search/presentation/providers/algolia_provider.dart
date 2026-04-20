@@ -89,6 +89,7 @@ final randomAlgoliaSearchProvider =
   } else {
     debugPrint('Algoliaから取得します');
 
+    final isConnected = ref.read(isConnectedProvider);
     if (!isConnected) {
       throw const NetworkFailure();
     }
