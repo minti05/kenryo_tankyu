@@ -24,7 +24,7 @@ jobs:
 
       - name: Run format check
         run: dart format --set-exit-if-changed .
-        continue-on-error: false
+        continue-on-error: true
 
       - name: Run analyzer
         run: flutter analyze

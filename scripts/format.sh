@@ -3,7 +3,7 @@
 set -e
 
 echo "🎨 Formatting Dart/Flutter code..."
-dart format --fix .
+dart format .
 
 echo "✅ Format complete"
 echo ""
