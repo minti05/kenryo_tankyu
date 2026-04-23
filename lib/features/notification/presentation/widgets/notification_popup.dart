@@ -42,20 +42,23 @@ class NotificationPopup extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              notification.isRead != false ?
-                              const SizedBox.shrink() :
-                              Text(
-                                'NEW',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              notification.isRead != false
+                                  ? const SizedBox.shrink()
+                                  : Text(
+                                      'NEW',
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                               IconButton(
                                 onPressed: () => Navigator.of(context).pop(),
-                                icon:
-                                    Icon(Icons.close, color: Theme.of(context).colorScheme.primary),
+                                icon: Icon(Icons.close,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                               ),
                             ],
                           ),
@@ -96,7 +99,8 @@ class NotificationPopup extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          TextWithUrl(text: notification.contents), // text:取得した文字列
+                          TextWithUrl(
+                              text: notification.contents), // text:取得した文字列
                         ],
                       ),
                     ),

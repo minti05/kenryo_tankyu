@@ -29,16 +29,16 @@ class DisplaySubCategoryList extends ConsumerWidget {
         ),
         Expanded(
           child: ListView.separated(
-           itemBuilder: (BuildContext context, int index) {
+            itemBuilder: (BuildContext context, int index) {
               return GestureDetector(
-                onTap: (){},
+                onTap: () {},
                 child: ListTile(
                   trailing: const Icon(Icons.navigate_next),
                   title: Text(subCategoryList[index].displayName),
                   onTap: () {
                     notifier.selectedSubCategory(subCategoryList[index]);
                     context.pushReplacement('/resultList');
-                    },
+                  },
                 ),
               );
             },

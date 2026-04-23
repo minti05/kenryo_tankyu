@@ -68,9 +68,8 @@ class _EditWorkInfoState extends State<EditWorkInfo> {
           ),
           initialValue: _selectedCourse,
           items: Course.values
-              .map<DropdownMenuItem<Course>>((Course value) =>
-                  DropdownMenuItem(
-                      value: value, child: Text(value.displayName)))
+              .map<DropdownMenuItem<Course>>((Course value) => DropdownMenuItem(
+                  value: value, child: Text(value.displayName)))
               .toList(),
           onChanged: (value) {
             setState(() {
@@ -89,8 +88,7 @@ class _EditWorkInfoState extends State<EditWorkInfo> {
           items: EnterYear.values
               .map<DropdownMenuItem<EnterYear>>((EnterYear value) =>
                   DropdownMenuItem(
-                      value: value,
-                      child: Text(value.displayName.toString())))
+                      value: value, child: Text(value.displayName.toString())))
               .toList(),
           onChanged: (value) {
             setState(() {

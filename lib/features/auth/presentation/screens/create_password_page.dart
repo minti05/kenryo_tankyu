@@ -5,7 +5,6 @@ import 'package:kenryo_tankyu/features/auth/presentation/widgets/auth_app_bar.da
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/input_email.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/input_password.dart';
 
-
 class CreatePassWordPage extends ConsumerWidget {
   const CreatePassWordPage({super.key});
 
@@ -38,13 +37,11 @@ class CreatePassWordPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        'アカウントを作成しましょう',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(fontWeight: FontWeight.bold)
-                      ),
+                      Text('アカウントを作成しましょう',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 5),
                       InputEmail(ref.watch(authProvider).email!, false, false),
                       const SizedBox(height: 20),

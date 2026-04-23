@@ -37,7 +37,8 @@ class _LibraryPageState extends State<LibraryPage>
           padding: const EdgeInsets.all(8.0),
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.grey.shade300, borderRadius: BorderRadius.circular(25.0)),
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(25.0)),
             child: TabBar(
               indicatorWeight: 3.0,
               controller: _tabController,

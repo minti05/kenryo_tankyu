@@ -20,10 +20,10 @@ class OverlayDialog extends ModalRoute<void> {
 
   @override
   Widget buildPage(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     return Center(
       child: Material(
         type: MaterialType.transparency,
@@ -74,11 +74,11 @@ class OverlayDialog extends ModalRoute<void> {
 
   @override
   Widget buildTransitions(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return FadeTransition(
       opacity: animation,
       child: child,

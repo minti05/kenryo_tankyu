@@ -4,8 +4,6 @@ import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 
-
-
 class PdfChoiceChip extends ConsumerWidget {
   final Searched searched;
   const PdfChoiceChip({super.key, required this.searched});
@@ -24,8 +22,9 @@ class PdfChoiceChip extends ConsumerWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isSameScreen) return;
-      if(list.isEmpty){
-        stringProviderNotifier.state = '$partOfId${DocumentType.slide.idSuffix}';
+      if (list.isEmpty) {
+        stringProviderNotifier.state =
+            '$partOfId${DocumentType.slide.idSuffix}';
       } else {
         stringProviderNotifier.state = '$partOfId${list[0].idSuffix}';
       }

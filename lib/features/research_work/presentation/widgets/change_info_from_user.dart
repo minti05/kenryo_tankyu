@@ -53,7 +53,7 @@ class _ChangeInfoFromUserState extends State<ChangeInfoFromUser> {
           });
         },
         initialValue: selected?.displayName,
-        hint: const Text('選択してください'), 
+        hint: const Text('選択してください'),
         items: [
           for (final item in ChangeInfoFromUserType.values)
             DropdownMenuItem(

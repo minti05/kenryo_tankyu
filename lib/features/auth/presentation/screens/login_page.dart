@@ -43,7 +43,8 @@ class LoginPage extends ConsumerWidget {
                               .bodyMedium!
                               .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 5),
-                      InputEmail(ref.watch(authProvider).email ?? '', true, isDeveloper ),
+                      InputEmail(ref.watch(authProvider).email ?? '', true,
+                          isDeveloper),
                       const SizedBox(height: 20),
                       Text('パスワードを入力',
                           style: Theme.of(context)

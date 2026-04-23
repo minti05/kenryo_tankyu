@@ -6,10 +6,10 @@ import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
-class SubCategorySelectHeader extends ConsumerWidget implements PreferredSizeWidget {
+class SubCategorySelectHeader extends ConsumerWidget
+    implements PreferredSizeWidget {
   //探索からカテゴリを選び、サブカテゴリ検索画面にいった時にのみ、ここに値が入っている
   final String categoryWord;
-
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -21,17 +21,17 @@ class SubCategorySelectHeader extends ConsumerWidget implements PreferredSizeWid
       leading: BackButton(
         onPressed: () {
           ref.read(suggestCategoryProvider.notifier).state = Category.none;
-          ref.read(suggestSubCategoryProvider.notifier).state = SubCategory.none;
+          ref.read(suggestSubCategoryProvider.notifier).state =
+              SubCategory.none;
           ref.read(searchProvider.notifier).deleteAllParameters();
           ref.read(footerProvider.notifier).state = 1;
           context.go('/explore');
         },
       ),
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-      titleSpacing:  0.0, 
+      titleSpacing: 0.0,
       title: Padding(
-        padding: EdgeInsets.only(
-            right: 16.0),
+        padding: EdgeInsets.only(right: 16.0),
         child: SizedBox(
           height: 40,
           child: Container(

@@ -9,7 +9,6 @@
 
 const String version = '1.1.0';
 
-
 //Module cloud_firestore not foundになる場合の対処法
 //1. Xcodeでios/Runner.xcworkspaceを開く
 /*
@@ -24,6 +23,8 @@ const String appName = '探究アーカイブ';
 const String appIcon = 'assets/images/app_icon.png';
 
 // 利用規約やプライバシーポリシーのリンク 更新時に以下を変更
-final termsOfServiceLink = Uri.parse('https://sites.google.com/view/tankyu-terms-of-service');
-final privacyPolicyLink = Uri.parse('https://sites.google.com/view/tankyu-privacy-policy');
+final termsOfServiceLink =
+    Uri.parse('https://sites.google.com/view/tankyu-terms-of-service');
+final privacyPolicyLink =
+    Uri.parse('https://sites.google.com/view/tankyu-privacy-policy');
 final contactFormLink = Uri.parse('https://forms.gle/xUXX88MJ5fLsVtAk9');

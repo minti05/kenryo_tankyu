@@ -4,7 +4,7 @@ import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorit
 
 class WorkTitle extends StatelessWidget {
   final Searched searched;
-  const  WorkTitle({super.key,required this.searched});
+  const WorkTitle({super.key, required this.searched});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,7 @@ class WorkTitle extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          FavoriteForResultPage(
-              searched: searched),
+          FavoriteForResultPage(searched: searched),
         ],
       ),
     );

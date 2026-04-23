@@ -6,7 +6,6 @@ class FireStoreService {
   FireStoreService._();
   static FireStoreService get instance => _instance;
 
-
   Future<void> create() async {
     final db = FirebaseFirestore.instance;
 
@@ -89,7 +88,7 @@ class FireStoreService {
     // });
   }
 
-    Future<void> createNotification() async {
+  Future<void> createNotification() async {
     final db = FirebaseFirestore.instance;
 
     await db.collection('notification').doc('11111111').set({
@@ -161,6 +160,4 @@ class FireStoreService {
     //   'exactLikes': 0,
     // });
   }
-
-  
 }

@@ -15,7 +15,6 @@ class InputEmail extends ConsumerStatefulWidget {
 }
 
 class _InputEmailState extends ConsumerState<InputEmail> {
-
   late TextEditingController _controller;
 
   @override
@@ -39,11 +38,12 @@ class _InputEmailState extends ConsumerState<InputEmail> {
       enabled: widget.isEdit,
       keyboardType: TextInputType.emailAddress,
       inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_.+-]')),  //メールアドレスの入力制限
+        FilteringTextInputFormatter.allow(
+            RegExp(r'[a-zA-Z0-9_.+-]')), //メールアドレスの入力制限
       ],
       controller: _controller,
       decoration: InputDecoration(
-        suffixText: widget.isDeveloper ? '@developer.com': '@kenryo.ed.jp',
+        suffixText: widget.isDeveloper ? '@developer.com' : '@kenryo.ed.jp',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),

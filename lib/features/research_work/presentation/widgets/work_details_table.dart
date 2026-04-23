@@ -43,8 +43,7 @@ class WorkDetailsTable extends StatelessWidget {
             const Center(
                 child: Text('カテゴリ2', style: TextStyle(color: Colors.grey))),
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+              padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
               child: Text(
                   '${searched.category2.displayName} > ${searched.subCategory2.displayName}',
                   style: const TextStyle(fontSize: 16)),

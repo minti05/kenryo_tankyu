@@ -5,7 +5,6 @@ class InitialHeader extends StatelessWidget implements PreferredSizeWidget {
   //探索からカテゴリを選び、サブカテゴリ検索画面にいった時にのみ、ここに値が入っている
   final String? categoryWord;
 
-
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   const InitialHeader({super.key, this.categoryWord});
@@ -16,8 +15,8 @@ class InitialHeader extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
       titleSpacing: categoryWord?.isEmpty == null ? 20.0 : 0.0, //？が
       title: Padding(
-        padding: EdgeInsets.only(
-            right: categoryWord?.isEmpty == null ? 0.0 : 16.0),
+        padding:
+            EdgeInsets.only(right: categoryWord?.isEmpty == null ? 0.0 : 16.0),
         child: SizedBox(
           height: 40,
           child: InkWell(
@@ -35,7 +34,9 @@ class InitialHeader extends StatelessWidget implements PreferredSizeWidget {
                   const Icon(Icons.search),
                   const Padding(padding: EdgeInsets.only(left: 12)),
                   Text(
-                    categoryWord?.isEmpty == null ? 'キーワードを検索' : 'カテゴリ...$categoryWord',
+                    categoryWord?.isEmpty == null
+                        ? 'キーワードを検索'
+                        : 'カテゴリ...$categoryWord',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
