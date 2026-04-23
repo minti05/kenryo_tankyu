@@ -3,12 +3,12 @@
 set -e
 
 echo "🎨 Formatting Dart/Flutter code..."
-dart format --fix lib/ test/ android/ ios/
+dart format --fix .
 
 echo "✅ Format complete"
 echo ""
 echo "🔍 Running analyzer..."
-flutter analyze lib/ test/
+flutter analyze
 
 echo ""
 echo "✨ All checks passed!"

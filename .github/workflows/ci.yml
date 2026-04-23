@@ -23,9 +23,9 @@ jobs:
         run: flutter pub get
 
       - name: Run format check
-        run: dart format --set-exit-if-changed lib/ test/ android/ ios/
+        run: dart format --set-exit-if-changed .
         continue-on-error: false
 
       - name: Run analyzer
-        run: flutter analyze lib/ test/
+        run: flutter analyze
         continue-on-error: false
