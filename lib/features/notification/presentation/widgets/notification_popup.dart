@@ -42,7 +42,7 @@ class NotificationPopup extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              notification.isRead != false
+                              notification.isRead
                                   ? const SizedBox.shrink()
                                   : Text(
                                       'NEW',
