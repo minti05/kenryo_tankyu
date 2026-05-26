@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite_button.dart';
 
 class WorkTitle extends StatelessWidget {
   final Searched searched;
@@ -20,7 +20,7 @@ class WorkTitle extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          FavoriteForResultPage(searched: searched),
+          FavoriteButton(searched: searched, isLarge: true),
         ],
       ),
     );

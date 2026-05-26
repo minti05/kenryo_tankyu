@@ -5,7 +5,7 @@ import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/image_chip.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite_button.dart';
 
 class ResultPreviewContent extends ConsumerWidget {
   final Searched searched;
@@ -84,9 +84,7 @@ class ResultPreviewContent extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 4.0),
-                  child: forLibrary
-                      ? FavoriteForHistory(searched: searched)
-                      : FavoriteForResultListPage(searched: searched),
+                  child: FavoriteButton(searched: searched, isLarge: false),
                 ),
               ],
             ),

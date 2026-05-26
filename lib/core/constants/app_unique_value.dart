@@ -2,12 +2,12 @@
 
 //バージョンアップデートの時にやること
 //1. pubspec.yamlのversionを変更
-//2. lib/const/app_unique_value.dartのversionを変更
+//2. lib/core/constants/app_unique_value.dartのversionを変更
 //ターミナルで以下を実行
 //flutter pub get
 //flutter build ios
 
-const String version = '1.1.0';
+const String version = '1.1.1';
 
 //Module cloud_firestore not foundになる場合の対処法
 //1. Xcodeでios/Runner.xcworkspaceを開く
