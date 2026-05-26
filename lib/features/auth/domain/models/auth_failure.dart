@@ -1,33 +1,33 @@
-sealed class AuthFailure implements Exception {
-  const AuthFailure();
+sealed class AuthFailure extends Failure {
+  const AuthFailure(String message) : super(message);
 }
 
 class InvalidEmail extends AuthFailure {
-  const InvalidEmail();
+  const InvalidEmail() : super('メールアドレスの形式が正しくありません。');
 }
 
 class WrongPassword extends AuthFailure {
-  const WrongPassword();
+  const WrongPassword() : super('パスワードが正しくありません。');
 }
 
 class UserNotFound extends AuthFailure {
-  const UserNotFound();
+  const UserNotFound() : super('ユーザーが見つかりません。');
 }
 
 class EmailAlreadyInUse extends AuthFailure {
-  const EmailAlreadyInUse();
+  const EmailAlreadyInUse() : super('このメールアドレスはすでに使用されています。');
 }
 
 class WeakPassword extends AuthFailure {
-  const WeakPassword();
+  const WeakPassword() : super('パスワードが簡単すぎます。より複雑なパスワードを設定してください。');
 }
 
 class RequiresRecentLogin extends AuthFailure {
-  const RequiresRecentLogin();
+  const RequiresRecentLogin() : super('セキュリティのため、もう一度ログインしてください。');
 }
 
 class UnknownAuthFailure extends AuthFailure {
-  final String? message;
   final String? code;
-  const UnknownAuthFailure({this.message, this.code});
+  const UnknownAuthFailure({String? message, this.code})
+    : super(message ?? '予期せぬエラーが発生しました。');
 }

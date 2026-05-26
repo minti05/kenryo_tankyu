@@ -104,11 +104,9 @@ class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
     }
   }
 
-  AuthFailure _mapFirebaseException(FirebaseAuthException e) {
+  Failure _mapFirebaseException(FirebaseAuthException e) {
     if (e.code == 'unavailable' || e.code == 'network-request-failed') {
-      // この場合は AuthFailure のどれかにマッピングするか、Failure を投げる
-      // 基盤側と合わせるなら Failure を投げたいが、Repository のシグネチャが AuthFailure を期待している場合がある
-      // 今回は既存の AuthFailure に Network 系のものがないので、Unknown に入れるか追加を検討。
+      return const NetworkFailure();
     }
     switch (e.code) {
       case 'user-not-found':

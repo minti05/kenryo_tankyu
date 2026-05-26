@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:kenryo_tankyu/core/constants/work/search_value.dart";
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_list_preview.dart'; // ResultList is here
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_header.dart';
@@ -103,28 +104,10 @@ class ResultListPage extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    error: (error, stackTrace) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.cloud_off,
-                                size: 64, color: Colors.grey[400]),
-                            const SizedBox(height: 16),
-                            const Text('検索中にエラーが発生しました'),
-                            Text(error.toString(),
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.grey)),
-                            const SizedBox(height: 24),
-                            ElevatedButton.icon(
-                              onPressed: () =>
-                                  ref.invalidate(algoliaSearchProvider),
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('再試行'),
-                            ),
-                          ],
-                        ),
-                      );
+                    error: (error, stackTrace) => CommonErrorView(
+                      error: error,
+                      onRetry: () => ref.invalidate(algoliaSearchProvider),
+                      ),
                     },
                   );
                 },

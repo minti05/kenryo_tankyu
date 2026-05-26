@@ -4,6 +4,7 @@ import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class DisplayPdf extends ConsumerWidget {
   final Searched searched;
@@ -54,8 +55,7 @@ class DisplayPdf extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) =>
-                  Center(child: Text('PDFの取得中にエラーが発生しました: $error')),
+              error: (error, _) => CommonErrorView(error: error),
             );
           }),
           Align(
