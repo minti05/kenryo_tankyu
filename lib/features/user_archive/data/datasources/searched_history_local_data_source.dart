@@ -41,31 +41,33 @@ class SearchedHistoryLocalDataSource {
           );
         },
         onUpgrade: (db, oldVersion, newVersion) async {
-          // バージョン10への更新で全ユーザーの履歴をリセット
-          await db.execute('DROP TABLE IF EXISTS searched_history;');
-          await db.execute(
-            'CREATE TABLE searched_history('
-            'documentID INTEGER PRIMARY KEY NOT NULL, '
-            'isFavorite INTEGER NOT NULL, '
-            'category1 TEXT NOT NULL, '
-            'subCategory1 TEXT NOT NULL, '
-            'category2 TEXT NOT NULL, '
-            'subCategory2 TEXT NOT NULL, '
-            'enterYear INTEGER NOT NULL, '
-            'eventName TEXT NOT NULL, '
-            'course TEXT NOT NULL, '
-            'title TEXT NOT NULL, '
-            'author TEXT NOT NULL, '
-            'likes INTEGER NOT NULL, '
-            'existsSlide INTEGER NOT NULL, '
-            'existsReport INTEGER NOT NULL, '
-            'existsThesis INTEGER NOT NULL, '
-            'existsPoster INTEGER NOT NULL, '
-            'savedAt TEXT NOT NULL, '
-            'CHECK(LENGTH(documentID) == 8),'
-            'CHECK(savedAt != null) '
-            ');',
-          );
+          if (oldVersion < 10) {
+            // バージョン10への更新で全ユーザーの履歴をリセット
+            await db.execute('DROP TABLE IF EXISTS searched_history;');
+            await db.execute(
+              'CREATE TABLE searched_history('
+              'documentID INTEGER PRIMARY KEY NOT NULL, '
+              'isFavorite INTEGER NOT NULL, '
+              'category1 TEXT NOT NULL, '
+              'subCategory1 TEXT NOT NULL, '
+              'category2 TEXT NOT NULL, '
+              'subCategory2 TEXT NOT NULL, '
+              'enterYear INTEGER NOT NULL, '
+              'eventName TEXT NOT NULL, '
+              'course TEXT NOT NULL, '
+              'title TEXT NOT NULL, '
+              'author TEXT NOT NULL, '
+              'likes INTEGER NOT NULL, '
+              'existsSlide INTEGER NOT NULL, '
+              'existsReport INTEGER NOT NULL, '
+              'existsThesis INTEGER NOT NULL, '
+              'existsPoster INTEGER NOT NULL, '
+              'savedAt TEXT NOT NULL, '
+              'CHECK(LENGTH(documentID) == 8),'
+              'CHECK(savedAt != null) '
+              ');',
+            );
+          }
         },
         version: 10,
       );

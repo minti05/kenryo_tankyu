@@ -30,7 +30,10 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
     // 親から渡される likes が更新されたタイミングで楽観的な上書きを解除する。
     // これにより、通信完了→SQLite再読み込み完了の間に一瞬元の値に戻る
     // フリッカーを防ぐ。
-    if (widget.searched.likes != oldWidget.searched.likes) {
+    if (widget.searched.documentID != oldWidget.searched.documentID) {
+      _isFavoriteLocal = null;
+      _likesLocal = null;
+    } else if (widget.searched.likes != oldWidget.searched.likes) {
       _likesLocal = null;
     }
   }
