@@ -1,4 +1,3 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
 
@@ -14,12 +13,12 @@ abstract class Auth with _$Auth {
     String? password,
     String? userName,
     @Default(false) bool confirmVerifyEmail,
-    @Default(5)int limit,
+    @Default(5) int limit,
   }) = _Auth;
   factory Auth.fromJson(Map<String, dynamic> json) => _$AuthFromJson(json);
 }
 
-class AffiliationConverter implements JsonConverter<Affiliation,String> {
+class AffiliationConverter implements JsonConverter<Affiliation, String> {
   const AffiliationConverter();
 
   @override

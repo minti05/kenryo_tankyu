@@ -96,7 +96,7 @@ class FirestoreUpload {
       json.remove('id');
       //sendAtをtimestampに変換
       json['sendAt'] = Timestamp.fromDate(notification.sendAt);
-      
+
       await FirebaseFirestore.instance
           .collection('notifications')
           .doc(notification.id)

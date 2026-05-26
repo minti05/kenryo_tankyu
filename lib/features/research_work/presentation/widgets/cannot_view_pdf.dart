@@ -26,15 +26,15 @@ class _CannotViewPdfState extends State<CannotViewPdf> {
             itemCount: DocumentType.values.length,
             itemBuilder: (context, index) {
               return CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
-          controlAffinity: ListTileControlAffinity.leading,
-          title: Text(DocumentType.values[index].displayName),
-          value: _selectedCannotViewPdf[index],
-          onChanged: (bool? value) {
-            setState(() {
-              _selectedCannotViewPdf[index] = value!;
-            });
-          },
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(DocumentType.values[index].displayName),
+                value: _selectedCannotViewPdf[index],
+                onChanged: (bool? value) {
+                  setState(() {
+                    _selectedCannotViewPdf[index] = value!;
+                  });
+                },
               );
             }),
         TextFormField(

@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 class TestSelectPage extends StatelessWidget {
   const TestSelectPage({super.key});
-  static final items = ['みつきくん用','こじさん用','あおい用'];
+  static final items = ['みつきくん用', 'こじさん用', 'あおい用'];
 
   @override
   Widget build(BuildContext context) {
@@ -13,11 +13,11 @@ class TestSelectPage extends StatelessWidget {
           return ListTile(
             title: Text(items[index]),
             onTap: () {
-              if(index == 0) {
+              if (index == 0) {
                 context.go('/testSelect/mitsuki');
-              } else if(index == 1) {
+              } else if (index == 1) {
                 context.go('/testSelect/coji');
-              } else if(index == 2) {
+              } else if (index == 2) {
                 context.go('/testSelect/aoi');
               }
             },

@@ -62,9 +62,9 @@ class InputYear extends ConsumerWidget {
 
     for (int i = 0; i < Affiliation.values.length; i++) {
       if (value[i].enterYear != null) {
-        final differences = now.year - value[i].enterYear! +1;
+        final differences = now.year - value[i].enterYear! + 1;
         final pre = now.month < 4 ? "新" : "現";
-        if (pre == '現'){
+        if (pre == '現') {
           //4月から12月までの対応
           differences >= 1 && differences <= 3 ? list.add(value[i]) : null;
         } else {

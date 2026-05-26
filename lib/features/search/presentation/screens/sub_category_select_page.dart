@@ -11,7 +11,8 @@ class SubCategorySelectPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final Category selectedCategory = ref.watch(searchProvider).category;
     return Scaffold(
-      appBar: SubCategorySelectHeader(categoryWord:selectedCategory.displayName),
+      appBar:
+          SubCategorySelectHeader(categoryWord: selectedCategory.displayName),
       body: const DisplaySubCategoryList(),
     );
   }

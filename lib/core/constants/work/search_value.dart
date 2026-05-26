@@ -1,6 +1,7 @@
 //検索画面の条件分岐を管理するファイル
 
 enum SortType { newOrder, oldOrder, likeOrder }
+
 extension SortTypeExtension on SortType {
   String get name {
     switch (this) {
@@ -14,7 +15,13 @@ extension SortTypeExtension on SortType {
   }
 }
 
-enum SortTypeForTeacher {nameAscendingOrder,nameDescendingOrder,subjectOrder,gradeOrder}
+enum SortTypeForTeacher {
+  nameAscendingOrder,
+  nameDescendingOrder,
+  subjectOrder,
+  gradeOrder
+}
+
 extension SortTypeForTeacherExtension on SortTypeForTeacher {
   String get name {
     switch (this) {

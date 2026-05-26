@@ -1,0 +1,31 @@
+name: Lint and Format Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.7'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run format check
+        run: dart format --set-exit-if-changed .
+        continue-on-error: false
+
+      - name: Run analyzer
+        run: flutter analyze
+        continue-on-error: false

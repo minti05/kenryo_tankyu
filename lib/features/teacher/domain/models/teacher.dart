@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'teacher.freezed.dart';
 part 'teacher.g.dart';
 
@@ -13,7 +12,9 @@ abstract class Teacher with _$Teacher {
     required String name,
     required String nameKana,
     @SubjectEnumConverter() @Default(SubjectType.other) SubjectType subject,
-    @GradeInChargeEnumConverter() @Default(GradeInCharge.unknown) GradeInCharge gradeInCharge,
+    @GradeInChargeEnumConverter()
+    @Default(GradeInCharge.unknown)
+    GradeInCharge gradeInCharge,
     required String filename,
     @Default([]) List<String> keywords,
   }) = _Teacher;
@@ -28,7 +29,8 @@ abstract class Teacher with _$Teacher {
         keywords: [],
       );
 
-  factory Teacher.fromJson(Map<String, dynamic> json) => _$TeacherFromJson(json);
+  factory Teacher.fromJson(Map<String, dynamic> json) =>
+      _$TeacherFromJson(json);
 }
 
 class SubjectEnumConverter implements JsonConverter<SubjectType, String> {
@@ -62,7 +64,8 @@ enum SubjectType {
   const SubjectType({required this.name, required this.color});
 }
 
-class GradeInChargeEnumConverter implements JsonConverter<GradeInCharge, String> {
+class GradeInChargeEnumConverter
+    implements JsonConverter<GradeInCharge, String> {
   const GradeInChargeEnumConverter();
 
   @override

@@ -19,10 +19,9 @@ class CheckEmailPage extends ConsumerWidget {
               children: [
                 const Text('メール認証',
                     style:
-                    TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
-                Image.asset(appIcon,
-                    width: 100, height: 100),
-               Card(
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+                Image.asset(appIcon, width: 100, height: 100),
+                Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
@@ -33,11 +32,13 @@ class CheckEmailPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Text('${ref.watch(authProvider).email}@kenryo.ed.jpにメールを送信しました。',
+                        Text(
+                            '${ref.watch(authProvider).email}@kenryo.ed.jpにメールを送信しました。',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.left),
                         const SizedBox(height: 20),
-                        const Text('メールに記載されたリンクをクリックして、アカウントを有効化してください。\nメールが届かない場合は、迷惑メールフォルダをご確認ください。'),
+                        const Text(
+                            'メールに記載されたリンクをクリックして、アカウントを有効化してください。\nメールが届かない場合は、迷惑メールフォルダをご確認ください。'),
                         const SizedBox(height: 20),
                         Center(
                           child: ElevatedButton(
@@ -72,10 +73,10 @@ class CheckEmailPage extends ConsumerWidget {
     );
   }
 
-  _resendVerifyEmail(BuildContext context, WidgetRef ref) async{
+  _resendVerifyEmail(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(authProvider.notifier).sendVerifyEmail();
-      if(!context.mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('メールを再送しました。'),
@@ -90,7 +91,7 @@ class CheckEmailPage extends ConsumerWidget {
     }
   }
 
-  _reload(BuildContext context, WidgetRef ref) async{
+  _reload(BuildContext context, WidgetRef ref) async {
     await ref.read(authProvider.notifier).reloadUser();
     // ログイン成功時にFCMトークンを取得
     final messaging = ref.read(firebaseMessagingProvider);

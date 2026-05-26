@@ -5,7 +5,6 @@ import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 
-
 class SearchHeader extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
   @override
@@ -33,7 +32,8 @@ class _SearchHeaderState extends ConsumerState<SearchHeader> {
         onPressed: () {
           //入力が中断された内容を全て削除する
           ref.read(suggestCategoryProvider.notifier).state = Category.none;
-          ref.read(suggestSubCategoryProvider.notifier).state = SubCategory.none;
+          ref.read(suggestSubCategoryProvider.notifier).state =
+              SubCategory.none;
           notifier.deleteAllParameters();
           context.go('/home');
         },
@@ -98,9 +98,10 @@ class _SearchHeaderState extends ConsumerState<SearchHeader> {
       debugPrint('category: ${category.displayName}');
       ref.read(suggestCategoryProvider.notifier).state = category;
       //ref.read(searchProvider.notifier).selectedCategory(category);
-    } else if (subCategoryList.any((element) => element.suggestNameList.contains(text))) {
-      final SubCategory subCategory =
-          subCategoryList.firstWhere((element) => element.suggestNameList.contains(text));
+    } else if (subCategoryList
+        .any((element) => element.suggestNameList.contains(text))) {
+      final SubCategory subCategory = subCategoryList
+          .firstWhere((element) => element.suggestNameList.contains(text));
       debugPrint('subCategory: ${subCategory.displayName}');
       ref.read(suggestSubCategoryProvider.notifier).state = subCategory;
       //ref.read(searchProvider.notifier).selectedSubCategory(subCategory);

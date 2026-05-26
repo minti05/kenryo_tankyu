@@ -17,7 +17,8 @@ class SubCategoryChip extends ConsumerWidget {
     final List<SubCategory> exactSubCategoryList = categoryName.subCategories;
 
     ///定義系②:選択されたサブカテゴリを取得している。
-    final SubCategory selectedSubCategory = ref.watch(searchProvider).subCategory;
+    final SubCategory selectedSubCategory =
+        ref.watch(searchProvider).subCategory;
 
     return Wrap(
       spacing: 8.0,
@@ -25,7 +26,7 @@ class SubCategoryChip extends ConsumerWidget {
         return ChoiceChip(
             label: Text(exactSubCategoryList[index].displayName),
             selected:
-            exactSubCategoryList.indexOf(selectedSubCategory) == index,
+                exactSubCategoryList.indexOf(selectedSubCategory) == index,
             onSelected: (_) =>
                 notifier.selectedSubCategory(exactSubCategoryList[index]));
       }).toList(),

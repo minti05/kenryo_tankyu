@@ -67,7 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '848862581518',
     projectId: 'tankyu-app',
     storageBucket: 'tankyu-app.appspot.com',
-    iosClientId: '848862581518-c73uvqaavqbkje0fo6tva67a2rf678ks.apps.googleusercontent.com',
+    iosClientId:
+        '848862581518-c73uvqaavqbkje0fo6tva67a2rf678ks.apps.googleusercontent.com',
     iosBundleId: 'com.example.kenryoTankyu',
   );
 
@@ -77,7 +78,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '848862581518',
     projectId: 'tankyu-app',
     storageBucket: 'tankyu-app.appspot.com',
-    iosClientId: '848862581518-9gbgujfl84h5j7260grv0ip70itq8q8o.apps.googleusercontent.com',
+    iosClientId:
+        '848862581518-9gbgujfl84h5j7260grv0ip70itq8q8o.apps.googleusercontent.com',
     iosBundleId: 'com.example.kenryoTankyu.RunnerTests',
   );
 }

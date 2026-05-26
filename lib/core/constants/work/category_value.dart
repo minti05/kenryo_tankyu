@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 
-final List<String> categoryList = Category.values.map((e) => e.displayName).toList();
+final List<String> categoryList =
+    Category.values.map((e) => e.displayName).toList();
 
 enum Category {
   society(
       displayName: '地域',
       nameForExplore: '地域',
-      suggestNameList: ['地域','ちいき'],
+      suggestNameList: ['地域', 'ちいき'],
       color: Color(0xFFd73c00),
       subCategories: [
         SubCategory.disasterPrevention,
@@ -21,7 +22,7 @@ enum Category {
   history(
     displayName: '人文・歴史',
     nameForExplore: '人文・歴史',
-    suggestNameList: ['人文','歴史','じんぶん','れきし','人文歴史'],
+    suggestNameList: ['人文', '歴史', 'じんぶん', 'れきし', '人文歴史'],
     color: Color(0xFFd68d00),
     subCategories: [
       SubCategory.history,
@@ -39,7 +40,7 @@ enum Category {
   rights(
     displayName: '人権・社会福祉',
     nameForExplore: '人権\n社会福祉',
-    suggestNameList: ['人権','社会福祉','じんけん','しゃかいふくし'],
+    suggestNameList: ['人権', '社会福祉', 'じんけん', 'しゃかいふくし'],
     color: Color(0xFF492456),
     subCategories: [
       SubCategory.gender,
@@ -55,7 +56,7 @@ enum Category {
   international(
     displayName: '国際',
     nameForExplore: '国際',
-    suggestNameList: ['国際','こくさい'],
+    suggestNameList: ['国際', 'こくさい'],
     color: Color(0xFF1e00d7),
     subCategories: [
       SubCategory.international,
@@ -66,7 +67,7 @@ enum Category {
   business(
     displayName: '社会・経済',
     nameForExplore: '社会\n経済',
-    suggestNameList: ['社会','経済','しゃかい','けいざい'],
+    suggestNameList: ['社会', '経済', 'しゃかい', 'けいざい'],
     color: Color(0xFF00d89c),
     subCategories: [
       SubCategory.marketing,
@@ -79,7 +80,7 @@ enum Category {
   industry(
     displayName: '産業',
     nameForExplore: '産業',
-    suggestNameList: ['産業','さんぎょう'],
+    suggestNameList: ['産業', 'さんぎょう'],
     color: Color(0xFFb1d800),
     subCategories: [
       SubCategory.agriculture,
@@ -92,7 +93,7 @@ enum Category {
   education(
     displayName: 'スポーツ・教育',
     nameForExplore: 'スポーツ\n教育',
-    suggestNameList: ['スポーツ','教育','すぽーつ','きょういく'],
+    suggestNameList: ['スポーツ', '教育', 'すぽーつ', 'きょういく'],
     color: Color(0xFFd80040),
     subCategories: [
       SubCategory.sports,
@@ -105,7 +106,7 @@ enum Category {
   environment(
     displayName: '環境問題',
     nameForExplore: '環境問題',
-    suggestNameList: ['環境問題','かんきょうもんだい','環境','かんきょう'],
+    suggestNameList: ['環境問題', 'かんきょうもんだい', '環境', 'かんきょう'],
     color: Color(0xFF03d929),
     subCategories: [
       SubCategory.ecosystem,
@@ -119,7 +120,7 @@ enum Category {
   science(
     displayName: '数学・理科',
     nameForExplore: '数学\n理科',
-    suggestNameList: ['数学','理科','すうがく','りか','科学','かがく'], 
+    suggestNameList: ['数学', '理科', 'すうがく', 'りか', '科学', 'かがく'],
     color: Color(0xFF006fd8),
     subCategories: [
       SubCategory.mathematics,
@@ -133,7 +134,7 @@ enum Category {
   technology(
     displayName: 'テクノロジー・工学',
     nameForExplore: 'テクノロジー\n工学',
-    suggestNameList: ['テクノロジー','工学','てくのろじー','こうがく','技術','ぎじゅつ'],
+    suggestNameList: ['テクノロジー', '工学', 'てくのろじー', 'こうがく', '技術', 'ぎじゅつ'],
     color: Color(0xFF15d8cd),
     subCategories: [
       SubCategory.app,
@@ -147,7 +148,7 @@ enum Category {
   health(
     displayName: '健康・医療',
     nameForExplore: '健康\n医療',
-    suggestNameList: ['健康','医療','けんこう','いりょう','医学','いがく'],
+    suggestNameList: ['健康', '医療', 'けんこう', 'いりょう', '医学', 'いがく'],
     color: Color(0xFFd80089),
     subCategories: [
       SubCategory.health,
@@ -161,7 +162,7 @@ enum Category {
   art(
     displayName: 'デザイン・アート',
     nameForExplore: 'デザイン\nアート',
-    suggestNameList: ['デザイン','アート','でざいん','あーと'],
+    suggestNameList: ['デザイン', 'アート', 'でざいん', 'あーと'],
     color: Color(0xFFda5e00),
     subCategories: [
       SubCategory.art,
@@ -174,7 +175,7 @@ enum Category {
   life(
     displayName: 'くらし',
     nameForExplore: 'くらし',
-    suggestNameList: ['くらし','暮らし','生活','せいかつ'],
+    suggestNameList: ['くらし', '暮らし', '生活', 'せいかつ'],
     color: Color(0xFFd4d708),
     subCategories: [
       SubCategory.food,

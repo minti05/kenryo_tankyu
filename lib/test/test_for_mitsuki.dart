@@ -6,7 +6,6 @@ class TestForMitsuki extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-        body: Center(child: Text('This is a test page for Mitsuki.'))
-    );
+        body: Center(child: Text('This is a test page for Mitsuki.')));
   }
 }
