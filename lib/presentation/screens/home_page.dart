@@ -5,7 +5,6 @@ import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
-import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 import 'package:kenryo_tankyu/features/notification/presentation/widgets/notification_permission_dialog.dart';
@@ -102,11 +101,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                     });
               },
             ),
-            const SizedBox(height: 16),
-            const Text('コンテンツ',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const ContentCarousel(),
             const SizedBox(height: 16),
           ],
         ),

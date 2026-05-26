@@ -108,7 +108,6 @@ class ResultListPage extends ConsumerWidget {
                       error: error,
                       onRetry: () => ref.invalidate(algoliaSearchProvider),
                       ),
-                    },
                   );
                 },
               ),

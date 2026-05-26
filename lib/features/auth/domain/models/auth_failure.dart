@@ -1,3 +1,5 @@
+import 'package:kenryo_tankyu/core/error/failures.dart';
+
 sealed class AuthFailure extends Failure {
   const AuthFailure(String message) : super(message);
 }

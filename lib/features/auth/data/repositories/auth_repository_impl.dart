@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenryo_tankyu/core/error/error_mapper.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/auth/domain/repositories/auth_repository.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
