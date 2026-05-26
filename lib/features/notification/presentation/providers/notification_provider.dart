@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';

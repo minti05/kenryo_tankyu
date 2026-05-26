@@ -1,6 +1,6 @@
 /// エラー情報を保持する抽象クラス
 /// すべてのエラー（Failure）はこのクラスを継承します。
-sealed class Failure implements Exception {
+abstract class Failure implements Exception {
   final String message;
   const Failure(this.message);
 

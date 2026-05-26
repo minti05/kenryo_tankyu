@@ -89,8 +89,8 @@ class AuthNotifier extends _$AuthNotifier {
     if (user != null && user.email != null) {
       // 本来はTransactionなどでやるべきだが簡易的に
       await ref
-        .read(userRepositoryProvider)
-        .updateRegisteredStatus(email: user.email!, isRegistered: false);
+          .read(userRepositoryProvider)
+          .updateRegisteredStatus(email: user.email!, isRegistered: false);
       await ref.read(authRepositoryProvider).deleteUser();
     }
   }

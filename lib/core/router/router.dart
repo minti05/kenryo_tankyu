@@ -9,8 +9,6 @@ import 'package:kenryo_tankyu/features/auth/presentation/screens/verify_name_pag
 import 'package:kenryo_tankyu/features/auth/presentation/screens/login_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/reset_password_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/verify_email_page.dart';
-import 'package:kenryo_tankyu/features/krgp/presentation/screens/krgp_home_page.dart';
-import 'package:kenryo_tankyu/features/krgp/presentation/screens/krgp_year_page.dart';
 import 'package:kenryo_tankyu/features/notification/presentation/screens/notification_page.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/screens/result_page.dart';
 import 'package:kenryo_tankyu/features/search/presentation/screens/result_list_page.dart';
@@ -90,17 +88,6 @@ final routesProvider = Provider<GoRouter>((ref) {
           final documentID = state.pathParameters['documentID']!;
           return ResultPage(documentID: int.parse(documentID));
         },
-      ),
-      GoRoute(
-        path: '/krgp',
-        builder: (context, state) => const KrgpPage(),
-        routes: [
-          GoRoute(
-            path: 'year',
-            builder: (context, state) =>
-                KrgpYearPage(year: state.extra as String),
-          ),
-        ],
       ),
       GoRoute(
           path: '/teacher',

@@ -1,7 +1,7 @@
 import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class InputPassword extends ConsumerStatefulWidget {
@@ -180,7 +180,6 @@ class _InputPasswordState extends ConsumerState<InputPassword> {
       if (!context.mounted) return;
 
       showErrorDialog(context, e);
-      }
     }
   }
 }

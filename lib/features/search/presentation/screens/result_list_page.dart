@@ -107,8 +107,7 @@ class ResultListPage extends ConsumerWidget {
                     error: (error, stackTrace) => CommonErrorView(
                       error: error,
                       onRetry: () => ref.invalidate(algoliaSearchProvider),
-                      ),
-                    },
+                    ),
                   );
                 },
               ),
