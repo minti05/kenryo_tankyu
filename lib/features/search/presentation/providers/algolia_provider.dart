@@ -62,7 +62,7 @@ class SortedListNotifier extends Notifier<List<Searched>> {
         debugPrint('古い順で並び替えます');
         break;
       case SortType.likeOrder:
-        newList.sort((a, b) => b.vagueLikes.compareTo(a.vagueLikes));
+        newList.sort((a, b) => b.likes.compareTo(a.likes));
         debugPrint('いいね順で並び替えます');
         break;
     }

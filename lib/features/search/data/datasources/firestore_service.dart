@@ -32,8 +32,7 @@ class FireStoreService {
       'existsThesis': true,
       'existsPoster': true,
       'author': '縣陵太郎',
-      'vagueLikes': 1921,
-      'exactLikes': 1921,
+      'likes': 1921,
     });
     // await db.collection('works').doc('20202290').set({
     //   'title': 'みんなのぶしつ 〜高校生の放課後の居場所に挑む〜',
@@ -105,8 +104,7 @@ class FireStoreService {
       'existsThesis': true,
       'existsPoster': true,
       'author': '縣陵太郎',
-      'vagueLikes': 1921,
-      'exactLikes': 1921,
+      'likes': 1921,
     });
     // await db.collection('works').doc('20202290').set({
     //   'title': 'みんなのぶしつ 〜高校生の放課後の居場所に挑む〜',
