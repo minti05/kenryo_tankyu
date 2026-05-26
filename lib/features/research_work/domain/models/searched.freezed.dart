@@ -33,8 +33,6 @@ mixin _$Searched {
   String get title;
   String get author;
   int get likes;
-  int get vagueLikes;
-  int get exactLikes;
   bool get existsSlide;
   bool get existsReport;
   bool get existsThesis;
@@ -78,10 +76,6 @@ mixin _$Searched {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.likes, likes) || other.likes == likes) &&
-            (identical(other.vagueLikes, vagueLikes) ||
-                other.vagueLikes == vagueLikes) &&
-            (identical(other.exactLikes, exactLikes) ||
-                other.exactLikes == exactLikes) &&
             (identical(other.existsSlide, existsSlide) ||
                 other.existsSlide == existsSlide) &&
             (identical(other.existsReport, existsReport) ||
@@ -97,33 +91,30 @@ mixin _$Searched {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hashAll([
-        runtimeType,
-        documentID,
-        isFavorite,
-        category1,
-        subCategory1,
-        category2,
-        subCategory2,
-        enterYear,
-        eventName,
-        course,
-        title,
-        author,
-        likes,
-        vagueLikes,
-        exactLikes,
-        existsSlide,
-        existsReport,
-        existsThesis,
-        existsPoster,
-        savedAt,
-        isCached
-      ]);
+  int get hashCode => Object.hash(
+      runtimeType,
+      documentID,
+      isFavorite,
+      category1,
+      subCategory1,
+      category2,
+      subCategory2,
+      enterYear,
+      eventName,
+      course,
+      title,
+      author,
+      likes,
+      existsSlide,
+      existsReport,
+      existsThesis,
+      existsPoster,
+      savedAt,
+      isCached);
 
   @override
   String toString() {
-    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, vagueLikes: $vagueLikes, exactLikes: $exactLikes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
+    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
   }
 }
 
@@ -145,8 +136,6 @@ abstract mixin class $SearchedCopyWith<$Res> {
       String title,
       String author,
       int likes,
-      int vagueLikes,
-      int exactLikes,
       bool existsSlide,
       bool existsReport,
       bool existsThesis,
@@ -179,8 +168,6 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
     Object? title = null,
     Object? author = null,
     Object? likes = null,
-    Object? vagueLikes = null,
-    Object? exactLikes = null,
     Object? existsSlide = null,
     Object? existsReport = null,
     Object? existsThesis = null,
@@ -236,14 +223,6 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
       likes: null == likes
           ? _self.likes
           : likes // ignore: cast_nullable_to_non_nullable
-              as int,
-      vagueLikes: null == vagueLikes
-          ? _self.vagueLikes
-          : vagueLikes // ignore: cast_nullable_to_non_nullable
-              as int,
-      exactLikes: null == exactLikes
-          ? _self.exactLikes
-          : exactLikes // ignore: cast_nullable_to_non_nullable
               as int,
       existsSlide: null == existsSlide
           ? _self.existsSlide
@@ -379,8 +358,6 @@ extension SearchedPatterns on Searched {
             String title,
             String author,
             int likes,
-            int vagueLikes,
-            int exactLikes,
             bool existsSlide,
             bool existsReport,
             bool existsThesis,
@@ -406,8 +383,6 @@ extension SearchedPatterns on Searched {
             _that.title,
             _that.author,
             _that.likes,
-            _that.vagueLikes,
-            _that.exactLikes,
             _that.existsSlide,
             _that.existsReport,
             _that.existsThesis,
@@ -447,8 +422,6 @@ extension SearchedPatterns on Searched {
             String title,
             String author,
             int likes,
-            int vagueLikes,
-            int exactLikes,
             bool existsSlide,
             bool existsReport,
             bool existsThesis,
@@ -473,8 +446,6 @@ extension SearchedPatterns on Searched {
             _that.title,
             _that.author,
             _that.likes,
-            _that.vagueLikes,
-            _that.exactLikes,
             _that.existsSlide,
             _that.existsReport,
             _that.existsThesis,
@@ -513,8 +484,6 @@ extension SearchedPatterns on Searched {
             String title,
             String author,
             int likes,
-            int vagueLikes,
-            int exactLikes,
             bool existsSlide,
             bool existsReport,
             bool existsThesis,
@@ -539,8 +508,6 @@ extension SearchedPatterns on Searched {
             _that.title,
             _that.author,
             _that.likes,
-            _that.vagueLikes,
-            _that.exactLikes,
             _that.existsSlide,
             _that.existsReport,
             _that.existsThesis,
@@ -569,8 +536,6 @@ class _Searched extends Searched {
       this.title = '',
       this.author = '',
       this.likes = 0,
-      this.vagueLikes = 0,
-      this.exactLikes = 0,
       this.existsSlide = false,
       this.existsReport = false,
       this.existsThesis = false,
@@ -617,12 +582,6 @@ class _Searched extends Searched {
   @override
   @JsonKey()
   final int likes;
-  @override
-  @JsonKey()
-  final int vagueLikes;
-  @override
-  @JsonKey()
-  final int exactLikes;
   @override
   @JsonKey()
   final bool existsSlide;
@@ -682,10 +641,6 @@ class _Searched extends Searched {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.author, author) || other.author == author) &&
             (identical(other.likes, likes) || other.likes == likes) &&
-            (identical(other.vagueLikes, vagueLikes) ||
-                other.vagueLikes == vagueLikes) &&
-            (identical(other.exactLikes, exactLikes) ||
-                other.exactLikes == exactLikes) &&
             (identical(other.existsSlide, existsSlide) ||
                 other.existsSlide == existsSlide) &&
             (identical(other.existsReport, existsReport) ||
@@ -701,33 +656,30 @@ class _Searched extends Searched {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hashAll([
-        runtimeType,
-        documentID,
-        isFavorite,
-        category1,
-        subCategory1,
-        category2,
-        subCategory2,
-        enterYear,
-        eventName,
-        course,
-        title,
-        author,
-        likes,
-        vagueLikes,
-        exactLikes,
-        existsSlide,
-        existsReport,
-        existsThesis,
-        existsPoster,
-        savedAt,
-        isCached
-      ]);
+  int get hashCode => Object.hash(
+      runtimeType,
+      documentID,
+      isFavorite,
+      category1,
+      subCategory1,
+      category2,
+      subCategory2,
+      enterYear,
+      eventName,
+      course,
+      title,
+      author,
+      likes,
+      existsSlide,
+      existsReport,
+      existsThesis,
+      existsPoster,
+      savedAt,
+      isCached);
 
   @override
   String toString() {
-    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, vagueLikes: $vagueLikes, exactLikes: $exactLikes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
+    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
   }
 }
 
@@ -751,8 +703,6 @@ abstract mixin class _$SearchedCopyWith<$Res>
       String title,
       String author,
       int likes,
-      int vagueLikes,
-      int exactLikes,
       bool existsSlide,
       bool existsReport,
       bool existsThesis,
@@ -785,8 +735,6 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
     Object? title = null,
     Object? author = null,
     Object? likes = null,
-    Object? vagueLikes = null,
-    Object? exactLikes = null,
     Object? existsSlide = null,
     Object? existsReport = null,
     Object? existsThesis = null,
@@ -842,14 +790,6 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
       likes: null == likes
           ? _self.likes
           : likes // ignore: cast_nullable_to_non_nullable
-              as int,
-      vagueLikes: null == vagueLikes
-          ? _self.vagueLikes
-          : vagueLikes // ignore: cast_nullable_to_non_nullable
-              as int,
-      exactLikes: null == exactLikes
-          ? _self.exactLikes
-          : exactLikes // ignore: cast_nullable_to_non_nullable
               as int,
       existsSlide: null == existsSlide
           ? _self.existsSlide

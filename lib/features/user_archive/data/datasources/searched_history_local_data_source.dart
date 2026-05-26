@@ -30,8 +30,6 @@ class SearchedHistoryLocalDataSource {
             'title TEXT NOT NULL, '
             'author TEXT NOT NULL, '
             'likes INTEGER NOT NULL, '
-            'vagueLikes INTEGER NOT NULL, '
-            'exactLikes INTEGER NOT NULL, '
             'existsSlide INTEGER NOT NULL, '
             'existsReport INTEGER NOT NULL, '
             'existsThesis INTEGER NOT NULL, '
@@ -43,12 +41,33 @@ class SearchedHistoryLocalDataSource {
           );
         },
         onUpgrade: (db, oldVersion, newVersion) async {
-          if (oldVersion < 8) {
-            await db.execute(
-                'ALTER TABLE searched_history ADD COLUMN likes INTEGER NOT NULL DEFAULT 0');
-          }
+          // バージョン10への更新で全ユーザーの履歴をリセット
+          await db.execute('DROP TABLE IF EXISTS searched_history;');
+          await db.execute(
+            'CREATE TABLE searched_history('
+            'documentID INTEGER PRIMARY KEY NOT NULL, '
+            'isFavorite INTEGER NOT NULL, '
+            'category1 TEXT NOT NULL, '
+            'subCategory1 TEXT NOT NULL, '
+            'category2 TEXT NOT NULL, '
+            'subCategory2 TEXT NOT NULL, '
+            'enterYear INTEGER NOT NULL, '
+            'eventName TEXT NOT NULL, '
+            'course TEXT NOT NULL, '
+            'title TEXT NOT NULL, '
+            'author TEXT NOT NULL, '
+            'likes INTEGER NOT NULL, '
+            'existsSlide INTEGER NOT NULL, '
+            'existsReport INTEGER NOT NULL, '
+            'existsThesis INTEGER NOT NULL, '
+            'existsPoster INTEGER NOT NULL, '
+            'savedAt TEXT NOT NULL, '
+            'CHECK(LENGTH(documentID) == 8),'
+            'CHECK(savedAt != null) '
+            ');',
+          );
         },
-        version: 8,
+        version: 10,
       );
     } catch (error, stackTrace) {
       return Future.error(error, stackTrace);
@@ -87,6 +106,18 @@ class SearchedHistoryLocalDataSource {
         {'isFavorite': isFavorite},
         where: 'documentID = ?',
         whereArgs: [documentID],
+      );
+    } catch (error, stackTrace) {
+      return Future.error(error, stackTrace);
+    }
+  }
+
+  Future<void> updateLikes(int documentID, int delta) async {
+    try {
+      final Database db = await database;
+      await db.rawUpdate(
+        'UPDATE searched_history SET likes = MAX(0, likes + ?) WHERE documentID = ?',
+        [delta, documentID],
       );
     } catch (error, stackTrace) {
       return Future.error(error, stackTrace);

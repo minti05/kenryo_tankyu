@@ -7,13 +7,11 @@ import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_
 /// AsyncValue.isLoading を監視して、通信中の連打防止と視覚的フィードバックを行います。
 class FavoriteButton extends ConsumerStatefulWidget {
   final Searched searched;
-  final bool showLikes;
   final bool isLarge;
 
   const FavoriteButton({
     super.key,
     required this.searched,
-    this.showLikes = true,
     this.isLarge = false,
   });
 
@@ -27,14 +25,29 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
   int? _likesLocal;
 
   @override
+  void didUpdateWidget(FavoriteButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 親から渡される likes が更新されたタイミングで楽観的な上書きを解除する。
+    // これにより、通信完了→SQLite再読み込み完了の間に一瞬元の値に戻る
+    // フリッカーを防ぐ。
+    if (widget.searched.likes != oldWidget.searched.likes) {
+      _likesLocal = null;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final favoriteState =
         ref.watch(userIsFavoriteStateProvider(widget.searched.documentID));
 
-    // 通信が完了したらローカルの状態を同期/リセット
+    // 通信完了後にローカル状態をリセット。
+    // _likesLocal はエラー時のみここでリセットし、成功時は
+    // didUpdateWidget で親の likes が更新されたタイミングでリセットする。
     if (!favoriteState.isLoading) {
       _isFavoriteLocal = null;
-      _likesLocal = null;
+      if (favoriteState.hasError) {
+        _likesLocal = null;
+      }
     }
 
     final isFavorite = _isFavoriteLocal ??
@@ -51,7 +64,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: color, size: widget.isLarge ? 28 : 24),
-        if (widget.showLikes && !widget.searched.isCached) ...[
+        if (!widget.searched.isCached) ...[
           const SizedBox(height: 4),
           Text(
             likes.toString(),

@@ -46,7 +46,9 @@ Future<Searched> researchWork(Ref ref, int documentID) async {
   } else {
     final cached = await archiveRepo.getHistory(documentID);
     if (cached != null) {
-      return cached;
+      // SQLite は isCached を保存しないため Default(true) になる。
+      // 詳細画面では常に実データとして扱う。
+      return cached.copyWith(isCached: false);
     } else {
       return fetchFromServer();
     }

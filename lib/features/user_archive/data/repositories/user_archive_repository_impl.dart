@@ -71,7 +71,9 @@ class UserArchiveRepositoryImpl
   @override
   Future<void> changeFavoriteState(int documentID, bool nextIsFavorite) async {
     try {
+      final delta = nextIsFavorite ? 1 : -1;
       await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
+      await _historyDataSource.updateLikes(documentID, delta);
       await updateRemoteLikes(documentID, nextIsFavorite);
     } catch (e) {
       throw mapException(e);

@@ -38,8 +38,6 @@ abstract class Searched with _$Searched {
     @Default('') String title,
     @Default('') String author,
     @Default(0) int likes,
-    @Default(0) int vagueLikes,
-    @Default(0) int exactLikes,
     @Default(false) bool existsSlide,
     @Default(false) bool existsReport,
     @Default(false) bool existsThesis,
@@ -60,7 +58,6 @@ abstract class Searched with _$Searched {
     return searched.copyWith(
         documentID: int.parse(doc.objectID),
         isFavorite: isFavorite,
-        likes: searched.exactLikes, // exactLikesをlikesにマッピング
         isCached: false);
   }
   factory Searched.fromFirestore(DocumentSnapshot doc, bool isFavorite) {
@@ -69,7 +66,6 @@ abstract class Searched with _$Searched {
     return searched.copyWith(
         documentID: int.parse(doc.id),
         isFavorite: isFavorite,
-        likes: searched.exactLikes, // exactLikesをlikesにマッピング
         isCached: false);
   }
   factory Searched.fromSQLite(Map<String, dynamic> json) {
@@ -88,7 +84,6 @@ abstract class Searched with _$Searched {
     final json = this.toJson();
     json.remove('isCached');
     json['isFavorite'] = this.isFavorite ? 1 : 0;
-    json['likes'] = this.likes; // likesを追加
     json['existsSlide'] = this.existsSlide ? 1 : 0;
     json['existsReport'] = this.existsReport ? 1 : 0;
     json['existsThesis'] = this.existsThesis ? 1 : 0;
