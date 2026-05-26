@@ -64,9 +64,7 @@ abstract class Searched with _$Searched {
     final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     final searched = Searched.fromJson(data);
     return searched.copyWith(
-        documentID: int.parse(doc.id),
-        isFavorite: isFavorite,
-        isCached: false);
+        documentID: int.parse(doc.id), isFavorite: isFavorite, isCached: false);
   }
   factory Searched.fromSQLite(Map<String, dynamic> json) {
     final mutableJson = Map<String, dynamic>.from(json);
