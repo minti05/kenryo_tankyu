@@ -32,6 +32,7 @@ mixin _$Searched {
   Course get course;
   String get title;
   String get author;
+  int get likes;
   int get vagueLikes;
   int get exactLikes;
   bool get existsSlide;
@@ -76,6 +77,7 @@ mixin _$Searched {
             (identical(other.course, course) || other.course == course) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.author, author) || other.author == author) &&
+            (identical(other.likes, likes) || other.likes == likes) &&
             (identical(other.vagueLikes, vagueLikes) ||
                 other.vagueLikes == vagueLikes) &&
             (identical(other.exactLikes, exactLikes) ||
@@ -108,6 +110,7 @@ mixin _$Searched {
         course,
         title,
         author,
+        likes,
         vagueLikes,
         exactLikes,
         existsSlide,
@@ -120,7 +123,7 @@ mixin _$Searched {
 
   @override
   String toString() {
-    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, vagueLikes: $vagueLikes, exactLikes: $exactLikes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
+    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, vagueLikes: $vagueLikes, exactLikes: $exactLikes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
   }
 }
 
@@ -141,6 +144,7 @@ abstract mixin class $SearchedCopyWith<$Res> {
       @CourseEnumConverter() Course course,
       String title,
       String author,
+      int likes,
       int vagueLikes,
       int exactLikes,
       bool existsSlide,
@@ -174,6 +178,7 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
     Object? course = null,
     Object? title = null,
     Object? author = null,
+    Object? likes = null,
     Object? vagueLikes = null,
     Object? exactLikes = null,
     Object? existsSlide = null,
@@ -228,6 +233,10 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
           ? _self.author
           : author // ignore: cast_nullable_to_non_nullable
               as String,
+      likes: null == likes
+          ? _self.likes
+          : likes // ignore: cast_nullable_to_non_nullable
+              as int,
       vagueLikes: null == vagueLikes
           ? _self.vagueLikes
           : vagueLikes // ignore: cast_nullable_to_non_nullable
@@ -369,6 +378,7 @@ extension SearchedPatterns on Searched {
             @CourseEnumConverter() Course course,
             String title,
             String author,
+            int likes,
             int vagueLikes,
             int exactLikes,
             bool existsSlide,
@@ -395,6 +405,7 @@ extension SearchedPatterns on Searched {
             _that.course,
             _that.title,
             _that.author,
+            _that.likes,
             _that.vagueLikes,
             _that.exactLikes,
             _that.existsSlide,
@@ -435,6 +446,7 @@ extension SearchedPatterns on Searched {
             @CourseEnumConverter() Course course,
             String title,
             String author,
+            int likes,
             int vagueLikes,
             int exactLikes,
             bool existsSlide,
@@ -460,6 +472,7 @@ extension SearchedPatterns on Searched {
             _that.course,
             _that.title,
             _that.author,
+            _that.likes,
             _that.vagueLikes,
             _that.exactLikes,
             _that.existsSlide,
@@ -499,6 +512,7 @@ extension SearchedPatterns on Searched {
             @CourseEnumConverter() Course course,
             String title,
             String author,
+            int likes,
             int vagueLikes,
             int exactLikes,
             bool existsSlide,
@@ -524,6 +538,7 @@ extension SearchedPatterns on Searched {
             _that.course,
             _that.title,
             _that.author,
+            _that.likes,
             _that.vagueLikes,
             _that.exactLikes,
             _that.existsSlide,
@@ -553,6 +568,7 @@ class _Searched extends Searched {
       @CourseEnumConverter() required this.course,
       this.title = '',
       this.author = '',
+      this.likes = 0,
       this.vagueLikes = 0,
       this.exactLikes = 0,
       this.existsSlide = false,
@@ -598,6 +614,9 @@ class _Searched extends Searched {
   @override
   @JsonKey()
   final String author;
+  @override
+  @JsonKey()
+  final int likes;
   @override
   @JsonKey()
   final int vagueLikes;
@@ -662,6 +681,7 @@ class _Searched extends Searched {
             (identical(other.course, course) || other.course == course) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.author, author) || other.author == author) &&
+            (identical(other.likes, likes) || other.likes == likes) &&
             (identical(other.vagueLikes, vagueLikes) ||
                 other.vagueLikes == vagueLikes) &&
             (identical(other.exactLikes, exactLikes) ||
@@ -694,6 +714,7 @@ class _Searched extends Searched {
         course,
         title,
         author,
+        likes,
         vagueLikes,
         exactLikes,
         existsSlide,
@@ -706,7 +727,7 @@ class _Searched extends Searched {
 
   @override
   String toString() {
-    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, vagueLikes: $vagueLikes, exactLikes: $exactLikes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
+    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, vagueLikes: $vagueLikes, exactLikes: $exactLikes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
   }
 }
 
@@ -729,6 +750,7 @@ abstract mixin class _$SearchedCopyWith<$Res>
       @CourseEnumConverter() Course course,
       String title,
       String author,
+      int likes,
       int vagueLikes,
       int exactLikes,
       bool existsSlide,
@@ -762,6 +784,7 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
     Object? course = null,
     Object? title = null,
     Object? author = null,
+    Object? likes = null,
     Object? vagueLikes = null,
     Object? exactLikes = null,
     Object? existsSlide = null,
@@ -816,6 +839,10 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
           ? _self.author
           : author // ignore: cast_nullable_to_non_nullable
               as String,
+      likes: null == likes
+          ? _self.likes
+          : likes // ignore: cast_nullable_to_non_nullable
+              as int,
       vagueLikes: null == vagueLikes
           ? _self.vagueLikes
           : vagueLikes // ignore: cast_nullable_to_non_nullable

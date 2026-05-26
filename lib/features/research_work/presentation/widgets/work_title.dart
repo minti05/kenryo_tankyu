@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite_button.dart';
 
 class WorkTitle extends StatelessWidget {
   final Searched searched;
-  const  WorkTitle({super.key,required this.searched});
+  const WorkTitle({super.key, required this.searched});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,7 @@ class WorkTitle extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          FavoriteForResultPage(
-              searched: searched),
+          FavoriteButton(searched: searched, isLarge: true),
         ],
       ),
     );

@@ -107,15 +107,11 @@ abstract class _$AbleChangeFavorite extends $Notifier<bool> {
   }
 }
 
-/// documentIDごとにfavoriteかどうかを記録するProvider
-
 @ProviderFor(UserIsFavoriteState)
 const userIsFavoriteStateProvider = UserIsFavoriteStateFamily._();
 
-/// documentIDごとにfavoriteかどうかを記録するProvider
 final class UserIsFavoriteStateProvider
     extends $AsyncNotifierProvider<UserIsFavoriteState, bool> {
-  /// documentIDごとにfavoriteかどうかを記録するProvider
   const UserIsFavoriteStateProvider._(
       {required UserIsFavoriteStateFamily super.from,
       required int super.argument})
@@ -153,9 +149,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'9f0f34dfbd030358810094267d9fa98a2a03a557';
-
-/// documentIDごとにfavoriteかどうかを記録するProvider
+    r'b82606851c4d45565a570aa3fc3382050df14ad2';
 
 final class UserIsFavoriteStateFamily extends $Family
     with
@@ -170,8 +164,6 @@ final class UserIsFavoriteStateFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// documentIDごとにfavoriteかどうかを記録するProvider
-
   UserIsFavoriteStateProvider call(
     int documentID,
   ) =>
@@ -180,8 +172,6 @@ final class UserIsFavoriteStateFamily extends $Family
   @override
   String toString() => r'userIsFavoriteStateProvider';
 }
-
-/// documentIDごとにfavoriteかどうかを記録するProvider
 
 abstract class _$UserIsFavoriteState extends $AsyncNotifier<bool> {
   late final _$args = ref.$arg as int;
