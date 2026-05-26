@@ -31,5 +31,5 @@ class RequiresRecentLogin extends AuthFailure {
 class UnknownAuthFailure extends AuthFailure {
   final String? code;
   const UnknownAuthFailure({String? message, this.code})
-    : super(message ?? '予期せぬエラーが発生しました。');
+      : super(message ?? '予期せぬエラーが発生しました。');
 }

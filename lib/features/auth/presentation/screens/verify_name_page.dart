@@ -104,44 +104,44 @@ class VerifyNamePage extends ConsumerWidget {
   }
 
   _verifyName(BuildContext context, WidgetRef ref) async {
-  try {
-    final auth = ref.watch(authProvider);
-    final notifier = ref.read(authProvider.notifier);
-    final emailAddress = '${auth.email}@kenryo.ed.jp';
+    try {
+      final auth = ref.watch(authProvider);
+      final notifier = ref.read(authProvider.notifier);
+      final emailAddress = '${auth.email}@kenryo.ed.jp';
 
-    final userData = await ref.read(userRepositoryProvider).verifyUser(
-        email: emailAddress, affiliation: auth.affiliation?.name ?? '');
+      final userData = await ref.read(userRepositoryProvider).verifyUser(
+          email: emailAddress, affiliation: auth.affiliation?.name ?? '');
 
-    if (userData != null) {
-      final userName = userData['name'];
-      final alreadyRegistered = userData['registered'];
-      if (alreadyRegistered) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              children: [
-                const Text('このメールアドレスは既に登録されています'),
-                ElevatedButton(
-                    onPressed: () => context.go('/welcome/login'),
-                    child: const Text('ログイン画面に移動')),
-              ],
+      if (userData != null) {
+        final userName = userData['name'];
+        final alreadyRegistered = userData['registered'];
+        if (alreadyRegistered) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Column(
+                children: [
+                  const Text('このメールアドレスは既に登録されています'),
+                  ElevatedButton(
+                      onPressed: () => context.go('/welcome/login'),
+                      child: const Text('ログイン画面に移動')),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          debugPrint("ここまで来てるよー");
+          notifier.changeUserName(userName);
+          context.go('/welcome/verify_name/create_password');
+        }
       } else {
-        debugPrint("ここまで来てるよー");
-        notifier.changeUserName(userName);
-        context.go('/welcome/verify_name/create_password');
+        notifier.decrementLimit();
       }
-    } else {
-      notifier.decrementLimit();
+    } on Failure catch (e) {
+      if (!context.mounted) return;
+      showErrorDialog(context, e);
+    } catch (e) {
+      if (!context.mounted) return;
+      debugPrint('Unexpected error: $e');
     }
-  } on Failure catch (e) {
-    if (!context.mounted) return;
-    showErrorDialog(context, e);
-  } catch (e) {
-    if (!context.mounted) return;
-    debugPrint('Unexpected error: $e');
   }
-}
 }
