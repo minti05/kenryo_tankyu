@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/constants/feature/user_value.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/auth_app_bar.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/widgets/input_email.dart';
@@ -43,7 +44,12 @@ class CreatePassWordPage extends ConsumerWidget {
                               .bodyMedium!
                               .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 5),
-                      InputEmail(ref.watch(authProvider).email!, false, false),
+                      InputEmail(
+                        ref.watch(authProvider).email!,
+                        false,
+                        ref.watch(authProvider).affiliation ==
+                            Affiliation.developer,
+                      ),
                       const SizedBox(height: 20),
                       const InputPassword(),
                       const SizedBox(height: 20),

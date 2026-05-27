@@ -29,6 +29,12 @@ class _InputEmailState extends ConsumerState<InputEmail> {
     _controller.dispose();
   }
 
+  String? get _suffixText {
+    if (widget.isDeveloper) return null;
+    if (!widget.isEdit) return '@kenryo.ed.jp';
+    return _controller.text.contains('@') ? null : '@kenryo.ed.jp';
+  }
+
   @override
   Widget build(BuildContext context) {
     final notifier = ref.read(authProvider.notifier);
@@ -38,17 +44,19 @@ class _InputEmailState extends ConsumerState<InputEmail> {
       enabled: widget.isEdit,
       keyboardType: TextInputType.emailAddress,
       inputFormatters: [
-        FilteringTextInputFormatter.allow(
-            RegExp(r'[a-zA-Z0-9_.+-]')), //メールアドレスの入力制限
+        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_.+@-]')),
       ],
       controller: _controller,
       decoration: InputDecoration(
-        suffixText: widget.isDeveloper ? '@developer.com' : '@kenryo.ed.jp',
+        suffixText: _suffixText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
       ),
-      onChanged: (text) => notifier.changeEmail(text),
+      onChanged: (text) {
+        setState(() {});
+        notifier.changeEmail(text);
+      },
     );
   }
 }

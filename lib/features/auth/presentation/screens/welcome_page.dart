@@ -60,19 +60,6 @@ class WelcomePage extends ConsumerWidget {
               ),
               Spacer(flex: 2),
               Text('Version: $version'),
-              const SizedBox(height: 10),
-              RichText(
-                text: TextSpan(
-                  text: 'デベロッパーとしてログイン',
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: Colors.blue,
-                      ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      context.push('/welcome/login', extra: true);
-                    },
-                ),
-              ),
             ],
           ),
         ),

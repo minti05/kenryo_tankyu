@@ -8,8 +8,7 @@ import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider
 
 class InputPasswordForLogin extends ConsumerStatefulWidget {
   final String password;
-  final bool isDeveloper;
-  const InputPasswordForLogin(this.password, this.isDeveloper, {super.key});
+  const InputPasswordForLogin(this.password, {super.key});
 
   @override
   ConsumerState<InputPasswordForLogin> createState() =>
@@ -66,8 +65,7 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
                     ref.watch(authProvider).email != null &&
                     _controller.text != ''
                 ? () async {
-                    await _login(
-                        context, ref, _controller.text, widget.isDeveloper);
+                    await _login(context, ref, _controller.text);
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -83,15 +81,13 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
     );
   }
 
-  Future<void> _login(BuildContext context, WidgetRef ref, String password,
-      bool isDeveloper) async {
+  Future<void> _login(
+      BuildContext context, WidgetRef ref, String password) async {
     final rawEmail = ref.read(authProvider).email;
     if (rawEmail == null) return;
 
     try {
-      await ref
-          .read(authProvider.notifier)
-          .login(rawEmail, password, isDeveloper);
+      await ref.read(authProvider.notifier).login(rawEmail, password);
 
       // ログイン成功時にFCMトークンを取得 (Log only based on original?)
       // Original code did get token.

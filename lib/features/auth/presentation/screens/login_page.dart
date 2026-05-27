@@ -53,7 +53,7 @@ class LoginPage extends ConsumerWidget {
                               .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 5),
                       InputPasswordForLogin(
-                          ref.watch(authProvider).password ?? '', isDeveloper),
+                          ref.watch(authProvider).password ?? ''),
                     ],
                   ),
                 ),

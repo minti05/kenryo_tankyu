@@ -43,15 +43,12 @@ class AuthNotifier extends _$AuthNotifier {
     state = state.copyWith(limit: state.limit - 1);
   }
 
-  Future<void> login(String rawEmail, String password, bool isDeveloper) async {
-    final email =
-        '$rawEmail${isDeveloper ? '@developer.com' : '@kenryo.ed.jp'}';
-    await ref
-        .read(authRepositoryProvider)
-        .signInWithEmailAndPassword(email: email, password: password);
-    await ref
-        .read(userRepositoryProvider)
-        .updateRegisteredStatus(email: email, isRegistered: true);
+  Future<void> login(String rawEmail, String password) async {
+    final authRepo = ref.read(authRepositoryProvider);
+    final userRepo = ref.read(userRepositoryProvider);
+    final email = rawEmail.contains('@') ? rawEmail : '$rawEmail@kenryo.ed.jp';
+    await authRepo.signInWithEmailAndPassword(email: email, password: password);
+    await userRepo.updateRegisteredStatus(email: email, isRegistered: true);
   }
 
   Future<void> sendVerifyEmail() async {
@@ -59,22 +56,31 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> reloadUser() async {
-    await ref.read(authRepositoryProvider).reloadUser();
+    final authRepo = ref.read(authRepositoryProvider);
+    final userRepo = ref.read(userRepositoryProvider);
+    await authRepo.reloadUser();
+    final user = authRepo.currentUser;
+    if (user?.emailVerified == true && user?.email != null) {
+      await userRepo.updateRegisteredStatus(
+          email: user!.email!, isRegistered: true);
+    }
   }
 
   Future<void> createUser(String password) async {
-    final email = '${state.email}@kenryo.ed.jp';
-    await ref
-        .read(authRepositoryProvider)
-        .createUserWithEmailAndPassword(email: email, password: password);
-    await ref
-        .read(authRepositoryProvider)
-        .updateDisplayName(state.userName ?? '');
-    await ref.read(authRepositoryProvider).sendEmailVerification();
+    final authRepo = ref.read(authRepositoryProvider);
+    final rawEmail = state.email ?? '';
+    final email = state.affiliation == Affiliation.developer
+        ? rawEmail
+        : '$rawEmail@kenryo.ed.jp';
+    final userName = state.userName ?? '';
+    await authRepo.createUserWithEmailAndPassword(
+        email: email, password: password);
+    await authRepo.updateDisplayName(userName);
+    await authRepo.sendEmailVerification();
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
-    final fullEmail = '$email@kenryo.ed.jp';
+    final fullEmail = email.contains('@') ? email : '$email@kenryo.ed.jp';
     await ref
         .read(authRepositoryProvider)
         .sendPasswordResetEmail(email: fullEmail);
@@ -85,13 +91,22 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> deleteAccount() async {
-    final user = ref.read(authRepositoryProvider).currentUser;
-    if (user != null && user.email != null) {
-      // 本来はTransactionなどでやるべきだが簡易的に
-      await ref
-          .read(userRepositoryProvider)
-          .updateRegisteredStatus(email: user.email!, isRegistered: false);
-      await ref.read(authRepositoryProvider).deleteUser();
+    final authRepo = ref.read(authRepositoryProvider);
+    final userRepo = ref.read(userRepositoryProvider);
+    final user = authRepo.currentUser;
+    if (user == null || user.email == null) return;
+    final email = user.email!;
+    // Firestore更新を先に行う。Auth削除後はrequest.authがnullになりセキュリティルールで弾かれるため。
+    await userRepo.updateRegisteredStatus(email: email, isRegistered: false);
+    try {
+      await authRepo.deleteUser();
+    } catch (deleteError) {
+      // Auth削除失敗時はFirestoreをロールバックして整合性を保つ。
+      // ロールバック自体の失敗は握り潰し、元のエラーを必ず rethrow する。
+      try {
+        await userRepo.updateRegisteredStatus(email: email, isRegistered: true);
+      } catch (_) {}
+      rethrow;
     }
   }
 }

@@ -64,7 +64,8 @@ class ResetPasswordPage extends ConsumerWidget {
               const SizedBox(height: 20),
               confirmVerifiedEmail
                   ? ElevatedButton(
-                      onPressed: () => context.go('/welcome/login'),
+                      onPressed: () =>
+                          context.go('/welcome/login', extra: false),
                       child: const Text('ログインし直す'))
                   : const SizedBox(),
               const Spacer(flex: 2),
