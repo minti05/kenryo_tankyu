@@ -34,17 +34,27 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final routesProvider = Provider<GoRouter>((ref) {
-  // 認証状態を監視してリダイレクト先を決定する
-  final authStateAsync = ref.watch(authStateChangesProvider);
-  final redirection = authStateAsync.hasValue
-      ? authStateAsync.value == null
-          ? '/welcome'
-          : '/home'
-      : '/welcome';
-
-  return GoRouter(
-    initialLocation: redirection,
+  final router = GoRouter(
+    initialLocation: '/welcome',
     navigatorKey: _rootNavigatorKey,
+    redirect: (context, state) {
+      final authAsync = ref.read(authStateChangesProvider);
+      if (!authAsync.hasValue) return null;
+      final user = authAsync.value;
+
+      final loc = state.matchedLocation;
+      final isOnWelcome = loc.startsWith('/welcome');
+      final isOnVerifyEmail = loc == '/verify_email';
+
+      if (user == null) {
+        return isOnWelcome ? null : '/welcome';
+      }
+      if (!user.emailVerified) {
+        return isOnVerifyEmail ? null : '/verify_email';
+      }
+      if (isOnWelcome || isOnVerifyEmail) return '/home';
+      return null;
+    },
     routes: [
       GoRoute(
           path: '/welcome',
@@ -62,7 +72,7 @@ final routesProvider = Provider<GoRouter>((ref) {
             GoRoute(
                 path: 'login',
                 builder: (context, state) =>
-                    LoginPage(isDeveloper: state.extra as bool),
+                    LoginPage(isDeveloper: state.extra as bool? ?? false),
                 routes: [
                   GoRoute(
                     path: 'reset_password',
@@ -159,4 +169,8 @@ final routesProvider = Provider<GoRouter>((ref) {
       child: Scaffold(body: Center(child: Text(state.error.toString()))),
     ),
   );
+
+  ref.listen(authStateChangesProvider, (_, __) => router.refresh());
+  ref.onDispose(router.dispose);
+  return router;
 });

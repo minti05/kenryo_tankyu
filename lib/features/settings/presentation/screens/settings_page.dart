@@ -215,8 +215,16 @@ class SettingsPage extends ConsumerWidget {
                               Navigator.of(context).pop();
                             } on Failure catch (e) {
                               if (!context.mounted) return;
-
+                              Navigator.of(context).pop();
                               showErrorDialog(context, e);
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content:
+                                        Text('予期せぬエラーが発生しました: $e')),
+                              );
                             }
                           },
                           child: const Text('はい'),

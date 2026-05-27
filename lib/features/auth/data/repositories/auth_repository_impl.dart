@@ -113,6 +113,7 @@ class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
       case 'user-not-found':
         return const UserNotFound();
       case 'wrong-password':
+      case 'invalid-credential':
         return const WrongPassword();
       case 'email-already-in-use':
         return const EmailAlreadyInUse();

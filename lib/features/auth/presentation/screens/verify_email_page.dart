@@ -3,10 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
+import 'package:kenryo_tankyu/core/constants/feature/user_value.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class CheckEmailPage extends ConsumerWidget {
   const CheckEmailPage({super.key});
+
+  String _displayEmail(WidgetRef ref) {
+    // Firebase ユーザーのメールアドレスを正とする。フォーム状態より信頼性が高い。
+    final fbEmail = ref.watch(authStateChangesProvider).asData?.value?.email;
+    if (fbEmail != null) return fbEmail;
+    // フォールバック: アプリ起動直後など stream 未受信時
+    final auth = ref.watch(authProvider);
+    if (auth.affiliation == Affiliation.developer) return auth.email ?? '';
+    return '${auth.email ?? ''}@kenryo.ed.jp';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +44,7 @@ class CheckEmailPage extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Text(
-                            '${ref.watch(authProvider).email}@kenryo.ed.jpにメールを送信しました。',
+                            '${_displayEmail(ref)}にメールを送信しました。',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.left),
                         const SizedBox(height: 20),

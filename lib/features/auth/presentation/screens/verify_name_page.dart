@@ -1,5 +1,6 @@
 import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/core/constants/feature/user_value.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,7 +57,9 @@ class VerifyNamePage extends ConsumerWidget {
                                 .copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 5),
                         InputEmail(
-                            ref.read(authProvider).email ?? '', true, false),
+                            auth.email ?? '',
+                            true,
+                            auth.affiliation == Affiliation.developer),
                         Consumer(builder: (context, ref, child) {
                           final limit = auth.limit;
                           switch (limit) {
@@ -107,7 +110,9 @@ class VerifyNamePage extends ConsumerWidget {
     try {
       final auth = ref.watch(authProvider);
       final notifier = ref.read(authProvider.notifier);
-      final emailAddress = '${auth.email}@kenryo.ed.jp';
+      final isDeveloper = auth.affiliation == Affiliation.developer;
+      final emailAddress =
+          isDeveloper ? auth.email! : '${auth.email}@kenryo.ed.jp';
 
       final userData = await ref.read(userRepositoryProvider).verifyUser(
           email: emailAddress, affiliation: auth.affiliation?.name ?? '');
@@ -122,7 +127,8 @@ class VerifyNamePage extends ConsumerWidget {
                 children: [
                   const Text('このメールアドレスは既に登録されています'),
                   ElevatedButton(
-                      onPressed: () => context.go('/welcome/login'),
+                      onPressed: () =>
+                          context.go('/welcome/login', extra: false),
                       child: const Text('ログイン画面に移動')),
                 ],
               ),

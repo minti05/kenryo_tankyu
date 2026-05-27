@@ -45,7 +45,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> updateDisplayName(String name) async {
-    await _firebaseAuth.currentUser?.updateDisplayName(name);
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw StateError('User not logged in');
+    await user.updateDisplayName(name);
   }
 
   @override
@@ -60,17 +62,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> deleteUser() async {
-    await _firebaseAuth.currentUser?.delete();
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw StateError('User not logged in');
+    await user.delete();
   }
 
   @override
   Future<void> sendEmailVerification() async {
-    await _firebaseAuth.currentUser?.sendEmailVerification();
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw StateError('User not logged in');
+    await user.sendEmailVerification();
   }
 
   @override
   Future<void> reloadUser() async {
-    await _firebaseAuth.currentUser?.reload();
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw StateError('User not logged in');
+    await user.reload();
   }
 }
 
