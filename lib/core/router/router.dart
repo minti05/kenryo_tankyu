@@ -171,6 +171,5 @@ final routesProvider = Provider<GoRouter>((ref) {
   );
 
   ref.listen(authStateChangesProvider, (_, __) => router.refresh());
-  ref.onDispose(router.dispose);
   return router;
 });

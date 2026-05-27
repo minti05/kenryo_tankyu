@@ -65,8 +65,7 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
                     ref.watch(authProvider).email != null &&
                     _controller.text != ''
                 ? () async {
-                    await _login(
-                        context, ref, _controller.text);
+                    await _login(context, ref, _controller.text);
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -82,14 +81,13 @@ class _InputPasswordForLoginState extends ConsumerState<InputPasswordForLogin> {
     );
   }
 
-  Future<void> _login(BuildContext context, WidgetRef ref, String password) async {
+  Future<void> _login(
+      BuildContext context, WidgetRef ref, String password) async {
     final rawEmail = ref.read(authProvider).email;
     if (rawEmail == null) return;
 
     try {
-      await ref
-          .read(authProvider.notifier)
-          .login(rawEmail, password);
+      await ref.read(authProvider.notifier).login(rawEmail, password);
 
       // ログイン成功時にFCMトークンを取得 (Log only based on original?)
       // Original code did get token.

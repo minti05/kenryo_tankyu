@@ -221,9 +221,7 @@ class SettingsPage extends ConsumerWidget {
                               if (!context.mounted) return;
                               Navigator.of(context).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('予期せぬエラーが発生しました: $e')),
+                                SnackBar(content: Text('予期せぬエラーが発生しました: $e')),
                               );
                             }
                           },

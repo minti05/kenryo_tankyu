@@ -46,8 +46,7 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> login(String rawEmail, String password) async {
     final authRepo = ref.read(authRepositoryProvider);
     final userRepo = ref.read(userRepositoryProvider);
-    final email =
-        rawEmail.contains('@') ? rawEmail : '$rawEmail@kenryo.ed.jp';
+    final email = rawEmail.contains('@') ? rawEmail : '$rawEmail@kenryo.ed.jp';
     await authRepo.signInWithEmailAndPassword(email: email, password: password);
     await userRepo.updateRegisteredStatus(email: email, isRegistered: true);
   }

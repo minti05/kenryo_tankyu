@@ -56,9 +56,7 @@ class VerifyNamePage extends ConsumerWidget {
                                 .bodyMedium!
                                 .copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 5),
-                        InputEmail(
-                            auth.email ?? '',
-                            true,
+                        InputEmail(auth.email ?? '', true,
                             auth.affiliation == Affiliation.developer),
                         Consumer(builder: (context, ref, child) {
                           final limit = auth.limit;
@@ -108,7 +106,7 @@ class VerifyNamePage extends ConsumerWidget {
 
   _verifyName(BuildContext context, WidgetRef ref) async {
     try {
-      final auth = ref.watch(authProvider);
+      final auth = ref.read(authProvider);
       final notifier = ref.read(authProvider.notifier);
       final isDeveloper = auth.affiliation == Affiliation.developer;
       final emailAddress =

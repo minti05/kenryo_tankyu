@@ -43,8 +43,7 @@ class CheckEmailPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Text(
-                            '${_displayEmail(ref)}にメールを送信しました。',
+                        Text('${_displayEmail(ref)}にメールを送信しました。',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.left),
                         const SizedBox(height: 20),
