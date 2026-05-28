@@ -89,20 +89,39 @@ class ResultListPage extends ConsumerWidget {
                       }
                     },
                     loading: () => Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircularProgressIndicator(),
-                          const SizedBox(height: 16),
-                          if (!isConnected) ...[
-                            const Text('インターネットに接続されていません'),
-                            const Text('再接続を待機しています...',
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.grey)),
-                          ] else
-                            const Text('検索中...'),
-                        ],
-                      ),
+                      child: isConnected
+                          ? const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(),
+                                SizedBox(height: 16),
+                                Text('検索中...'),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.wifi_off_rounded,
+                                  size: 52,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text('インターネットに接続されていません。'),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '接続を待機しています...',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
+                                      ),
+                                ),
+                              ],
+                            ),
                     ),
                     error: (error, stackTrace) => CommonErrorView(
                       error: error,

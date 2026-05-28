@@ -4,7 +4,10 @@ import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 
 /// 全画面共通の「お気に入り」ボタン。
-/// AsyncValue.isLoading を監視して、通信中の連打防止と視覚的フィードバックを行います。
+///
+/// ハートアイコンの状態は楽観的に即時反映するが、
+/// いいね数（likes）は Firestore への書き込みが確認された後にのみ更新する。
+/// これにより、オフライン時にカウントが誤って加算・保持されるのを防ぐ。
 class FavoriteButton extends ConsumerStatefulWidget {
   final Searched searched;
   final bool isLarge;
@@ -20,43 +23,43 @@ class FavoriteButton extends ConsumerStatefulWidget {
 }
 
 class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
-  // 楽観的UIのためのローカル状態
+  /// ハートアイコン用の楽観的ローカル状態（即時フィードバック）
   bool? _isFavoriteLocal;
-  int? _likesLocal;
 
   @override
   void didUpdateWidget(FavoriteButton oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 親から渡される likes が更新されたタイミングで楽観的な上書きを解除する。
-    // これにより、通信完了→SQLite再読み込み完了の間に一瞬元の値に戻る
-    // フリッカーを防ぐ。
+    // 別の作品に切り替わった場合はリセット
     if (widget.searched.documentID != oldWidget.searched.documentID) {
       _isFavoriteLocal = null;
-      _likesLocal = null;
-    } else if (widget.searched.likes != oldWidget.searched.likes) {
-      _likesLocal = null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // 通信完了後（成功・失敗どちらも）にローカル状態をリセット
+    // build メソッド内の直接変更を避け、ref.listen で安全に setState を呼ぶ
+    ref.listen<AsyncValue<bool>>(
+      userIsFavoriteStateProvider(widget.searched.documentID),
+      (previous, next) {
+        if (previous?.isLoading == true && !next.isLoading) {
+          setState(() {
+            _isFavoriteLocal = null;
+          });
+        }
+      },
+    );
+
     final favoriteState =
         ref.watch(userIsFavoriteStateProvider(widget.searched.documentID));
-
-    // 通信完了後にローカル状態をリセット。
-    // _likesLocal はエラー時のみここでリセットし、成功時は
-    // didUpdateWidget で親の likes が更新されたタイミングでリセットする。
-    if (!favoriteState.isLoading) {
-      _isFavoriteLocal = null;
-      if (favoriteState.hasError) {
-        _likesLocal = null;
-      }
-    }
 
     final isFavorite = _isFavoriteLocal ??
         favoriteState.asData?.value ??
         widget.searched.isFavorite;
-    final likes = _likesLocal ?? widget.searched.likes;
+
+    // likes は Firestore 確認後に SQLite へ反映された値のみ使用（楽観的更新なし）
+    final likes = widget.searched.likes;
+
     final isLoading = favoriteState.isLoading;
 
     final color =
@@ -98,10 +101,9 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
       onTap: isLoading
           ? null
           : () {
-              // 楽観的UIの更新
+              // ハートアイコンのみ楽観的に更新（counts は確認後に自動反映）
               setState(() {
                 _isFavoriteLocal = !isFavorite;
-                _likesLocal = isFavorite ? likes - 1 : likes + 1;
               });
               ref
                   .read(userIsFavoriteStateProvider(widget.searched.documentID)

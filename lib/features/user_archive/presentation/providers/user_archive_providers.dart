@@ -78,13 +78,27 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
     // エラーハンドリング
     if (state.hasError && context.mounted) {
       final error = state.error;
-      if (error is Failure) {
+      if (error is NetworkFailure) {
+        // ネットワークエラーはSnackBarで軽く通知（モーダルでUIを塞がない）
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.wifi_off, color: Colors.white, size: 18),
+                SizedBox(width: 8),
+                Text('インターネットに接続できませんでした'),
+              ],
+            ),
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else if (error is Failure) {
         showErrorDialog(context, error);
       } else {
         showErrorDialog(context, UnknownFailure(message: error.toString()));
       }
-      // エラー時は前の状態に戻す（楽観的UIに近い挙動にする場合などは検討が必要だが、
-      // ここではRepositoryの失敗＝状態不整合なので、確実に取得し直すか前の値に戻す）
+      // エラー時は前の状態に戻す
       state = previousState;
     }
   }

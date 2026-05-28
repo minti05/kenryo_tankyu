@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 
 /// ページやリスト内で使用する共通のエラー表示ウィジェット
 class CommonErrorView extends ConsumerWidget {
@@ -17,29 +17,35 @@ class CommonErrorView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isConnected = ref.watch(isConnectedProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
-    String message = 'エラーが発生しました。';
-    IconData icon = Icons.error_outline;
+    // エラー自体が NetworkFailure か、現在オフラインかで判定
+    final isNetworkError = error is NetworkFailure || !isConnected;
 
-    if (!isConnected) {
+    final String message;
+    final IconData icon;
+
+    if (isNetworkError) {
       message = 'インターネットに接続されていません。';
-      icon = Icons.wifi_off;
+      icon = Icons.wifi_off_rounded;
     } else if (error is Failure) {
       message = (error as Failure).message;
+      icon = Icons.error_outline_rounded;
     } else {
       message = error.toString();
+      icon = Icons.error_outline_rounded;
     }
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              color: isConnected ? Colors.red : Colors.grey,
-              size: 48,
+              color: isNetworkError ? colorScheme.outline : colorScheme.error,
+              size: 52,
             ),
             const SizedBox(height: 16),
             Text(
@@ -47,16 +53,18 @@ class CommonErrorView extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            if (!isConnected) ...[
+            if (isNetworkError && !isConnected) ...[
               const SizedBox(height: 8),
-              const Text(
-                '再接続を待機しています...',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                '接続を待機しています...',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.outline,
+                    ),
               ),
             ],
             if (onRetry != null) ...[
               const SizedBox(height: 24),
-              ElevatedButton.icon(
+              FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
                 label: const Text('再試行'),

@@ -55,7 +55,12 @@ class DisplayPdf extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => CommonErrorView(error: error),
+              error: (error, _) => CommonErrorView(
+                error: error,
+                onRetry: () => ref.invalidate(
+                  pdfProvider(nowWatchingPdf, searched.enterYear),
+                ),
+              ),
             );
           }),
           Align(

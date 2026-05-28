@@ -80,7 +80,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                 return asyncValue.when(
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) => CommonErrorView(error: error),
+                    error: (error, stackTrace) => CommonErrorView(
+                          error: error,
+                          onRetry: () {
+                            ref.read(forceRefreshProvider.notifier).state =
+                                true;
+                            ref.invalidate(randomAlgoliaSearchProvider);
+                          },
+                        ),
                     data: (data) {
                       return Column(
                         children: [
