@@ -72,12 +72,12 @@ class UserArchiveRepositoryImpl
   Future<void> changeFavoriteState(int documentID, bool nextIsFavorite) async {
     // isFavorite は楽観的に SQLite へ即時保存。
     // likes カウントは Firestore の更新が確認できた後にのみ SQLite を更新する。
-    // Firestore 失敗時は isFavorite もロールバックして不整合を防ぐ。
+    // Firestore 失敗時のみ isFavorite をロールバックして不整合を防ぐ。
+    // updateLikes（SQLite）の失敗時はロールバック不要（Firestore は既に成功済み）。
     final previousIsFavorite = !nextIsFavorite;
+    await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
     try {
-      await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
       await updateRemoteLikes(documentID, nextIsFavorite);
-      await _historyDataSource.updateLikes(documentID, nextIsFavorite ? 1 : -1);
     } catch (e) {
       // Firestore 失敗: SQLite の isFavorite をロールバック
       try {
@@ -88,6 +88,7 @@ class UserArchiveRepositoryImpl
       }
       throw mapException(e);
     }
+    await _historyDataSource.updateLikes(documentID, nextIsFavorite ? 1 : -1);
   }
 
   @override

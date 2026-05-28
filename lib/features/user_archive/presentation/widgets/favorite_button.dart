@@ -37,13 +37,21 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
 
   @override
   Widget build(BuildContext context) {
+    // 通信完了後（成功・失敗どちらも）にローカル状態をリセット
+    // build メソッド内の直接変更を避け、ref.listen で安全に setState を呼ぶ
+    ref.listen<AsyncValue<bool>>(
+      userIsFavoriteStateProvider(widget.searched.documentID),
+      (previous, next) {
+        if (previous?.isLoading == true && !next.isLoading) {
+          setState(() {
+            _isFavoriteLocal = null;
+          });
+        }
+      },
+    );
+
     final favoriteState =
         ref.watch(userIsFavoriteStateProvider(widget.searched.documentID));
-
-    // 通信完了後（成功・失敗どちらも）にローカル状態をリセット
-    if (!favoriteState.isLoading) {
-      _isFavoriteLocal = null;
-    }
 
     final isFavorite = _isFavoriteLocal ??
         favoriteState.asData?.value ??
