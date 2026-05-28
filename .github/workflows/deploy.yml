@@ -17,6 +17,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Apple は iOS 26 SDK (Xcode 26) 以上でのビルドを必須としているため
+      # ランナーにインストールされている最新の Xcode を選択する
+      - name: Select latest Xcode
+        run: |
+          echo "Available Xcode versions:"
+          ls /Applications/ | grep Xcode
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "Selecting: $LATEST_XCODE"
+          sudo xcode-select -s "$LATEST_XCODE"
+          xcodebuild -version
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
