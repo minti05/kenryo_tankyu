@@ -5,6 +5,9 @@ on:
     branches:
       - release
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   deploy_ios:
     runs-on: macos-latest
@@ -13,6 +16,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Apple は iOS 26 SDK (Xcode 26) 以上でのビルドを必須としているため
+      # ランナーにインストールされている最新の Xcode を選択する
+      - name: Select latest Xcode
+        run: |
+          echo "Available Xcode versions:"
+          ls /Applications/ | grep Xcode
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "Selecting: $LATEST_XCODE"
+          sudo xcode-select -s "$LATEST_XCODE"
+          xcodebuild -version
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -36,6 +50,12 @@ jobs:
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
         run: echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
 
+      # Firebase サービスアカウント認証情報は gitignore されているため Secret から復元
+      - name: Restore Firebase credentials
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        run: printf "%s" "$FIREBASE_CREDENTIALS" > assets/your_service_account_credentials.json
+
       # match が証明書リポジトリに SSH でアクセスするための設定
       - name: Configure SSH for match
         env:
@@ -53,4 +73,3 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}

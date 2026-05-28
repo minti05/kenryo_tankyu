@@ -48,6 +48,16 @@ platform :ios do
       " --build-name=#{ver[:name]} --build-number=#{ver[:number]}",
     )
 
+    # match が取得したプロファイルを Xcode プロジェクトに明示的に設定
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/Runner.xcodeproj",
+      team_id: "3D576795HU",
+      code_sign_identity: "iPhone Distribution",
+      profile_name: "match AppStore goto.tankyuapp",
+      bundle_identifier: "goto.tankyuapp",
+    )
+
     build_app(
       workspace: "ios/Runner.xcworkspace",
       scheme: "Runner",
