@@ -39,6 +39,12 @@ jobs:
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
         run: echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
 
+      # Firebase サービスアカウント認証情報は gitignore されているため Secret から復元
+      - name: Restore Firebase credentials
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        run: printf "%s" "$FIREBASE_CREDENTIALS" > assets/your_service_account_credentials.json
+
       # match が証明書リポジトリに SSH でアクセスするための設定
       - name: Configure SSH for match
         env:
