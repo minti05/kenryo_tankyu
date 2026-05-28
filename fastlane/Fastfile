@@ -1,0 +1,71 @@
+require 'yaml'
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    api_key = build_and_sign
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc "Build and upload to App Store (manual review submission)"
+  lane :deploy do
+    api_key = build_and_sign
+    upload_to_app_store(
+      api_key: api_key,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+    )
+  end
+
+  def build_and_sign
+    setup_ci if Helper.ci?
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_KEY_CONTENT"),
+      is_key_content_base64: true,
+      in_house: false,
+    )
+
+    match(
+      type: "appstore",
+      readonly: Helper.ci?,
+      api_key: api_key,
+    )
+
+    ver = _load_version
+    UI.message("Building version #{ver[:name]} (build #{ver[:number]})")
+
+    sh(
+      "cd .. && flutter build ios --release --no-codesign" \
+      " --build-name=#{ver[:name]} --build-number=#{ver[:number]}",
+    )
+
+    build_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "build/ios/ipa",
+      output_name: "Runner.ipa",
+      clean: false,
+    )
+
+    api_key
+  end
+end
+
+def _load_version
+  pubspec = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'pubspec.yaml'))
+  version_str = pubspec['version'].to_s
+  {
+    name: version_str.split('+')[0],
+    number: (ENV['GITHUB_RUN_NUMBER'] || version_str.split('+')[1] || '1').to_i,
+  }
+end

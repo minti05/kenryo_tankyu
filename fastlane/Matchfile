@@ -1,0 +1,4 @@
+git_url("git@github.com:minti05/certificates.git")
+storage_mode("git")
+type("appstore")
+app_identifier(["goto.tankyuapp"])
