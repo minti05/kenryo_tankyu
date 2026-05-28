@@ -3,50 +3,28 @@ require 'yaml'
 default_platform(:ios)
 
 platform :ios do
-  # TestFlight にビルドをアップロード
   desc "Build and upload to TestFlight"
   lane :beta do
-    setup_ci if is_ci
-
-    api_key = app_store_connect_api_key(
-      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
-      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
-      key_content: ENV.fetch("APP_STORE_CONNECT_KEY_CONTENT"),
-      is_key_content_base64: true,
-      in_house: false,
-    )
-
-    match(
-      type: "appstore",
-      readonly: is_ci,
-      api_key: api_key,
-    )
-
-    ver = _load_version
-    UI.message("Building version #{ver[:name]} (build #{ver[:number]})")
-
-    sh("cd .. && flutter build ios --release --no-codesign" \
-       " --build-name=#{ver[:name]} --build-number=#{ver[:number]}")
-
-    build_app(
-      workspace: "ios/Runner.xcworkspace",
-      scheme: "Runner",
-      export_method: "app-store",
-      output_directory: "build/ios/ipa",
-      output_name: "Runner.ipa",
-      clean: false,
-    )
-
+    api_key = build_and_sign
     upload_to_testflight(
       api_key: api_key,
       skip_waiting_for_build_processing: true,
     )
   end
 
-  # App Store 本番にアップロード（審査提出は手動）
   desc "Build and upload to App Store (manual review submission)"
   lane :deploy do
-    setup_ci if is_ci
+    api_key = build_and_sign
+    upload_to_app_store(
+      api_key: api_key,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+    )
+  end
+
+  def build_and_sign
+    setup_ci if Helper.ci?
 
     api_key = app_store_connect_api_key(
       key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
@@ -58,15 +36,17 @@ platform :ios do
 
     match(
       type: "appstore",
-      readonly: is_ci,
+      readonly: Helper.ci?,
       api_key: api_key,
     )
 
     ver = _load_version
     UI.message("Building version #{ver[:name]} (build #{ver[:number]})")
 
-    sh("cd .. && flutter build ios --release --no-codesign" \
-       " --build-name=#{ver[:name]} --build-number=#{ver[:number]}")
+    sh(
+      "cd .. && flutter build ios --release --no-codesign" \
+      " --build-name=#{ver[:name]} --build-number=#{ver[:number]}",
+    )
 
     build_app(
       workspace: "ios/Runner.xcworkspace",
@@ -77,12 +57,7 @@ platform :ios do
       clean: false,
     )
 
-    upload_to_app_store(
-      api_key: api_key,
-      skip_metadata: true,
-      skip_screenshots: true,
-      submit_for_review: false,
-    )
+    api_key
   end
 end
 
