@@ -19,7 +19,7 @@ class ResultPreviewContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () async {
+      onTap: () {
         context.push('/result/${searched.documentID}');
       },
       onLongPress: mode == ResultPreviewMode.library

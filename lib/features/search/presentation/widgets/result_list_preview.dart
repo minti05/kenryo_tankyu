@@ -19,12 +19,10 @@ class ResultList extends ConsumerWidget {
         child: ListView.separated(
           itemBuilder: (BuildContext context, int index) {
             final Searched searched = data[index];
-            return Consumer(builder: (context, ref, child) {
-              return ResultPreviewContent(
-                searched: searched,
-                mode: ResultPreviewMode.search,
-              );
-            });
+            return ResultPreviewContent(
+              searched: searched,
+              mode: ResultPreviewMode.search,
+            );
           },
           separatorBuilder: (BuildContext context, int index) {
             return const Padding(
