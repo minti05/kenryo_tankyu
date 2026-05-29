@@ -67,6 +67,7 @@ dependencies:
   algoliasearch: ^1.38.0
   algolia_helper_flutter: ^1.4.0
   connectivity_plus: ^7.0.0
+  share_plus: ^12.0.2
 
 dev_dependencies:
   flutter_test:
