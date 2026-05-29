@@ -5,10 +5,17 @@ enum EnterYear {
   enter2021(displayName: 2021),
   enter2022(displayName: 2022),
   enter2023(displayName: 2023),
+  enter2024(displayName: 2024),
+  enter2025(displayName: 2025),
   undefined(displayName: 0);
 
   final int displayName;
   const EnterYear({required this.displayName});
+
+  String get label {
+    if (this == EnterYear.undefined) return '指定なし';
+    return '$displayName年度入学';
+  }
 }
 
 class EnterYearEnumConverter implements JsonConverter<EnterYear, int> {

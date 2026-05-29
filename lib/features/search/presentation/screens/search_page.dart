@@ -144,7 +144,6 @@ class SearchPage extends ConsumerWidget {
         data.category == Category.none &&
         data.subCategory == SubCategory.none &&
         data.enterYear == EnterYear.undefined &&
-        data.eventName == EventName.undefined &&
         data.course == Course.undefined;
     if (isAllEmpty) {
       return const SizedBox();

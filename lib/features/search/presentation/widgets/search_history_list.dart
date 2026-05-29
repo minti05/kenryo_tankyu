@@ -81,11 +81,8 @@ class SearchHistoryList extends ConsumerWidget {
     search.subCategory != SubCategory.none
         ? searchList.add(search.subCategory.displayName)
         : null;
-    search.enterYear.displayName != 0
-        ? searchList.add(search.enterYear.displayName.toString())
-        : null;
-    search.eventName != EventName.undefined
-        ? searchList.add(search.eventName.displayName)
+    search.enterYear != EnterYear.undefined
+        ? searchList.add(search.enterYear.label)
         : null;
     search.course != Course.undefined
         ? searchList.add(search.course.displayName)
