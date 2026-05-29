@@ -22,7 +22,7 @@ class ResultList extends ConsumerWidget {
             return Consumer(builder: (context, ref, child) {
               return ResultPreviewContent(
                 searched: searched,
-                forLibrary: false,
+                mode: ResultPreviewMode.search,
               );
             });
           },

@@ -94,13 +94,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                           Card(
                             child: ResultPreviewContent(
                               searched: data[0],
-                              forLibrary: false,
+                              mode: ResultPreviewMode.search,
                             ),
                           ),
                           Card(
                             child: ResultPreviewContent(
                               searched: data[1],
-                              forLibrary: false,
+                              mode: ResultPreviewMode.search,
                             ),
                           ),
                         ],
