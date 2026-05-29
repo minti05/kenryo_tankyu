@@ -97,6 +97,12 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> deleteAccount() async {
     final authRepo = ref.read(authRepositoryProvider);
     final userRepo = ref.read(userRepositoryProvider);
+    // deleteUser()後にauthStateChangesが発火してAuthNotifierが破棄される可能性があるため、
+    // ref.readで取得するデータソースは非同期処理の前にすべて退避しておく。
+    final searchedHistoryDs = ref.read(searchedHistoryLocalDataSourceProvider);
+    final pdfDs = ref.read(pdfLocalDataSourceProvider);
+    final searchHistoryDs = ref.read(searchHistoryDataSourceProvider);
+
     final user = authRepo.currentUser;
     if (user == null || user.email == null) return;
     final email = user.email!;
@@ -113,18 +119,26 @@ class AuthNotifier extends _$AuthNotifier {
       rethrow;
     }
     // アカウント削除成功後、全ローカルデータを消去（失敗してもアカウント削除は成功とみなす）
-    await _clearAllLocalData();
+    await _clearAllLocalData(
+      searchedHistoryDs: searchedHistoryDs,
+      pdfDs: pdfDs,
+      searchHistoryDs: searchHistoryDs,
+    );
   }
 
-  Future<void> _clearAllLocalData() async {
+  Future<void> _clearAllLocalData({
+    required SearchedHistoryLocalDataSource searchedHistoryDs,
+    required PdfLocalDataSource pdfDs,
+    required SearchHistoryDataSource searchHistoryDs,
+  }) async {
     try {
-      await ref.read(searchedHistoryLocalDataSourceProvider).deleteAllHistory();
+      await searchedHistoryDs.deleteAllHistory();
     } catch (_) {}
     try {
-      await ref.read(pdfLocalDataSourceProvider).deleteAllPdf();
+      await pdfDs.deleteAllPdf();
     } catch (_) {}
     try {
-      await ref.read(searchHistoryDataSourceProvider).deleteAllHistory();
+      await searchHistoryDs.deleteAllHistory();
     } catch (_) {}
     try {
       await NotificationDbController.deleteAllNotifications();
