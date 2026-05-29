@@ -7,7 +7,6 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_l
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
-import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class ResultHeader extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
@@ -42,7 +41,7 @@ class ResultHeaderState extends ConsumerState<ResultHeader> {
         child: SizedBox(
           height: 40,
           child: InkWell(
-            onTap: () => context.pushReplacement('/search'),
+            onTap: () => context.pop(),
             child: Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -67,24 +66,12 @@ class ResultHeaderState extends ConsumerState<ResultHeader> {
 
   void _backTo(BuildContext context) {
     final notifier = ref.read(searchProvider.notifier);
-    final footerNotifier = ref.read(footerProvider.notifier);
     final Search searchStatus = ref.watch(searchProvider);
-    //優先順位は上から順
-    //ユーザーが入力した単語が入っている場合→キーワード入力画面(/search)まで戻る
-    //サブカテゴリーが入っている場合→サブカテゴリ選択画面(/subCategory)まで戻る
-    //カテゴリのみ選択されている場合→カテゴリ選択画面(/explore)まで戻る
-    if (searchStatus.searchWord.isNotEmpty) {
-      context.go('/search');
-    } else if (searchStatus.subCategory != SubCategory.none) {
+    if (searchStatus.subCategory != SubCategory.none) {
       notifier.deleteParameter('subCategory');
-      context.go('/subCategory');
     } else if (searchStatus.category != Category.none) {
       notifier.deleteAllParameters();
-      footerNotifier.state = 1;
-      context.go('/explore');
-    } else {
-      footerNotifier.state = 0;
-      context.go('/home');
     }
+    context.pop();
   }
 }

@@ -12,7 +12,6 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/search_header
 import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_list.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/search_history_list.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
-import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class SearchPage extends ConsumerWidget {
   const SearchPage({super.key});
@@ -64,8 +63,7 @@ class SearchPage extends ConsumerWidget {
                     title: const Text('またはカテゴリから選ぶ'),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
-                      ref.read(footerProvider.notifier).state = 1;
-                      context.go('/explore');
+                      context.push('/categorySelect');
                     },
                   );
                 }
@@ -130,11 +128,11 @@ class SearchPage extends ConsumerWidget {
     final notifier = ref.read(searchProvider.notifier);
     if (suggestCategory != Category.none) {
       notifier.selectedCategory(suggestCategory);
-      context.pushReplacement('/subCategory');
+      context.push('/subCategory');
     } else {
       notifier.selectedCategory(whatCategory);
       notifier.selectedSubCategory(suggestSubCategory);
-      context.pushReplacement('/resultList');
+      context.push('/resultList');
     }
   }
 
@@ -165,7 +163,7 @@ class SearchPage extends ConsumerWidget {
             trailing: IconButton(
               icon: const Icon(Icons.search_sharp),
               onPressed: () {
-                context.pushReplacement('/resultList');
+                context.push('/resultList');
               },
             ),
           ),

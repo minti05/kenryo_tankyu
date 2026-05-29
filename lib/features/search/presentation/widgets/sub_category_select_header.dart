@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
-import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class SubCategorySelectHeader extends ConsumerWidget
     implements PreferredSizeWidget {
@@ -24,8 +23,7 @@ class SubCategorySelectHeader extends ConsumerWidget
           ref.read(suggestSubCategoryProvider.notifier).state =
               SubCategory.none;
           ref.read(searchProvider.notifier).deleteAllParameters();
-          ref.read(footerProvider.notifier).state = 1;
-          context.go('/explore');
+          context.pop();
         },
       ),
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
