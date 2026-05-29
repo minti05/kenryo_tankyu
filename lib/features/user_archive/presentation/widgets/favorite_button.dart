@@ -11,11 +11,13 @@ import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_
 class FavoriteButton extends ConsumerStatefulWidget {
   final Searched searched;
   final bool isLarge;
+  final bool enabled;
 
   const FavoriteButton({
     super.key,
     required this.searched,
     this.isLarge = false,
+    this.enabled = true,
   });
 
   @override
@@ -96,6 +98,10 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
             )
           : content,
     );
+
+    if (!widget.enabled) {
+      return buttonBase;
+    }
 
     return InkWell(
       onTap: isLoading

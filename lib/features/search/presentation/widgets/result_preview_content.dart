@@ -7,22 +7,23 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/image_chip.da
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite_button.dart';
 
+enum ResultPreviewMode { search, library }
+
 class ResultPreviewContent extends ConsumerWidget {
   final Searched searched;
-  final bool forLibrary;
+  final ResultPreviewMode mode;
   const ResultPreviewContent(
-      {super.key, required this.searched, required this.forLibrary});
+      {super.key, required this.searched, required this.mode});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap: () async {
-        ///詳細画面への遷移と、履歴の追加
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
         context.push('/result/${searched.documentID}');
       },
-      onLongPress: forLibrary
+      onLongPress: mode == ResultPreviewMode.library
           ? () async {
-              ///履歴の消去
               showDialog(
                 context: context,
                 builder: (context) {
@@ -86,7 +87,11 @@ class ResultPreviewContent extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 4.0),
-                  child: FavoriteButton(searched: searched, isLarge: false),
+                  child: FavoriteButton(
+                    searched: searched,
+                    isLarge: false,
+                    enabled: mode == ResultPreviewMode.library,
+                  ),
                 ),
               ],
             ),
