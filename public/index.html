@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>探究アーカイブ</title>
+  <style>
+    body {
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f5f5;
+      color: #333;
+      text-align: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    p  { font-size: 0.95rem; color: #666; margin-bottom: 24px; }
+    .badge {
+      display: inline-block;
+      background: #1a73e8;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+  </style>
+  <script>
+    // アプリがインストールされていれば Deep Link で開く
+    const path = window.location.pathname; // e.g. /result/123
+    const appScheme = "kenryotankyu:/" + path;
+    window.location.replace(appScheme);
+    // フォールバック: 2秒後にそのままページを表示
+    setTimeout(function () {
+      document.getElementById("fallback").style.display = "flex";
+    }, 2000);
+  </script>
+</head>
+<body>
+  <div id="fallback" style="display:none; flex-direction:column; align-items:center;">
+    <h1>探究アーカイブ</h1>
+    <p>
+      長野県松本県ヶ丘高等学校の<br />
+      探究活動アーカイブアプリです。<br />
+      アプリをインストールしてご覧ください。
+    </p>
+    <a class="badge" href="https://apps.apple.com/jp/app/id000000000">
+      App Store でダウンロード
+    </a>
+  </div>
+</body>
+</html>

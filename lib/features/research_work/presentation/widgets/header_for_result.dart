@@ -39,6 +39,17 @@ class HeaderForResultPage extends ConsumerWidget
                   ),
                   PopupMenuItem(
                     onTap: () async {
+                      final url =
+                          'https://tankyu-app.web.app/result/${searched.documentID}';
+                      await Clipboard.setData(ClipboardData(text: url));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('共有リンクをコピーしました')),
+                      );
+                    },
+                    child: const Text('共有リンクをコピー'),
+                  ),
+                  PopupMenuItem(
+                    onTap: () async {
                       final data = ClipboardData(text: _setClipboard(searched));
                       await Clipboard.setData(data);
                       ScaffoldMessenger.of(context).showSnackBar(
