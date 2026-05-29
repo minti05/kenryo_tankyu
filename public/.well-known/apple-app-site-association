@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "3D576795HU.goto.tankyuapp",
+        "paths": ["/result/*"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.kenryo_tankyu",
+      "sha256_cert_fingerprints": [
+        "60:BC:7B:21:79:DF:5A:E8:9F:D7:39:B5:EC:78:2D:38:1A:87:9C:C1:78:E7:39:56:85:F9:D3:D2:CC:1E:4A:C8"
+      ]
+    }
+  }
+]
