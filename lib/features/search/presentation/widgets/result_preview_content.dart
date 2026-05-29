@@ -37,11 +37,13 @@ class ResultPreviewContent extends ConsumerWidget {
                         child: const Text('キャンセル'),
                       ),
                       TextButton(
-                        onPressed: () {
-                          ref
+                        onPressed: () async {
+                          await ref
                               .read(historyControllerProvider.notifier)
                               .deleteHistory(searched.documentID);
-                          Navigator.of(context).pop();
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
                         },
                         child: const Text('消去'),
                       ),

@@ -122,7 +122,38 @@ class HistoryController extends _$HistoryController {
   Future<void> deleteHistory(int id) async {
     final repository = ref.read(userArchiveRepositoryProvider);
     await repository.deleteHistory(id);
+    if (!ref.mounted) return;
     ref.invalidate(searchedHistoryProvider);
+  }
+
+  Future<void> deleteAllHistory() async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteAllHistory();
+    if (!ref.mounted) return;
+    ref.invalidate(searchedHistoryProvider);
+  }
+
+  Future<void> deleteHistoryBefore(DateTime date) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteHistoryBefore(date);
+    if (!ref.mounted) return;
+    ref.invalidate(searchedHistoryProvider);
+  }
+}
+
+@riverpod
+class PdfCacheController extends _$PdfCacheController {
+  @override
+  void build() {}
+
+  Future<void> deleteAll() async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteAllPdfCache();
+  }
+
+  Future<void> deleteBefore(DateTime date) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deletePdfCacheBefore(date);
   }
 }
 

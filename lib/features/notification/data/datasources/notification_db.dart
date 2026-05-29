@@ -139,4 +139,9 @@ class NotificationDbController {
       {'isRead': 1},
     );
   }
+
+  static Future<void> deleteAllNotifications() async {
+    final Database db = await database;
+    await db.delete('notification');
+  }
 }

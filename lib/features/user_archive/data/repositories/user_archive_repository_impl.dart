@@ -6,6 +6,7 @@ import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_d
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/domain/models/archive_stats.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
 
 class UserArchiveRepositoryImpl
@@ -63,6 +64,42 @@ class UserArchiveRepositoryImpl
   Future<void> deleteHistory(int documentID) async {
     try {
       await _historyDataSource.deleteHistory(documentID);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteAllHistory() async {
+    try {
+      await _historyDataSource.deleteAllHistory();
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteHistoryBefore(DateTime date) async {
+    try {
+      await _historyDataSource.deleteHistoryBefore(date);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<HistoryStats> getHistoryStats() async {
+    try {
+      return await _historyDataSource.getHistoryStats();
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<List<DateTime>> getAllHistorySavedDates() async {
+    try {
+      return await _historyDataSource.getAllSavedDates();
     } catch (e) {
       throw mapException(e);
     }
@@ -185,6 +222,42 @@ class UserArchiveRepositoryImpl
       return await _pdfDataSource
           .getRemotePdfForTeacher(id)
           .timeout(const Duration(seconds: 10));
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<void> deleteAllPdfCache() async {
+    try {
+      await _pdfDataSource.deleteAllPdf();
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<void> deletePdfCacheBefore(DateTime date) async {
+    try {
+      await _pdfDataSource.deletePdfBefore(date);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<PdfCacheStats> getPdfCacheStats() async {
+    try {
+      return await _pdfDataSource.getPdfCacheStats();
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<List<PdfCacheEntry>> getAllPdfCacheEntries() async {
+    try {
+      return await _pdfDataSource.getAllCacheEntries();
     } catch (e) {
       throw mapException(e);
     }

@@ -3,6 +3,10 @@ import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
+import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
+import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
@@ -93,6 +97,12 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> deleteAccount() async {
     final authRepo = ref.read(authRepositoryProvider);
     final userRepo = ref.read(userRepositoryProvider);
+    // deleteUser()後にauthStateChangesが発火してAuthNotifierが破棄される可能性があるため、
+    // ref.readで取得するデータソースは非同期処理の前にすべて退避しておく。
+    final searchedHistoryDs = ref.read(searchedHistoryLocalDataSourceProvider);
+    final pdfDs = ref.read(pdfLocalDataSourceProvider);
+    final searchHistoryDs = ref.read(searchHistoryDataSourceProvider);
+
     final user = authRepo.currentUser;
     if (user == null || user.email == null) return;
     final email = user.email!;
@@ -108,5 +118,30 @@ class AuthNotifier extends _$AuthNotifier {
       } catch (_) {}
       rethrow;
     }
+    // アカウント削除成功後、全ローカルデータを消去（失敗してもアカウント削除は成功とみなす）
+    await _clearAllLocalData(
+      searchedHistoryDs: searchedHistoryDs,
+      pdfDs: pdfDs,
+      searchHistoryDs: searchHistoryDs,
+    );
+  }
+
+  Future<void> _clearAllLocalData({
+    required SearchedHistoryLocalDataSource searchedHistoryDs,
+    required PdfLocalDataSource pdfDs,
+    required SearchHistoryDataSource searchHistoryDs,
+  }) async {
+    try {
+      await searchedHistoryDs.deleteAllHistory();
+    } catch (_) {}
+    try {
+      await pdfDs.deleteAllPdf();
+    } catch (_) {}
+    try {
+      await searchHistoryDs.deleteAllHistory();
+    } catch (_) {}
+    try {
+      await NotificationDbController.deleteAllNotifications();
+    } catch (_) {}
   }
 }

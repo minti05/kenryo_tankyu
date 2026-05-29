@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
+import 'package:kenryo_tankyu/features/user_archive/domain/models/archive_stats.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -91,5 +92,53 @@ class PdfLocalDataSource {
     remoteData != null ? await insertPdf(id, remoteData) : null;
 
     return remoteData;
+  }
+
+  Future<void> deleteAllPdf() async {
+    final Database db = await database;
+    await db.delete('works_pdf');
+  }
+
+  Future<void> deletePdfBefore(DateTime date) async {
+    final Database db = await database;
+    await db.delete(
+      'works_pdf',
+      where: 'savedAt < ?',
+      whereArgs: [date.toIso8601String()],
+    );
+  }
+
+  Future<List<PdfCacheEntry>> getAllCacheEntries() async {
+    final Database db = await database;
+    final result = await db.rawQuery(
+      'SELECT savedAt, LENGTH(pdfData) as bytes FROM works_pdf',
+    );
+    return result
+        .map((r) => (
+              date: DateTime.parse(r['savedAt'] as String),
+              bytes: (r['bytes'] as int?) ?? 0,
+            ))
+        .toList();
+  }
+
+  Future<PdfCacheStats> getPdfCacheStats() async {
+    final Database db = await database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count, SUM(LENGTH(pdfData)) as totalBytes, MIN(savedAt) as oldest, MAX(savedAt) as newest FROM works_pdf',
+    );
+    if (result.isEmpty) {
+      return (count: 0, totalBytes: 0, oldest: null, newest: null);
+    }
+    final row = result[0];
+    final count = (row['count'] as int?) ?? 0;
+    final totalBytes = (row['totalBytes'] as int?) ?? 0;
+    final oldestStr = row['oldest'] as String?;
+    final newestStr = row['newest'] as String?;
+    return (
+      count: count,
+      totalBytes: totalBytes,
+      oldest: oldestStr != null ? DateTime.parse(oldestStr) : null,
+      newest: newestStr != null ? DateTime.parse(newestStr) : null,
+    );
   }
 }
