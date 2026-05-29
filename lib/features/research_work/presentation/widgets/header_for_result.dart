@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
@@ -18,6 +19,12 @@ class HeaderForResultPage extends ConsumerWidget
     final String cachedText = searched.isCached ? '(オフラインから取得)' : '(オンラインから取得)';
     debugPrint(cachedText);
     return AppBar(
+      leading: Navigator.canPop(context)
+          ? null
+          : IconButton(
+              icon: const Icon(Icons.home_outlined),
+              onPressed: () => context.go('/home'),
+            ),
       actions: [
         data.when(
           data: (searched) {
