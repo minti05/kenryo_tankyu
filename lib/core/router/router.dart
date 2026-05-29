@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kenryo_tankyu/core/providers/deep_link_provider.dart';
 
 // Auth
 import 'package:kenryo_tankyu/features/auth/presentation/screens/welcome_page.dart';
@@ -57,12 +58,25 @@ final routesProvider = Provider<GoRouter>((ref) {
       final isOnVerifyEmail = loc == '/verify_email';
 
       if (user == null) {
-        return isOnWelcome ? null : '/welcome';
+        // ディープリンクで未ログイン時: 元のパスを保存してwelcomeへ
+        if (!isOnWelcome) {
+          ref.read(deepLinkPathProvider.notifier).state = loc;
+          return '/welcome';
+        }
+        return null;
       }
       if (!user.emailVerified) {
         return isOnVerifyEmail ? null : '/verify_email';
       }
-      if (isOnWelcome || isOnVerifyEmail) return '/home';
+      // ログイン完了後: 保存したディープリンク先があればそこへ
+      if (isOnWelcome || isOnVerifyEmail) {
+        final pending = ref.read(deepLinkPathProvider);
+        if (pending != null) {
+          ref.read(deepLinkPathProvider.notifier).state = null;
+          return pending;
+        }
+        return '/home';
+      }
       return null;
     },
     routes: [

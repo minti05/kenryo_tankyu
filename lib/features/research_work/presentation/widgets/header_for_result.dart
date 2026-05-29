@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/overlay_dialog.dart';
@@ -18,6 +19,12 @@ class HeaderForResultPage extends ConsumerWidget
     final String cachedText = searched.isCached ? '(オフラインから取得)' : '(オンラインから取得)';
     debugPrint(cachedText);
     return AppBar(
+      leading: Navigator.canPop(context)
+          ? null
+          : IconButton(
+              icon: const Icon(Icons.home_outlined),
+              onPressed: () => context.go('/home'),
+            ),
       actions: [
         data.when(
           data: (searched) {
@@ -39,13 +46,12 @@ class HeaderForResultPage extends ConsumerWidget
                   ),
                   PopupMenuItem(
                     onTap: () async {
-                      final data = ClipboardData(text: _setClipboard(searched));
-                      await Clipboard.setData(data);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('クリップボードにコピーしました')),
+                      final shareText = _buildShareText(searched);
+                      await SharePlus.instance.share(
+                        ShareParams(text: shareText),
                       );
                     },
-                    child: const Text('情報をクリップボードにコピー'),
+                    child: const Text('共有する...'),
                   ),
                 ];
               },
@@ -58,11 +64,15 @@ class HeaderForResultPage extends ConsumerWidget
     );
   }
 
-  String _setClipboard(Searched searched) {
-    final String text =
-        '『${searched.title}』\n${searched.enterYear.displayName}年度入学／${searched.course.displayName}\n名前：${searched.author}\n'
-        '---------\nカテゴリ1：${searched.category1.displayName}>${searched.subCategory1.displayName}\n'
-        'カテゴリ2：${searched.category2.displayName}>${searched.subCategory2.displayName}';
-    return text;
+  String _buildShareText(Searched searched) {
+    final url = 'https://tankyu-app.web.app/result/${searched.documentID}';
+    return '『${searched.title}』\n'
+        '${searched.enterYear.displayName}年度入学／${searched.course.displayName}\n'
+        '名前：${searched.author}\n'
+        '---------\n'
+        'カテゴリ1：${searched.category1.displayName}>${searched.subCategory1.displayName}\n'
+        'カテゴリ2：${searched.category2.displayName}>${searched.subCategory2.displayName}\n'
+        '---------\n'
+        '$url';
   }
 }
