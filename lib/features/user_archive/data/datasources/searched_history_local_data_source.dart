@@ -1,4 +1,5 @@
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/user_archive/domain/models/archive_stats.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -177,6 +178,45 @@ class SearchedHistoryLocalDataSource {
       'searched_history',
       where: 'documentID = ?',
       whereArgs: [documentID],
+    );
+  }
+
+  Future<void> deleteAllHistory() async {
+    final Database db = await database;
+    await db.delete('searched_history');
+  }
+
+  Future<void> deleteHistoryBefore(DateTime date) async {
+    final Database db = await database;
+    await db.delete(
+      'searched_history',
+      where: 'savedAt < ?',
+      whereArgs: [date.toIso8601String()],
+    );
+  }
+
+  Future<List<DateTime>> getAllSavedDates() async {
+    final Database db = await database;
+    final result = await db.query('searched_history', columns: ['savedAt']);
+    return result.map((r) => DateTime.parse(r['savedAt'] as String)).toList();
+  }
+
+  Future<HistoryStats> getHistoryStats() async {
+    final Database db = await database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count, MIN(savedAt) as oldest, MAX(savedAt) as newest FROM searched_history',
+    );
+    if (result.isEmpty) {
+      return (count: 0, oldest: null, newest: null);
+    }
+    final row = result[0];
+    final count = (row['count'] as int?) ?? 0;
+    final oldestStr = row['oldest'] as String?;
+    final newestStr = row['newest'] as String?;
+    return (
+      count: count,
+      oldest: oldestStr != null ? DateTime.parse(oldestStr) : null,
+      newest: newestStr != null ? DateTime.parse(newestStr) : null,
     );
   }
 }

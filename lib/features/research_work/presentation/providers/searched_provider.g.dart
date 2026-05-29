@@ -60,7 +60,7 @@ final class ResearchWorkProvider extends $FunctionalProvider<
   }
 }
 
-String _$researchWorkHash() => r'c79ee15529bdc74d9f43555a3544f2fe93ba4d33';
+String _$researchWorkHash() => r'ee2409657d34009b311ecdf8f987f999ddbe3738';
 
 final class ResearchWorkFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Searched>, int> {

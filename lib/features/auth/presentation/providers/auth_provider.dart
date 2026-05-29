@@ -3,6 +3,10 @@ import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
+import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
+import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
@@ -108,5 +112,22 @@ class AuthNotifier extends _$AuthNotifier {
       } catch (_) {}
       rethrow;
     }
+    // アカウント削除成功後、全ローカルデータを消去（失敗してもアカウント削除は成功とみなす）
+    await _clearAllLocalData();
+  }
+
+  Future<void> _clearAllLocalData() async {
+    try {
+      await ref.read(searchedHistoryLocalDataSourceProvider).deleteAllHistory();
+    } catch (_) {}
+    try {
+      await ref.read(pdfLocalDataSourceProvider).deleteAllPdf();
+    } catch (_) {}
+    try {
+      await ref.read(searchHistoryDataSourceProvider).deleteAllHistory();
+    } catch (_) {}
+    try {
+      await NotificationDbController.deleteAllNotifications();
+    } catch (_) {}
   }
 }
