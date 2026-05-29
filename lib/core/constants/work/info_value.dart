@@ -9,6 +9,11 @@ enum EnterYear {
 
   final int displayName;
   const EnterYear({required this.displayName});
+
+  String get label {
+    if (this == EnterYear.undefined) return '指定なし';
+    return '$displayName年度入学';
+  }
 }
 
 class EnterYearEnumConverter implements JsonConverter<EnterYear, int> {

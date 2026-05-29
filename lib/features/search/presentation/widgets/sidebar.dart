@@ -42,24 +42,13 @@ class SideBar extends ConsumerWidget {
                     children: [
                       const SizedBox(height: 10.0),
                       SearchDropButton(
-                          name: 'カテゴリ',
-                          selectedText: data.category.displayName,
-                          choices: Category.values
-                              .map((e) => e.displayName)
-                              .toList()),
-                      const SizedBox(height: 15.0),
-                      SearchDropButton(
-                          name: '期間',
-                          selectedText: data.enterYear.displayName.toString(),
+                          name: '年度指定',
+                          selectedText: data.enterYear != EnterYear.undefined
+                              ? data.enterYear.label
+                              : null,
                           choices: EnterYear.values
-                              .map((e) => e.displayName.toString())
-                              .toList()),
-                      const SizedBox(height: 15.0),
-                      SearchDropButton(
-                          name: 'イベント名',
-                          selectedText: data.eventName.displayName,
-                          choices: EventName.values
-                              .map((e) => e.displayName)
+                              .where((e) => e != EnterYear.undefined)
+                              .map((e) => e.label)
                               .toList()),
                       const SizedBox(height: 15.0),
                       SearchDropButton(
@@ -67,6 +56,13 @@ class SideBar extends ConsumerWidget {
                           selectedText: data.course.displayName,
                           choices:
                               Course.values.map((e) => e.displayName).toList()),
+                      const SizedBox(height: 15.0),
+                      SearchDropButton(
+                          name: 'カテゴリ',
+                          selectedText: data.category.displayName,
+                          choices: Category.values
+                              .map((e) => e.displayName)
+                              .toList()),
                       const SizedBox(height: 15.0),
                       const Text('サブカテゴリを選択'),
                       data.category != Category.none
