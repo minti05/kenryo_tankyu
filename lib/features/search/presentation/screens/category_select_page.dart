@@ -8,7 +8,7 @@ class CategorySelectPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('カテゴリから選ぶ'),
+        title: const Text('カテゴリーを選択'),
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
       ),
       body: const CategoryList(),
