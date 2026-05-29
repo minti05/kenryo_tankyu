@@ -53,7 +53,7 @@ class SearchHistoryList extends ConsumerWidget {
                             ref
                                 .read(searchProvider.notifier)
                                 .setParameters(search);
-                            context.pushReplacement('/resultList');
+                            context.push('/resultList');
                           });
                     },
                     separatorBuilder: (BuildContext context, int index) {

@@ -3,24 +3,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
+// Auth
 import 'package:kenryo_tankyu/features/auth/presentation/screens/welcome_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/create_password_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/verify_name_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/login_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/reset_password_page.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/screens/verify_email_page.dart';
-import 'package:kenryo_tankyu/features/notification/presentation/screens/notification_page.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/screens/result_page.dart';
+
+// Search
+import 'package:kenryo_tankyu/features/search/presentation/screens/category_select_page.dart';
 import 'package:kenryo_tankyu/features/search/presentation/screens/result_list_page.dart';
 import 'package:kenryo_tankyu/features/search/presentation/screens/search_page.dart';
 import 'package:kenryo_tankyu/features/search/presentation/screens/sub_category_select_page.dart';
+
+// Features
+import 'package:kenryo_tankyu/features/notification/presentation/screens/notification_page.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/screens/result_page.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/screens/settings_page.dart';
 import 'package:kenryo_tankyu/features/teacher/presentation/screens/show_teacher_pdf.dart';
 import 'package:kenryo_tankyu/features/teacher/presentation/screens/teacher_select_page.dart';
+
+// Shell (BottomNavigationBar)
 import 'package:kenryo_tankyu/presentation/screens/home_page.dart';
 import 'package:kenryo_tankyu/presentation/screens/explore_page.dart';
 import 'package:kenryo_tankyu/presentation/screens/library_page.dart';
 import 'package:kenryo_tankyu/presentation/widget/widget.dart';
+
+// Dev / Test
 import 'package:kenryo_tankyu/test/test_file_select.dart';
 import 'package:kenryo_tankyu/test/test_for_aoi.dart';
 import 'package:kenryo_tankyu/test/test_for_coji.dart';
@@ -56,34 +66,70 @@ final routesProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      // ─── 認証フロー ───────────────────────────────────────────
       GoRoute(
-          path: '/welcome',
-          builder: (context, state) => const WelcomePage(),
-          routes: [
-            GoRoute(
-                path: 'verify_name',
-                builder: (context, state) => const VerifyNamePage(),
-                routes: [
-                  GoRoute(
-                    path: 'create_password',
-                    builder: (context, state) => const CreatePassWordPage(),
-                  ),
-                ]),
-            GoRoute(
-                path: 'login',
-                builder: (context, state) =>
-                    LoginPage(isDeveloper: state.extra as bool? ?? false),
-                routes: [
-                  GoRoute(
-                    path: 'reset_password',
-                    builder: (context, state) => const ResetPasswordPage(),
-                  )
-                ]),
-          ]),
+        path: '/welcome',
+        builder: (context, state) => const WelcomePage(),
+        routes: [
+          GoRoute(
+            path: 'verify_name',
+            builder: (context, state) => const VerifyNamePage(),
+            routes: [
+              GoRoute(
+                path: 'create_password',
+                builder: (context, state) => const CreatePassWordPage(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'login',
+            builder: (context, state) =>
+                LoginPage(isDeveloper: state.extra as bool? ?? false),
+            routes: [
+              GoRoute(
+                path: 'reset_password',
+                builder: (context, state) => const ResetPasswordPage(),
+              ),
+            ],
+          ),
+        ],
+      ),
       GoRoute(
         path: '/verify_email',
         builder: (context, state) => const CheckEmailPage(),
       ),
+
+      // ─── 検索フロー ───────────────────────────────────────────
+      // 遷移順: /search → /categorySelect → /subCategory → /resultList
+      //         /search → /subCategory → /resultList
+      //         /explore(shell) → /subCategory → /resultList
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => const SearchPage(),
+      ),
+      GoRoute(
+        path: '/categorySelect',
+        builder: (context, state) => const CategorySelectPage(),
+      ),
+      GoRoute(
+        path: '/subCategory',
+        builder: (context, state) => const SubCategorySelectPage(),
+      ),
+      GoRoute(
+        path: '/resultList',
+        builder: (context, state) => ResultListPage(),
+      ),
+
+      // ─── 作品詳細 ─────────────────────────────────────────────
+      GoRoute(
+        path: '/result/:documentID',
+        builder: (context, state) {
+          final documentID = state.pathParameters['documentID']!;
+          return ResultPage(documentID: int.parse(documentID));
+        },
+      ),
+
+      // ─── その他の機能 ─────────────────────────────────────────
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
@@ -93,44 +139,22 @@ final routesProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NotificationPage(),
       ),
       GoRoute(
-        path: '/result/:documentID',
-        builder: (context, state) {
-          final documentID = state.pathParameters['documentID']!;
-          return ResultPage(documentID: int.parse(documentID));
-        },
-      ),
-      GoRoute(
-          path: '/teacher',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: TeacherSelectPage()),
-          routes: <RouteBase>[
-            GoRoute(
-              path: 'showPdf',
-              builder: (context, state) => const ShowTeacherPdfPage(),
-            ),
-          ]),
-
-      GoRoute(
-        path: '/resultList',
-        builder: (context, state) => ResultListPage(),
-      ),
-      GoRoute(
-        path: '/subCategory',
-        builder: (context, state) => const SubCategorySelectPage(),
-      ),
-      GoRoute(
-        path: '/search',
-        builder: (context, state) => const SearchPage(),
+        path: '/teacher',
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: TeacherSelectPage()),
+        routes: [
+          GoRoute(
+            path: 'showPdf',
+            builder: (context, state) => const ShowTeacherPdfPage(),
+          ),
+        ],
       ),
 
-      //ShellRoute内にBottomNavigationBarで遷移する画面を記載する
+      // ─── BottomNavigationBar (ShellRoute) ────────────────────
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
-        //BottomNavigationBarを実装しているページを記載する
-        //childでScaffoldのbodyを渡す
         builder: (context, state, child) => Footer(child: child),
-        routes: <RouteBase>[
-          //BottomNavigationBarから遷移するページを記載する
+        routes: [
           GoRoute(
             path: '/home',
             pageBuilder: (context, state) =>
@@ -146,19 +170,25 @@ final routesProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) =>
                 NoTransitionPage(child: LibraryPage(key: state.pageKey)),
           ),
+
+          // ─── 開発用テスト画面 ────────────────────────────────
           GoRoute(
             path: '/testSelect',
             pageBuilder: (context, state) =>
                 NoTransitionPage(child: TestSelectPage(key: state.pageKey)),
-            routes: <RouteBase>[
+            routes: [
               GoRoute(
-                  path: 'mitsuki',
-                  builder: (context, state) => const TestForMitsuki()),
+                path: 'mitsuki',
+                builder: (context, state) => const TestForMitsuki(),
+              ),
               GoRoute(
-                  path: 'coji',
-                  builder: (context, state) => const TestForCoji()),
+                path: 'coji',
+                builder: (context, state) => const TestForCoji(),
+              ),
               GoRoute(
-                  path: 'aoi', builder: (context, state) => const TestForAoi()),
+                path: 'aoi',
+                builder: (context, state) => const TestForAoi(),
+              ),
             ],
           ),
         ],
