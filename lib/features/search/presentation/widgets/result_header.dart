@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_list.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
@@ -66,11 +65,9 @@ class ResultHeaderState extends ConsumerState<ResultHeader> {
 
   void _backTo(BuildContext context) {
     final notifier = ref.read(searchProvider.notifier);
-    final Search searchStatus = ref.watch(searchProvider);
+    final Search searchStatus = ref.read(searchProvider);
     if (searchStatus.subCategory != SubCategory.none) {
       notifier.deleteParameter('subCategory');
-    } else if (searchStatus.category != Category.none) {
-      notifier.deleteAllParameters();
     }
     context.pop();
   }
