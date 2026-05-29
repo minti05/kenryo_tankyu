@@ -43,13 +43,9 @@ class SideBar extends ConsumerWidget {
                       const SizedBox(height: 10.0),
                       SearchDropButton(
                           name: '年度指定',
-                          selectedText: data.enterYear != EnterYear.undefined
-                              ? data.enterYear.label
-                              : null,
-                          choices: EnterYear.values
-                              .where((e) => e != EnterYear.undefined)
-                              .map((e) => e.label)
-                              .toList()),
+                          selectedText: data.enterYear.label,
+                          choices:
+                              EnterYear.values.map((e) => e.label).toList()),
                       const SizedBox(height: 15.0),
                       SearchDropButton(
                           name: '学科指定',
