@@ -302,7 +302,7 @@ final class HistoryControllerProvider
   }
 }
 
-String _$historyControllerHash() => r'd85952e0a282f362eb89d41a914b1b8b38090258';
+String _$historyControllerHash() => r'32a690092760aa7ca5bdf626dbbad41a4941b8d5';
 
 abstract class _$HistoryController extends $Notifier<void> {
   void build();
