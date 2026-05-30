@@ -9,6 +9,7 @@ abstract class SearchResult with _$SearchResult {
     required List<Searched> hits,
     required int page,
     required int nbPages,
+    required int nbHits,
   }) = _SearchResult;
 
   const SearchResult._();

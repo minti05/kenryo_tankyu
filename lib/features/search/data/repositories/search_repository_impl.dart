@@ -48,6 +48,7 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
               .toList(),
           page: response.page ?? page,
           nbPages: response.nbPages ?? 1,
+          nbHits: response.nbHits ?? hits.length,
         );
       }
     } catch (error) {

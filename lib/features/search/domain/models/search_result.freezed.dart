@@ -17,6 +17,7 @@ mixin _$SearchResult {
   List<Searched> get hits;
   int get page;
   int get nbPages;
+  int get nbHits;
 
   /// Create a copy of SearchResult
   /// with the given fields replaced by the non-null parameter values.
@@ -33,16 +34,17 @@ mixin _$SearchResult {
             other is SearchResult &&
             const DeepCollectionEquality().equals(other.hits, hits) &&
             (identical(other.page, page) || other.page == page) &&
-            (identical(other.nbPages, nbPages) || other.nbPages == nbPages));
+            (identical(other.nbPages, nbPages) || other.nbPages == nbPages) &&
+            (identical(other.nbHits, nbHits) || other.nbHits == nbHits));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(hits), page, nbPages);
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(hits), page, nbPages, nbHits);
 
   @override
   String toString() {
-    return 'SearchResult(hits: $hits, page: $page, nbPages: $nbPages)';
+    return 'SearchResult(hits: $hits, page: $page, nbPages: $nbPages, nbHits: $nbHits)';
   }
 }
 
@@ -52,7 +54,7 @@ abstract mixin class $SearchResultCopyWith<$Res> {
           SearchResult value, $Res Function(SearchResult) _then) =
       _$SearchResultCopyWithImpl;
   @useResult
-  $Res call({List<Searched> hits, int page, int nbPages});
+  $Res call({List<Searched> hits, int page, int nbPages, int nbHits});
 }
 
 /// @nodoc
@@ -70,6 +72,7 @@ class _$SearchResultCopyWithImpl<$Res> implements $SearchResultCopyWith<$Res> {
     Object? hits = null,
     Object? page = null,
     Object? nbPages = null,
+    Object? nbHits = null,
   }) {
     return _then(_self.copyWith(
       hits: null == hits
@@ -83,6 +86,10 @@ class _$SearchResultCopyWithImpl<$Res> implements $SearchResultCopyWith<$Res> {
       nbPages: null == nbPages
           ? _self.nbPages
           : nbPages // ignore: cast_nullable_to_non_nullable
+              as int,
+      nbHits: null == nbHits
+          ? _self.nbHits
+          : nbHits // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -181,13 +188,14 @@ extension SearchResultPatterns on SearchResult {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(List<Searched> hits, int page, int nbPages)? $default, {
+    TResult Function(List<Searched> hits, int page, int nbPages, int nbHits)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _SearchResult() when $default != null:
-        return $default(_that.hits, _that.page, _that.nbPages);
+        return $default(_that.hits, _that.page, _that.nbPages, _that.nbHits);
       case _:
         return orElse();
     }
@@ -208,12 +216,13 @@ extension SearchResultPatterns on SearchResult {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(List<Searched> hits, int page, int nbPages) $default,
+    TResult Function(List<Searched> hits, int page, int nbPages, int nbHits)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SearchResult():
-        return $default(_that.hits, _that.page, _that.nbPages);
+        return $default(_that.hits, _that.page, _that.nbPages, _that.nbHits);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -233,12 +242,13 @@ extension SearchResultPatterns on SearchResult {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(List<Searched> hits, int page, int nbPages)? $default,
+    TResult? Function(List<Searched> hits, int page, int nbPages, int nbHits)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SearchResult() when $default != null:
-        return $default(_that.hits, _that.page, _that.nbPages);
+        return $default(_that.hits, _that.page, _that.nbPages, _that.nbHits);
       case _:
         return null;
     }
@@ -251,7 +261,8 @@ class _SearchResult extends SearchResult {
   const _SearchResult(
       {required final List<Searched> hits,
       required this.page,
-      required this.nbPages})
+      required this.nbPages,
+      required this.nbHits})
       : _hits = hits,
         super._();
 
@@ -267,6 +278,8 @@ class _SearchResult extends SearchResult {
   final int page;
   @override
   final int nbPages;
+  @override
+  final int nbHits;
 
   /// Create a copy of SearchResult
   /// with the given fields replaced by the non-null parameter values.
@@ -283,16 +296,17 @@ class _SearchResult extends SearchResult {
             other is _SearchResult &&
             const DeepCollectionEquality().equals(other._hits, _hits) &&
             (identical(other.page, page) || other.page == page) &&
-            (identical(other.nbPages, nbPages) || other.nbPages == nbPages));
+            (identical(other.nbPages, nbPages) || other.nbPages == nbPages) &&
+            (identical(other.nbHits, nbHits) || other.nbHits == nbHits));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_hits), page, nbPages);
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(_hits), page, nbPages, nbHits);
 
   @override
   String toString() {
-    return 'SearchResult(hits: $hits, page: $page, nbPages: $nbPages)';
+    return 'SearchResult(hits: $hits, page: $page, nbPages: $nbPages, nbHits: $nbHits)';
   }
 }
 
@@ -304,7 +318,7 @@ abstract mixin class _$SearchResultCopyWith<$Res>
       __$SearchResultCopyWithImpl;
   @override
   @useResult
-  $Res call({List<Searched> hits, int page, int nbPages});
+  $Res call({List<Searched> hits, int page, int nbPages, int nbHits});
 }
 
 /// @nodoc
@@ -323,6 +337,7 @@ class __$SearchResultCopyWithImpl<$Res>
     Object? hits = null,
     Object? page = null,
     Object? nbPages = null,
+    Object? nbHits = null,
   }) {
     return _then(_SearchResult(
       hits: null == hits
@@ -336,6 +351,10 @@ class __$SearchResultCopyWithImpl<$Res>
       nbPages: null == nbPages
           ? _self.nbPages
           : nbPages // ignore: cast_nullable_to_non_nullable
+              as int,
+      nbHits: null == nbHits
+          ? _self.nbHits
+          : nbHits // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
