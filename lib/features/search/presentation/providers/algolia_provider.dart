@@ -12,7 +12,22 @@ import 'package:kenryo_tankyu/features/search/presentation/providers/search_hist
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
-final searchPageProvider = StateProvider.autoDispose<int>((ref) => 0);
+class SearchPageNotifier extends Notifier<int> {
+  @override
+  int build() {
+    ref.listen(searchProvider, (previous, next) {
+      state = 0;
+    });
+    return 0;
+  }
+
+  void setPage(int page) => state = page;
+}
+
+final searchPageProvider =
+    NotifierProvider.autoDispose<SearchPageNotifier, int>(() {
+  return SearchPageNotifier();
+});
 
 final algoliaSearchProvider =
     FutureProvider.autoDispose<List<Searched>?>((ref) async {
@@ -34,6 +49,10 @@ final algoliaSearchProvider =
     // Save history side effect (first page only)
     await historyRepository.insertHistory(
         search.copyWith(savedAt: DateTime.now(), numberOfHits: result.length));
+  }
+
+  if (result == null && page > 0) {
+    return [];
   }
 
   return result;

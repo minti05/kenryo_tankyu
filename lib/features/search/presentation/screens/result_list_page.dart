@@ -78,11 +78,13 @@ class ResultListPage extends ConsumerWidget {
                               padding: const EdgeInsets.only(
                                   left: 8.0, top: 4.0, bottom: 4.0),
                               child: Text(
-                                data.length == 20
-                                    ? '${currentPage * 20 + 1}〜${currentPage * 20 + 20}件目を表示中'
-                                    : currentPage == 0
-                                        ? '${data.length}件ヒットしました'
-                                        : '${currentPage * 20 + 1}〜${currentPage * 20 + data.length}件目を表示中',
+                                data.isEmpty
+                                    ? '該当するデータはありません'
+                                    : data.length == 20
+                                        ? '${currentPage * 20 + 1}〜${currentPage * 20 + 20}件目を表示中'
+                                        : currentPage == 0
+                                            ? '${data.length}件ヒットしました'
+                                            : '${currentPage * 20 + 1}〜${currentPage * 20 + data.length}件目を表示中',
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
@@ -95,13 +97,14 @@ class ResultListPage extends ConsumerWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   TextButton.icon(
-                                    onPressed: currentPage == 0
+                                    onPressed: asyncValue.isLoading ||
+                                            currentPage == 0
                                         ? null
                                         : () {
                                             ref
                                                 .read(
                                                     searchPageProvider.notifier)
-                                                .state = currentPage - 1;
+                                                .setPage(currentPage - 1);
                                           },
                                     icon: const Icon(Icons.arrow_back_ios,
                                         size: 16),
@@ -109,13 +112,14 @@ class ResultListPage extends ConsumerWidget {
                                   ),
                                   Text('${currentPage + 1}ページ目'),
                                   TextButton.icon(
-                                    onPressed: data.length < 20
+                                    onPressed: asyncValue.isLoading ||
+                                            data.length < 20
                                         ? null
                                         : () {
                                             ref
                                                 .read(
                                                     searchPageProvider.notifier)
-                                                .state = currentPage + 1;
+                                                .setPage(currentPage + 1);
                                           },
                                     icon: const Icon(Icons.arrow_forward_ios,
                                         size: 16),
