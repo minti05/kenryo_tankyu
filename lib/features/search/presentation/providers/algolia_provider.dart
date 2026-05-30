@@ -12,6 +12,8 @@ import 'package:kenryo_tankyu/features/search/presentation/providers/search_hist
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
+final searchPageProvider = StateProvider.autoDispose<int>((ref) => 0);
+
 final algoliaSearchProvider =
     FutureProvider.autoDispose<List<Searched>?>((ref) async {
   final isConnected = ref.watch(isConnectedProvider);
@@ -22,13 +24,14 @@ final algoliaSearchProvider =
   final search =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
 
+  final page = ref.watch(searchPageProvider);
   final repository = ref.watch(searchRepositoryProvider);
   final historyRepository = ref.watch(searchHistoryRepositoryProvider);
 
-  final result = await repository.search(params: search);
+  final result = await repository.search(params: search, page: page);
 
-  if (result != null) {
-    // Save history side effect
+  if (result != null && page == 0) {
+    // Save history side effect (first page only)
     await historyRepository.insertHistory(
         search.copyWith(savedAt: DateTime.now(), numberOfHits: result.length));
   }
