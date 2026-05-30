@@ -75,8 +75,10 @@ final algoliaSearchProvider =
 
   if (result != null && page == 0) {
     // Save history side effect (first page only)
-    await historyRepository.insertHistory(search.copyWith(
-        savedAt: DateTime.now(), numberOfHits: result.hits.length));
+    // 続きがある場合は21を保存し「20件+」表示のセンチネルとして使う
+    final hitsCount = result.isLastPage ? result.hits.length : 21;
+    await historyRepository.insertHistory(
+        search.copyWith(savedAt: DateTime.now(), numberOfHits: hitsCount));
   }
 
   if (result == null && page > 0) {

@@ -43,7 +43,7 @@ class SearchHistoryList extends ConsumerWidget {
                                     overflow: TextOverflow.ellipsis),
                               ),
                               Text(
-                                  search.numberOfHits == 20
+                                  search.numberOfHits > 20
                                       ? '20件+'
                                       : ' ${search.numberOfHits}件',
                                   style: const TextStyle(fontSize: 12)),
