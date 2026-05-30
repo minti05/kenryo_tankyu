@@ -71,6 +71,7 @@ class ResultListPage extends ConsumerWidget {
                         ));
                       } else {
                         final currentPage = ref.watch(searchPageProvider);
+                        final hits = data.hits;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -78,13 +79,11 @@ class ResultListPage extends ConsumerWidget {
                               padding: const EdgeInsets.only(
                                   left: 8.0, top: 4.0, bottom: 4.0),
                               child: Text(
-                                data.isEmpty
+                                hits.isEmpty
                                     ? '該当するデータはありません'
-                                    : data.length == 20
-                                        ? '${currentPage * 20 + 1}〜${currentPage * 20 + 20}件目を表示中'
-                                        : currentPage == 0
-                                            ? '${data.length}件ヒットしました'
-                                            : '${currentPage * 20 + 1}〜${currentPage * 20 + data.length}件目を表示中',
+                                    : currentPage == 0
+                                        ? '${hits.length}件ヒットしました'
+                                        : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中',
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
@@ -113,7 +112,7 @@ class ResultListPage extends ConsumerWidget {
                                   Text('${currentPage + 1}ページ目'),
                                   TextButton.icon(
                                     onPressed: asyncValue.isLoading ||
-                                            data.length < 20
+                                            data.isLastPage
                                         ? null
                                         : () {
                                             ref

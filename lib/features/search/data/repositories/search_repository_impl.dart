@@ -5,6 +5,7 @@ import 'package:algoliasearch/algoliasearch.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/data/datasources/search_data_source.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
+import 'package:kenryo_tankyu/features/search/domain/models/search_result.dart';
 import 'package:kenryo_tankyu/features/search/domain/repositories/search_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,7 +17,7 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
   final SearchDataSource _dataSource;
 
   @override
-  Future<List<Searched>?> search({
+  Future<SearchResult?> search({
     required Search params,
     int page = 0,
     int? hitsPerPage,
@@ -41,9 +42,13 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
       if (hits.isEmpty) {
         return null;
       } else {
-        return hits.map((object) {
-          return Searched.fromAlgolia(object, false);
-        }).toList();
+        return SearchResult(
+          hits: hits
+              .map((object) => Searched.fromAlgolia(object, false))
+              .toList(),
+          page: response.page ?? page,
+          nbPages: response.nbPages ?? 1,
+        );
       }
     } catch (error) {
       throw mapException(error);
