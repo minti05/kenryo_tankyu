@@ -81,7 +81,7 @@ class ResultListPage extends ConsumerWidget {
                               child: Text(
                                 hits.isEmpty
                                     ? '該当するデータはありません'
-                                    : currentPage == 0
+                                    : data.isLastPage && currentPage == 0
                                         ? '${hits.length}件ヒットしました'
                                         : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中',
                                 style: const TextStyle(fontSize: 16),
