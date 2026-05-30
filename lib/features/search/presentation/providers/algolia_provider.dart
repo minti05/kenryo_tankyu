@@ -13,6 +13,26 @@ import 'package:kenryo_tankyu/features/search/presentation/providers/search_hist
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
+class SearchResultCacheNotifier extends Notifier<Map<int, SearchResult>> {
+  @override
+  Map<int, SearchResult> build() {
+    ref.listen(searchProvider, (previous, next) {
+      state = {};
+    });
+    return {};
+  }
+
+  SearchResult? get(int page) => state[page];
+
+  void set(int page, SearchResult result) {
+    state = {...state, page: result};
+  }
+}
+
+final searchResultCacheProvider = NotifierProvider.autoDispose<
+    SearchResultCacheNotifier,
+    Map<int, SearchResult>>(SearchResultCacheNotifier.new);
+
 class SearchPageNotifier extends Notifier<int> {
   @override
   int build() {
@@ -41,6 +61,13 @@ final algoliaSearchProvider =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
 
   final page = ref.watch(searchPageProvider);
+  final cache = ref.watch(searchResultCacheProvider.notifier);
+
+  final cached = cache.get(page);
+  if (cached != null) {
+    return cached;
+  }
+
   final repository = ref.watch(searchRepositoryProvider);
   final historyRepository = ref.watch(searchHistoryRepositoryProvider);
 
@@ -54,6 +81,10 @@ final algoliaSearchProvider =
 
   if (result == null && page > 0) {
     return SearchResult(hits: [], page: page, nbPages: page);
+  }
+
+  if (result != null) {
+    cache.set(page, result);
   }
 
   return result;
