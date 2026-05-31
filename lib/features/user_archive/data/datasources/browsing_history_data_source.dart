@@ -104,6 +104,15 @@ class BrowsingHistoryDataSource {
     return (count: dates.length, oldest: dates.first, newest: dates.last);
   }
 
+  /// キャッシュヒット時に viewed_at のみ更新（帯域節約）
+  Future<void> updateViewedAt(String userId, int documentId) async {
+    await _client
+        .from('browsing_history')
+        .update({'viewed_at': DateTime.now().toUtc().toIso8601String()})
+        .eq('user_id', userId)
+        .eq('document_id', documentId);
+  }
+
   /// お気に入り操作に伴う likes の差分更新（現在値を取得してから +delta）
   Future<void> updateLikes(String userId, int documentID, int delta) async {
     final row = await _client

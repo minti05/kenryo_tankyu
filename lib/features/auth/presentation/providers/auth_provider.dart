@@ -8,6 +8,8 @@ import 'package:kenryo_tankyu/features/notification/data/datasources/notificatio
 import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
 import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -129,6 +131,9 @@ class AuthNotifier extends _$AuthNotifier {
     // ref.readで取得するデータソースは非同期処理の前にすべて退避しておく。
     final pdfDs = ref.read(pdfLocalDataSourceProvider);
     final searchHistoryDs = ref.read(searchHistoryDataSourceProvider);
+    final browsingHistoryDs = ref.read(browsingHistoryDataSourceProvider);
+    final favoritesDs = ref.read(favoritesRemoteDataSourceProvider);
+    final readNotifIds = ref.read(readNotificationIdsProvider.notifier);
 
     final user = authRepo.currentUser;
     if (user == null || user.email == null) return;
@@ -150,6 +155,9 @@ class AuthNotifier extends _$AuthNotifier {
       userId: user.uid,
       pdfDs: pdfDs,
       searchHistoryDs: searchHistoryDs,
+      browsingHistoryDs: browsingHistoryDs,
+      favoritesDs: favoritesDs,
+      readNotifIds: readNotifIds,
     );
   }
 
@@ -157,12 +165,24 @@ class AuthNotifier extends _$AuthNotifier {
     required String userId,
     required PdfLocalDataSource pdfDs,
     required SearchHistoryDataSource searchHistoryDs,
+    required BrowsingHistoryDataSource browsingHistoryDs,
+    required FavoritesRemoteDataSource favoritesDs,
+    required ReadNotificationIds readNotifIds,
   }) async {
     try {
       await pdfDs.deleteAllPdf();
     } catch (_) {}
     try {
       await searchHistoryDs.deleteAllHistory(userId);
+    } catch (_) {}
+    try {
+      await browsingHistoryDs.deleteAllHistory(userId);
+    } catch (_) {}
+    try {
+      await favoritesDs.deleteAllFavorites(userId);
+    } catch (_) {}
+    try {
+      await readNotifIds.deleteAll(userId);
     } catch (_) {}
     try {
       await NotificationDbController.deleteAllNotifications();

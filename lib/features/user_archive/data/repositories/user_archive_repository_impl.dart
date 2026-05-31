@@ -143,6 +143,17 @@ class UserArchiveRepositoryImpl
   }
 
   @override
+  Future<void> updateHistoryViewedAt(int documentID) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+    try {
+      await _browsingHistoryDataSource.updateViewedAt(userId, documentID);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
   Future<void> changeFavoriteState(int documentID, bool nextIsFavorite) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) throw mapException(Exception('ログインしていません'));
