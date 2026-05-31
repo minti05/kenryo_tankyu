@@ -9,36 +9,45 @@ part of 'search_history_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(searchHistory)
-const searchHistoryProvider = SearchHistoryProvider._();
+@ProviderFor(SearchHistoryCache)
+const searchHistoryCacheProvider = SearchHistoryCacheProvider._();
 
-final class SearchHistoryProvider extends $FunctionalProvider<
-        AsyncValue<List<Search>?>, List<Search>?, FutureOr<List<Search>?>>
-    with $FutureModifier<List<Search>?>, $FutureProvider<List<Search>?> {
-  const SearchHistoryProvider._()
+final class SearchHistoryCacheProvider
+    extends $AsyncNotifierProvider<SearchHistoryCache, List<Search>?> {
+  const SearchHistoryCacheProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'searchHistoryProvider',
-          isAutoDispose: true,
+          name: r'searchHistoryCacheProvider',
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$searchHistoryHash();
+  String debugGetCreateSourceHash() => _$searchHistoryCacheHash();
 
   @$internal
   @override
-  $FutureProviderElement<List<Search>?> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<Search>?> create(Ref ref) {
-    return searchHistory(ref);
-  }
+  SearchHistoryCache create() => SearchHistoryCache();
 }
 
-String _$searchHistoryHash() => r'190059a1cf94a37129ccf87ea95d045eee0e5c5c';
+String _$searchHistoryCacheHash() =>
+    r'5bf10a914eeff6caec88d2c7ea9f7fb8f3fc3b3e';
+
+abstract class _$SearchHistoryCache extends $AsyncNotifier<List<Search>?> {
+  FutureOr<List<Search>?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<List<Search>?>, List<Search>?>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Search>?>, List<Search>?>,
+        AsyncValue<List<Search>?>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
