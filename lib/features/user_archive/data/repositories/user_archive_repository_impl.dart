@@ -7,7 +7,6 @@ import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_hi
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/models/archive_stats.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
@@ -20,8 +19,6 @@ class UserArchiveRepositoryImpl
   final PdfLocalDataSource _pdfDataSource;
   final RecommendedWorksLocalDataSource _recommendedDataSource;
   final UserArchiveRemoteDataSource _remoteDataSource;
-  // SQLite の isFavorite 同期用（セッション⑥で削除予定）
-  final SearchedHistoryLocalDataSource _legacyHistoryDataSource;
 
   UserArchiveRepositoryImpl(
     this._browsingHistoryDataSource,
@@ -29,7 +26,6 @@ class UserArchiveRepositoryImpl
     this._pdfDataSource,
     this._recommendedDataSource,
     this._remoteDataSource,
-    this._legacyHistoryDataSource,
   );
 
   @override
@@ -175,12 +171,6 @@ class UserArchiveRepositoryImpl
     // browsing_history の likes をバックグラウンドで更新（失敗しても無視）
     _updateBrowsingHistoryLikesSilently(
         userId, documentID, nextIsFavorite ? 1 : -1);
-
-    // SQLite の isFavorite も同期（セッション⑥で削除予定）
-    await _legacyHistoryDataSource.changeFavoriteState(
-        documentID, nextIsFavorite);
-    await _legacyHistoryDataSource.updateLikes(
-        documentID, nextIsFavorite ? 1 : -1);
   }
 
   void _updateBrowsingHistoryLikesSilently(

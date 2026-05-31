@@ -9,7 +9,6 @@ import 'package:kenryo_tankyu/features/notification/presentation/providers/read_
 import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -128,7 +127,6 @@ class AuthNotifier extends _$AuthNotifier {
     final userRepo = ref.read(userRepositoryProvider);
     // deleteUser()後にauthStateChangesが発火してAuthNotifierが破棄される可能性があるため、
     // ref.readで取得するデータソースは非同期処理の前にすべて退避しておく。
-    final searchedHistoryDs = ref.read(searchedHistoryLocalDataSourceProvider);
     final pdfDs = ref.read(pdfLocalDataSourceProvider);
     final searchHistoryDs = ref.read(searchHistoryDataSourceProvider);
 
@@ -150,7 +148,6 @@ class AuthNotifier extends _$AuthNotifier {
     // アカウント削除成功後、全ローカルデータを消去（失敗してもアカウント削除は成功とみなす）
     await _clearAllLocalData(
       userId: user.uid,
-      searchedHistoryDs: searchedHistoryDs,
       pdfDs: pdfDs,
       searchHistoryDs: searchHistoryDs,
     );
@@ -158,13 +155,9 @@ class AuthNotifier extends _$AuthNotifier {
 
   Future<void> _clearAllLocalData({
     required String userId,
-    required SearchedHistoryLocalDataSource searchedHistoryDs,
     required PdfLocalDataSource pdfDs,
     required SearchHistoryDataSource searchHistoryDs,
   }) async {
-    try {
-      await searchedHistoryDs.deleteAllHistory();
-    } catch (_) {}
     try {
       await pdfDs.deleteAllPdf();
     } catch (_) {}
