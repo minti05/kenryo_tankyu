@@ -7,6 +7,7 @@ abstract class UserArchiveRepository {
   // History
   Future<List<Searched>?> getAllHistory();
   Future<List<Searched>?> getFavoriteHistory();
+  Future<List<Searched>?> getFavoriteHistoryByIds(Set<int> ids);
   Future<void> insertHistory(Searched searched);
   Future<Searched?> getHistory(int documentID);
   Future<void> deleteHistory(int documentID);

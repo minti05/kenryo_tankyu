@@ -54,6 +54,17 @@ class UserArchiveRepositoryImpl
   }
 
   @override
+  Future<List<Searched>?> getFavoriteHistoryByIds(Set<int> ids) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
+    try {
+      return await _browsingHistoryDataSource.getHistoryByIds(userId, ids);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
   Future<void> insertHistory(Searched searched) async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
