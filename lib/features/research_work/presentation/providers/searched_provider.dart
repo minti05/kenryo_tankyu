@@ -43,6 +43,8 @@ class ResearchWork extends _$ResearchWork {
       final cached = await archiveRepo.getHistory(documentID);
       if (cached != null) {
         result = cached.copyWith(isCached: false);
+        unawaited(
+            archiveRepo.updateHistoryViewedAt(documentID).catchError((_) {}));
       } else {
         result = await fetchFromServer();
       }

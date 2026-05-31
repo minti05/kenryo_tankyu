@@ -46,4 +46,8 @@ class FavoritesRemoteDataSource {
         .maybeSingle();
     return row != null;
   }
+
+  Future<void> deleteAllFavorites(String userId) async {
+    await _client.from('favorites').delete().eq('user_id', userId);
+  }
 }
