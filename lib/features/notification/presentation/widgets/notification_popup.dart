@@ -1,16 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';
+import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
 import 'package:kenryo_tankyu/core/utils/text_with_url.dart';
 
-class NotificationPopup extends StatelessWidget {
+class NotificationPopup extends ConsumerStatefulWidget {
   final NotificationContent notification;
   const NotificationPopup({
-    Key? key,
+    super.key,
     required this.notification,
-  }) : super(key: key);
+  });
+
+  @override
+  ConsumerState<NotificationPopup> createState() => _NotificationPopupState();
+}
+
+class _NotificationPopupState extends ConsumerState<NotificationPopup> {
+  @override
+  void initState() {
+    super.initState();
+    _markAsRead();
+  }
+
+  void _markAsRead() {
+    final user = ref.read(authStateChangesProvider).asData?.value;
+    if (user == null) return;
+    ref
+        .read(readNotificationIdsProvider.notifier)
+        .markAsRead(user.uid, widget.notification.id);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final readIds = ref.watch(readNotificationIdsProvider);
+    final isRead = readIds.contains(widget.notification.id);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
@@ -25,7 +50,7 @@ class NotificationPopup extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -42,7 +67,7 @@ class NotificationPopup extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              notification.isRead
+                              isRead
                                   ? const SizedBox.shrink()
                                   : Text(
                                       'NEW',
@@ -77,12 +102,12 @@ class NotificationPopup extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                notification.type.icon,
+                                widget.notification.type.icon,
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                notification.title,
+                                widget.notification.title,
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -92,15 +117,14 @@ class NotificationPopup extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${notification.sendAt.month}/${notification.sendAt.day} ${notification.sendAt.hour}:${notification.sendAt.minute.toString().padLeft(2, '0')}',
-                            style: TextStyle(
+                            '${widget.notification.sendAt.month}/${widget.notification.sendAt.day} ${widget.notification.sendAt.hour}:${widget.notification.sendAt.minute.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 12,
                             ),
                           ),
                           const SizedBox(height: 16),
-                          TextWithUrl(
-                              text: notification.contents), // text:取得した文字列
+                          TextWithUrl(text: widget.notification.contents),
                         ],
                       ),
                     ),

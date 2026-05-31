@@ -24,7 +24,6 @@ mixin _$NotificationContent {
   DateTime get sendAt;
   @DateTimeConverter()
   DateTime get savedAt;
-  bool get isRead;
 
   /// Create a copy of NotificationContent
   /// with the given fields replaced by the non-null parameter values.
@@ -50,18 +49,17 @@ mixin _$NotificationContent {
             (identical(other.contents, contents) ||
                 other.contents == contents) &&
             (identical(other.sendAt, sendAt) || other.sendAt == sendAt) &&
-            (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
-            (identical(other.isRead, isRead) || other.isRead == isRead));
+            (identical(other.savedAt, savedAt) || other.savedAt == savedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, type, headerImagePath, title,
-      contents, sendAt, savedAt, isRead);
+  int get hashCode => Object.hash(
+      runtimeType, id, type, headerImagePath, title, contents, sendAt, savedAt);
 
   @override
   String toString() {
-    return 'NotificationContent(id: $id, type: $type, headerImagePath: $headerImagePath, title: $title, contents: $contents, sendAt: $sendAt, savedAt: $savedAt, isRead: $isRead)';
+    return 'NotificationContent(id: $id, type: $type, headerImagePath: $headerImagePath, title: $title, contents: $contents, sendAt: $sendAt, savedAt: $savedAt)';
   }
 }
 
@@ -78,8 +76,7 @@ abstract mixin class $NotificationContentCopyWith<$Res> {
       String title,
       String contents,
       @DateTimeConverter() DateTime sendAt,
-      @DateTimeConverter() DateTime savedAt,
-      bool isRead});
+      @DateTimeConverter() DateTime savedAt});
 }
 
 /// @nodoc
@@ -102,7 +99,6 @@ class _$NotificationContentCopyWithImpl<$Res>
     Object? contents = null,
     Object? sendAt = null,
     Object? savedAt = null,
-    Object? isRead = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -133,10 +129,6 @@ class _$NotificationContentCopyWithImpl<$Res>
           ? _self.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      isRead: null == isRead
-          ? _self.isRead
-          : isRead // ignore: cast_nullable_to_non_nullable
-              as bool,
     ));
   }
 }
@@ -241,23 +233,15 @@ extension NotificationContentPatterns on NotificationContent {
             String title,
             String contents,
             @DateTimeConverter() DateTime sendAt,
-            @DateTimeConverter() DateTime savedAt,
-            bool isRead)?
+            @DateTimeConverter() DateTime savedAt)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _NotificationContent() when $default != null:
-        return $default(
-            _that.id,
-            _that.type,
-            _that.headerImagePath,
-            _that.title,
-            _that.contents,
-            _that.sendAt,
-            _that.savedAt,
-            _that.isRead);
+        return $default(_that.id, _that.type, _that.headerImagePath,
+            _that.title, _that.contents, _that.sendAt, _that.savedAt);
       case _:
         return orElse();
     }
@@ -285,22 +269,14 @@ extension NotificationContentPatterns on NotificationContent {
             String title,
             String contents,
             @DateTimeConverter() DateTime sendAt,
-            @DateTimeConverter() DateTime savedAt,
-            bool isRead)
+            @DateTimeConverter() DateTime savedAt)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _NotificationContent():
-        return $default(
-            _that.id,
-            _that.type,
-            _that.headerImagePath,
-            _that.title,
-            _that.contents,
-            _that.sendAt,
-            _that.savedAt,
-            _that.isRead);
+        return $default(_that.id, _that.type, _that.headerImagePath,
+            _that.title, _that.contents, _that.sendAt, _that.savedAt);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -327,22 +303,14 @@ extension NotificationContentPatterns on NotificationContent {
             String title,
             String contents,
             @DateTimeConverter() DateTime sendAt,
-            @DateTimeConverter() DateTime savedAt,
-            bool isRead)?
+            @DateTimeConverter() DateTime savedAt)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _NotificationContent() when $default != null:
-        return $default(
-            _that.id,
-            _that.type,
-            _that.headerImagePath,
-            _that.title,
-            _that.contents,
-            _that.sendAt,
-            _that.savedAt,
-            _that.isRead);
+        return $default(_that.id, _that.type, _that.headerImagePath,
+            _that.title, _that.contents, _that.sendAt, _that.savedAt);
       case _:
         return null;
     }
@@ -359,8 +327,7 @@ class _NotificationContent extends NotificationContent {
       required this.title,
       required this.contents,
       @DateTimeConverter() required this.sendAt,
-      @DateTimeConverter() required this.savedAt,
-      required this.isRead})
+      @DateTimeConverter() required this.savedAt})
       : super._();
   factory _NotificationContent.fromJson(Map<String, dynamic> json) =>
       _$NotificationContentFromJson(json);
@@ -384,8 +351,6 @@ class _NotificationContent extends NotificationContent {
   @override
   @DateTimeConverter()
   final DateTime savedAt;
-  @override
-  final bool isRead;
 
   /// Create a copy of NotificationContent
   /// with the given fields replaced by the non-null parameter values.
@@ -416,18 +381,17 @@ class _NotificationContent extends NotificationContent {
             (identical(other.contents, contents) ||
                 other.contents == contents) &&
             (identical(other.sendAt, sendAt) || other.sendAt == sendAt) &&
-            (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
-            (identical(other.isRead, isRead) || other.isRead == isRead));
+            (identical(other.savedAt, savedAt) || other.savedAt == savedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, type, headerImagePath, title,
-      contents, sendAt, savedAt, isRead);
+  int get hashCode => Object.hash(
+      runtimeType, id, type, headerImagePath, title, contents, sendAt, savedAt);
 
   @override
   String toString() {
-    return 'NotificationContent(id: $id, type: $type, headerImagePath: $headerImagePath, title: $title, contents: $contents, sendAt: $sendAt, savedAt: $savedAt, isRead: $isRead)';
+    return 'NotificationContent(id: $id, type: $type, headerImagePath: $headerImagePath, title: $title, contents: $contents, sendAt: $sendAt, savedAt: $savedAt)';
   }
 }
 
@@ -446,8 +410,7 @@ abstract mixin class _$NotificationContentCopyWith<$Res>
       String title,
       String contents,
       @DateTimeConverter() DateTime sendAt,
-      @DateTimeConverter() DateTime savedAt,
-      bool isRead});
+      @DateTimeConverter() DateTime savedAt});
 }
 
 /// @nodoc
@@ -470,7 +433,6 @@ class __$NotificationContentCopyWithImpl<$Res>
     Object? contents = null,
     Object? sendAt = null,
     Object? savedAt = null,
-    Object? isRead = null,
   }) {
     return _then(_NotificationContent(
       id: null == id
@@ -501,10 +463,6 @@ class __$NotificationContentCopyWithImpl<$Res>
           ? _self.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      isRead: null == isRead
-          ? _self.isRead
-          : isRead // ignore: cast_nullable_to_non_nullable
-              as bool,
     ));
   }
 }

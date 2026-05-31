@@ -19,7 +19,6 @@ abstract class NotificationContent with _$NotificationContent {
     required String contents,
     @DateTimeConverter() required DateTime sendAt,
     @DateTimeConverter() required DateTime savedAt,
-    required bool isRead,
   }) = _NotificationContent;
 
   factory NotificationContent.fromJson(Map<String, dynamic> json) =>
@@ -27,25 +26,16 @@ abstract class NotificationContent with _$NotificationContent {
 
   factory NotificationContent.fromSQLite(Map<String, dynamic> json) {
     final mutableJson = Map<String, dynamic>.from(json);
-    mutableJson['isRead'] = mutableJson['isRead'] == 1;
-    final notification = NotificationContent.fromJson(mutableJson);
-    return notification;
+    mutableJson.remove('isRead');
+    return NotificationContent.fromJson(mutableJson);
   }
 
   factory NotificationContent.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final mutableJson = Map<String, dynamic>.from(data);
-    mutableJson['isRead'] = false;
     mutableJson['savedAt'] = DateTime.now();
     mutableJson['id'] = doc.id;
-    final notification = NotificationContent.fromJson(mutableJson);
-    return notification;
-  }
-
-  Map<String, dynamic> toSQLite() {
-    final json = toJson();
-    json['isRead'] = json['isRead'] ? 1 : 0;
-    return json;
+    return NotificationContent.fromJson(mutableJson);
   }
 }
 
