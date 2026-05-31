@@ -39,28 +39,14 @@ class BrowsingHistoryDataSource {
     return rows.map((r) => Searched.fromSupabase(r, isFavorite: true)).toList();
   }
 
-  /// 初回閲覧は全フィールドをINSERT、再閲覧はviewed_atのみUPDATE
+  /// 閲覧履歴を記録する。既存レコードがあれば全フィールドを上書き（upsert）
+  /// recordView は常にサーバーフェッチ直後に呼ばれるため、データは常に最新
   Future<void> recordView(String userId, Searched work) async {
-    final existing = await _client
-        .from('browsing_history')
-        .select('document_id')
-        .eq('user_id', userId)
-        .eq('document_id', work.documentID)
-        .maybeSingle();
-
-    if (existing == null) {
-      await _client.from('browsing_history').insert({
-        'user_id': userId,
-        ...work.toSupabase(),
-        'viewed_at': DateTime.now().toUtc().toIso8601String(),
-      });
-    } else {
-      await _client
-          .from('browsing_history')
-          .update({'viewed_at': DateTime.now().toUtc().toIso8601String()})
-          .eq('user_id', userId)
-          .eq('document_id', work.documentID);
-    }
+    await _client.from('browsing_history').upsert({
+      'user_id': userId,
+      ...work.toSupabase(),
+      'viewed_at': DateTime.now().toUtc().toIso8601String(),
+    });
   }
 
   Future<Searched?> getHistory(String userId, int documentID) async {

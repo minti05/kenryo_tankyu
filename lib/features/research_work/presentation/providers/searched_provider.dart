@@ -71,7 +71,7 @@ class ResearchWork extends _$ResearchWork {
     if (DateTime.now().difference(viewedAt) < const Duration(days: 90)) return;
 
     if (!ref.mounted) return;
-    ref.read(isRefreshingLikesProvider(documentID).notifier).state = true;
+    ref.read(isRefreshingLikesProvider(documentID).notifier).set(true);
 
     try {
       final repository = ref.read(researchWorkRepositoryProvider);
@@ -92,7 +92,7 @@ class ResearchWork extends _$ResearchWork {
       // バックグラウンド更新の失敗はサイレントに無視
     } finally {
       if (ref.mounted) {
-        ref.read(isRefreshingLikesProvider(documentID).notifier).state = false;
+        ref.read(isRefreshingLikesProvider(documentID).notifier).set(false);
       }
     }
   }

@@ -22,6 +22,7 @@ class ResultPage extends ConsumerStatefulWidget {
 
 class _ResultPageMainState extends ConsumerState<ResultPage> {
   final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
+  ScaffoldMessengerState? _messenger;
 
   @override
   void initState() {
@@ -36,17 +37,19 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
 
   @override
   void dispose() {
+    _messenger?.clearSnackBars();
     screenListener.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _messenger = ScaffoldMessenger.of(context);
+
     // likes のバックグラウンド更新中はスナックバーを表示する
     ref.listen(isRefreshingLikesProvider(widget.documentID), (prev, next) {
-      final messenger = ScaffoldMessenger.of(context);
       if (next) {
-        messenger.showSnackBar(
+        _messenger?.showSnackBar(
           const SnackBar(
             content: Text('データが古いため更新しています...'),
             duration: Duration(seconds: 30),
@@ -54,7 +57,7 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
           ),
         );
       } else if (prev == true) {
-        messenger.clearSnackBars();
+        _messenger?.clearSnackBars();
       }
     });
 
