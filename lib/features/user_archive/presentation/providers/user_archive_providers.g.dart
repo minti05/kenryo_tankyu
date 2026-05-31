@@ -51,7 +51,54 @@ final class UserArchiveRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$userArchiveRepositoryHash() =>
-    r'c6db8d55d13a427585aad30fe5e7eb0f4dc33f40';
+    r'f843658a661f0d403b10a7a029dbfcca65e30650';
+
+@ProviderFor(FavoriteIdsCache)
+const favoriteIdsCacheProvider = FavoriteIdsCacheProvider._();
+
+final class FavoriteIdsCacheProvider
+    extends $NotifierProvider<FavoriteIdsCache, Set<int>> {
+  const FavoriteIdsCacheProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'favoriteIdsCacheProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$favoriteIdsCacheHash();
+
+  @$internal
+  @override
+  FavoriteIdsCache create() => FavoriteIdsCache();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Set<int> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Set<int>>(value),
+    );
+  }
+}
+
+String _$favoriteIdsCacheHash() => r'3cf55c7e5b5cf6e2fd26a951de32b2c8c7c450c3';
+
+abstract class _$FavoriteIdsCache extends $Notifier<Set<int>> {
+  Set<int> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<Set<int>, Set<int>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Set<int>, Set<int>>, Set<int>, Object?, Object?>;
+    element.handleValue(ref, created);
+  }
+}
 
 /// ボタン連打防止を管理するProvider
 
@@ -149,7 +196,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'7b0ea0aa4cf8c32da25e818bfbac9396ca605636';
+    r'c478737a523ceebc50049715c72d38d5d0d00fc9';
 
 final class UserIsFavoriteStateFamily extends $Family
     with

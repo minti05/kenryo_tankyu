@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
@@ -7,6 +8,7 @@ import 'package:kenryo_tankyu/features/notification/data/datasources/notificatio
 import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
@@ -20,6 +22,21 @@ Stream<User?> authStateChanges(Ref ref) {
 class AuthNotifier extends _$AuthNotifier {
   @override
   Auth build() {
+    ref.listen<AsyncValue<User?>>(
+      authStateChangesProvider,
+      fireImmediately: true,
+      (_, next) {
+        next.whenData((user) {
+          if (user != null && user.emailVerified) {
+            unawaited(
+              ref.read(favoriteIdsCacheProvider.notifier).initialize(user.uid),
+            );
+          } else {
+            ref.invalidate(favoriteIdsCacheProvider);
+          }
+        });
+      },
+    );
     return const Auth();
   }
 
