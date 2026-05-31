@@ -42,6 +42,22 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
 
   @override
   Widget build(BuildContext context) {
+    // likes のバックグラウンド更新中はスナックバーを表示する
+    ref.listen(isRefreshingLikesProvider(widget.documentID), (prev, next) {
+      final messenger = ScaffoldMessenger.of(context);
+      if (next) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('データが古いため更新しています...'),
+            duration: Duration(seconds: 30),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else if (prev == true) {
+        messenger.clearSnackBars();
+      }
+    });
+
     final currentIndex = ref.watch(isFullScreenProvider) ? 1 : 0; //全画面表示かどうか
     final AsyncValue<Searched> searched =
         ref.watch(searchedItemProvider(widget.documentID));

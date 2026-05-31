@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/features/research_work/data/repositories/research_work_repository_impl.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
@@ -6,59 +8,101 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'searched_provider.g.dart';
 
-//全画面表示ボタンを表示するかしないかを管理するprovider
 final showFullScreenButtonProvider =
     StateProvider.autoDispose<bool>((ref) => true);
 
-//全画面か詳細画面かどうかを管理するprovider。IndexedStackに使用
 final isFullScreenProvider = StateProvider.autoDispose<bool>((ref) => false);
 
-//同じ探究作品を見ている最中なのかどうかを管理するprovider
-//このproviderを導入することによって、全画面に切り替えたときに不用意な再ビルドを防ぐ。
 final isSameScreenProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 final forceReloadProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 @riverpod
-Future<Searched> researchWork(Ref ref, int documentID) async {
-  final repository = ref.watch(researchWorkRepositoryProvider);
-  final archiveRepo = ref.watch(userArchiveRepositoryProvider);
-  final forceReload = ref.read(forceReloadProvider);
+class ResearchWork extends _$ResearchWork {
+  @override
+  Future<Searched> build(int documentID) async {
+    final repository = ref.watch(researchWorkRepositoryProvider);
+    final archiveRepo = ref.watch(userArchiveRepositoryProvider);
+    final forceReload = ref.read(forceReloadProvider);
 
-  // Helper to fetch from server and update history
-  Future<Searched> fetchFromServer() async {
-    final data = await repository.getWork(documentID.toString());
-    final isFavorite = await archiveRepo.getFavoriteState(documentID);
-    final combined = data.copyWith(isFavorite: isFavorite, isCached: false);
-
-    // reset force flag if it was true? Legacy code did this.
-    if (forceReload) {
-      ref.read(forceReloadProvider.notifier).state = false;
+    Future<Searched> fetchFromServer() async {
+      final data = await repository.getWork(documentID.toString());
+      final isFavorite = await archiveRepo.getFavoriteState(documentID);
+      final combined = data.copyWith(isFavorite: isFavorite, isCached: false);
+      if (forceReload) {
+        ref.read(forceReloadProvider.notifier).state = false;
+      }
+      await archiveRepo.insertHistory(combined);
+      return combined;
     }
 
-    // Update history
-    await archiveRepo.insertHistory(combined);
-    return combined;
+    final Searched result;
+    if (forceReload) {
+      result = await fetchFromServer();
+    } else {
+      final cached = await archiveRepo.getHistory(documentID);
+      if (cached != null) {
+        result = cached.copyWith(isCached: false);
+      } else {
+        result = await fetchFromServer();
+      }
+    }
+
+    // キャッシュから取得した場合のみ陳腐化チェックを実施
+    if (result.savedAt != null) {
+      unawaited(_refreshLikesIfStale(documentID, result.savedAt!, result));
+    }
+
+    return result;
   }
 
-  if (forceReload) {
-    return fetchFromServer();
-  } else {
-    final cached = await archiveRepo.getHistory(documentID);
-    if (cached != null) {
-      // SQLite は isCached を保存しないため Default(true) になる。
-      // 詳細画面では常に実データとして扱う。
-      return cached.copyWith(isCached: false);
-    } else {
-      return fetchFromServer();
+  Future<void> _refreshLikesIfStale(
+    int documentID,
+    DateTime viewedAt,
+    Searched current,
+  ) async {
+    if (DateTime.now().difference(viewedAt) < const Duration(days: 90)) return;
+
+    if (!ref.mounted) return;
+    ref.read(isRefreshingLikesProvider(documentID).notifier).state = true;
+
+    try {
+      final repository = ref.read(researchWorkRepositoryProvider);
+      final archiveRepo = ref.read(userArchiveRepositoryProvider);
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+
+      final latest = await repository.getWork(documentID.toString());
+      final updated =
+          latest.copyWith(isFavorite: current.isFavorite, isCached: false);
+
+      if (!ref.mounted) return;
+      state = AsyncData(updated);
+
+      if (userId != null) {
+        unawaited(archiveRepo.updateHistoryWork(documentID, updated));
+      }
+    } catch (_) {
+      // バックグラウンド更新の失敗はサイレントに無視
+    } finally {
+      if (ref.mounted) {
+        ref.read(isRefreshingLikesProvider(documentID).notifier).state = false;
+      }
     }
   }
 }
 
-// Keeping the old name for backward compatibility or refactoring UI in next steps
+/// likes のバックグラウンド更新中かどうかを管理するProvider（スナックバー表示に使用）
+@riverpod
+class IsRefreshingLikes extends _$IsRefreshingLikes {
+  @override
+  bool build(int documentID) => false;
+
+  // ignore: use_setters_to_change_properties
+  void set(bool value) => state = value;
+}
+
+// 後方互換のエイリアス
 final searchedItemProvider = researchWorkProvider;
 
-//choiceChipの選択肢を管理する簡易的なProvider
 final intProvider = StateProvider.autoDispose((ref) => 0);
-final stringProvider =
-    StateProvider.autoDispose<String>((ref) => '22202363'); //TODO 初期値これ升田さんのやつ。
+final stringProvider = StateProvider.autoDispose<String>((ref) => '22202363');

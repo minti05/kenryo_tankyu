@@ -5,6 +5,7 @@ import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
@@ -19,19 +20,24 @@ part 'user_archive_providers.g.dart';
 
 @riverpod
 UserArchiveRepository userArchiveRepository(Ref ref) {
-  final historyDataSource = ref.watch(searchedHistoryLocalDataSourceProvider);
+  final browsingHistoryDataSource =
+      ref.watch(browsingHistoryDataSourceProvider);
   final favoritesDataSource = ref.watch(favoritesRemoteDataSourceProvider);
   final pdfDataSource = ref.watch(pdfLocalDataSourceProvider);
   final recommendedDataSource =
       ref.watch(recommendedWorksLocalDataSourceProvider);
   final remoteDataSource = ref.watch(userArchiveRemoteDataSourceProvider);
+  // SQLite の isFavorite 同期用（セッション⑥で削除予定）
+  final legacyHistoryDataSource =
+      ref.watch(searchedHistoryLocalDataSourceProvider);
 
   return UserArchiveRepositoryImpl(
-    historyDataSource,
+    browsingHistoryDataSource,
     favoritesDataSource,
     pdfDataSource,
     recommendedDataSource,
     remoteDataSource,
+    legacyHistoryDataSource,
   );
 }
 
@@ -137,7 +143,13 @@ Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
   if (onlyShowFavorite) {
     return repository.getFavoriteHistory();
   } else {
-    return repository.getAllHistory();
+    final history = await repository.getAllHistory();
+    if (history == null) return null;
+    // FavoriteIdsCache はインメモリキャッシュなので Supabase を叩かない
+    final favoriteIds = ref.read(favoriteIdsCacheProvider);
+    return history
+        .map((h) => h.copyWith(isFavorite: favoriteIds.contains(h.documentID)))
+        .toList();
   }
 }
 

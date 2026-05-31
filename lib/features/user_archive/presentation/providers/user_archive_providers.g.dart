@@ -51,7 +51,7 @@ final class UserArchiveRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$userArchiveRepositoryHash() =>
-    r'f843658a661f0d403b10a7a029dbfcca65e30650';
+    r'3144510063e2dec0a0491edf826b82ec6e79712e';
 
 @ProviderFor(FavoriteIdsCache)
 const favoriteIdsCacheProvider = FavoriteIdsCacheProvider._();
@@ -85,7 +85,7 @@ final class FavoriteIdsCacheProvider
   }
 }
 
-String _$favoriteIdsCacheHash() => r'3cf55c7e5b5cf6e2fd26a951de32b2c8c7c450c3';
+String _$favoriteIdsCacheHash() => r'601decced1c010a9a800c8bdc9a85aa7463d33e4';
 
 abstract class _$FavoriteIdsCache extends $Notifier<Set<int>> {
   Set<int> build();
