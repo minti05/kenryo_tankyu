@@ -68,6 +68,7 @@ dependencies:
   algolia_helper_flutter: ^1.4.0
   connectivity_plus: ^7.0.0
   share_plus: ^12.0.2
+  supabase_flutter: ^2.8.4
 
 dev_dependencies:
   flutter_test:
@@ -100,6 +101,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/supabase_config.json
     - assets/images/
     - assets/images/text/
     - assets/files/sample.pdf

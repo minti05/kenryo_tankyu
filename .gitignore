@@ -53,3 +53,6 @@ app.*.map.json
 # Firebase CLI
 .firebase/
 firepit-log.txt
+
+# Supabase config (distributed manually)
+assets/supabase_config.json
