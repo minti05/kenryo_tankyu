@@ -23,14 +23,16 @@ class SearchHistoryCache extends _$SearchHistoryCache {
   }
 
   void addOrUpdate(Search search) {
-    final current = state.asData?.value ?? [];
-    final idx = current.indexWhere((s) => _isSameSearch(s, search));
-    if (idx >= 0) {
-      final updated = List<Search>.from(current)..removeAt(idx);
-      state = AsyncData([search, ...updated]);
-    } else {
-      state = AsyncData([search, ...current]);
-    }
+    state.whenData((current) {
+      final list = current ?? [];
+      final idx = list.indexWhere((s) => _isSameSearch(s, search));
+      if (idx >= 0) {
+        final updated = List<Search>.from(list)..removeAt(idx);
+        state = AsyncData([search, ...updated]);
+      } else {
+        state = AsyncData([search, ...list]);
+      }
+    });
   }
 
   void clear() => state = const AsyncData(null);

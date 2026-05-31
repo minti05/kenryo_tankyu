@@ -78,8 +78,12 @@ final algoliaSearchProvider =
     // Save history side effect (first page only)
     final searchWithMeta =
         search.copyWith(savedAt: DateTime.now(), numberOfHits: result.nbHits);
-    await historyRepository.insertHistory(searchWithMeta);
-    ref.read(searchHistoryCacheProvider.notifier).addOrUpdate(searchWithMeta);
+    try {
+      await historyRepository.insertHistory(searchWithMeta);
+      ref.read(searchHistoryCacheProvider.notifier).addOrUpdate(searchWithMeta);
+    } catch (e) {
+      debugPrint('Failed to save search history: $e');
+    }
   }
 
   if (result == null && page > 0) {

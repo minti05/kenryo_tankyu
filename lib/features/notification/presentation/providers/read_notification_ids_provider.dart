@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:kenryo_tankyu/core/providers/supabase_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,38 +30,36 @@ class ReadNotificationIds extends _$ReadNotificationIds {
   }
 
   Future<void> markAsRead(String userId, String notificationId) async {
+    if (state.contains(notificationId)) return;
+    final previousState = state;
     state = {...state, notificationId};
-    unawaited(
-      ref
+    try {
+      await ref
           .read(supabaseClientProvider)
           .from('notification_reads')
-          .upsert({'user_id': userId, 'notification_id': notificationId})
-          .then((_) => null)
-          .catchError((Object e) {
-            debugPrint('notification_reads upsert error: $e');
-          }),
-    );
+          .upsert({'user_id': userId, 'notification_id': notificationId});
+    } catch (e) {
+      debugPrint('notification_reads upsert error: $e');
+      state = previousState;
+    }
   }
 
   Future<void> markAllAsRead(
     String userId,
     Set<String> notificationIds,
   ) async {
-    state = {...state, ...notificationIds};
     if (notificationIds.isEmpty) return;
-    unawaited(
-      ref
-          .read(supabaseClientProvider)
-          .from('notification_reads')
-          .upsert(
+    final previousState = state;
+    state = {...state, ...notificationIds};
+    try {
+      await ref.read(supabaseClientProvider).from('notification_reads').upsert(
             notificationIds
                 .map((id) => {'user_id': userId, 'notification_id': id})
                 .toList(),
-          )
-          .then((_) => null)
-          .catchError((Object e) {
-        debugPrint('notification_reads bulk upsert error: $e');
-      }),
-    );
+          );
+    } catch (e) {
+      debugPrint('notification_reads bulk upsert error: $e');
+      state = previousState;
+    }
   }
 }
