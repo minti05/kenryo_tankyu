@@ -189,7 +189,6 @@ class HistoryController extends _$HistoryController {
       await repository.deleteHistoryWithFavorite(id);
       if (!ref.mounted) return;
       ref.read(favoriteIdsCacheProvider.notifier).remove(id);
-      if (!ref.mounted) return;
       // (false) は FavoriteIdsCache の remove により自動再計算される
       ref.invalidate(searchedHistoryProvider(true));
     } else {
