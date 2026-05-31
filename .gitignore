@@ -54,6 +54,5 @@ app.*.map.json
 .firebase/
 firepit-log.txt
 
-# Environment variables
-.env
+# Supabase config (distributed manually)
 assets/supabase_config.json
