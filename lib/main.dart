@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,7 +13,9 @@ import 'package:kenryo_tankyu/core/router/router.dart';
 import 'package:kenryo_tankyu/core/theme/theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -46,6 +49,12 @@ Future<void> main() async {
 
   final sharedPreferences = await SharedPreferences.getInstance();
 
+  final needsMigrationDialog = await _migrateLegacyDb(sharedPreferences);
+  if (needsMigrationDialog) {
+    await sharedPreferences.setBool(
+        'supabase_migration_dialog_pending_v1', true);
+  }
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(
@@ -61,6 +70,25 @@ Future<void> main() async {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   debugPrint('Handling a background message ${message.messageId}');
+}
+
+/// SQLite→Supabase移行後の旧DBファイルを削除する。
+/// 旧ファイルが実際に存在して削除した場合のみ true を返す（ダイアログ表示フラグ）。
+Future<bool> _migrateLegacyDb(SharedPreferences prefs) async {
+  const key = 'supabase_migrated_v1';
+  if (prefs.getBool(key) == true) return false;
+
+  bool deletedAny = false;
+  final dbDir = await getDatabasesPath();
+  for (final name in ['searched_history.db', 'search_history.db']) {
+    final file = File(path.join(dbDir, name));
+    if (await file.exists()) {
+      await file.delete();
+      deletedAny = true;
+    }
+  }
+  await prefs.setBool(key, true);
+  return deletedAny;
 }
 
 class MainApp extends ConsumerStatefulWidget {

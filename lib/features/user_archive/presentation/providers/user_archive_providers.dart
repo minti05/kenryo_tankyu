@@ -9,7 +9,6 @@ import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_hi
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/repositories/user_archive_repository_impl.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
@@ -27,9 +26,6 @@ UserArchiveRepository userArchiveRepository(Ref ref) {
   final recommendedDataSource =
       ref.watch(recommendedWorksLocalDataSourceProvider);
   final remoteDataSource = ref.watch(userArchiveRemoteDataSourceProvider);
-  // SQLite の isFavorite 同期用（セッション⑥で削除予定）
-  final legacyHistoryDataSource =
-      ref.watch(searchedHistoryLocalDataSourceProvider);
 
   return UserArchiveRepositoryImpl(
     browsingHistoryDataSource,
@@ -37,7 +33,6 @@ UserArchiveRepository userArchiveRepository(Ref ref) {
     pdfDataSource,
     recommendedDataSource,
     remoteDataSource,
-    legacyHistoryDataSource,
   );
 }
 

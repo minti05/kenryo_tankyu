@@ -6,9 +6,7 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/result_previe
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
-
-import 'package:kenryo_tankyu/features/notification/presentation/widgets/notification_permission_dialog.dart';
-import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
+import 'package:kenryo_tankyu/presentation/widget/startup_dialogs.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   static HomePage builder(BuildContext context, GoRouterState state) =>
@@ -23,19 +21,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    _checkNotificationPermission();
-  }
-
-  Future<void> _checkNotificationPermission() async {
-    // 描画完了後にダイアログを表示
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final hasShown =
-          await ref.read(hasShownNotificationDialogProvider.future);
-      if (!hasShown) {
-        if (mounted) {
-          await showNotificationPermissionDialog(context);
-        }
-      }
+      if (!mounted) return;
+      await checkStartupDialogs(context, ref);
     });
   }
 
