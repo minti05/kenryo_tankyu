@@ -79,15 +79,20 @@ Future<bool> _migrateLegacyDb(SharedPreferences prefs) async {
   if (prefs.getBool(key) == true) return false;
 
   bool deletedAny = false;
-  final dbDir = await getDatabasesPath();
-  for (final name in ['searched_history.db', 'search_history.db']) {
-    final file = File(path.join(dbDir, name));
-    if (await file.exists()) {
-      await file.delete();
-      deletedAny = true;
+  try {
+    final dbDir = await getDatabasesPath();
+    for (final name in ['searched_history.db', 'search_history.db']) {
+      final file = File(path.join(dbDir, name));
+      if (await file.exists()) {
+        await file.delete();
+        deletedAny = true;
+      }
     }
+    await prefs.setBool(key, true);
+  } catch (e, stackTrace) {
+    debugPrint('Failed to migrate legacy DB: $e');
+    debugPrintStack(stackTrace: stackTrace);
   }
-  await prefs.setBool(key, true);
   return deletedAny;
 }
 

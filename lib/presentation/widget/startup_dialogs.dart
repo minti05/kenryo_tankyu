@@ -15,8 +15,7 @@ Future<void> checkStartupDialogs(BuildContext context, WidgetRef ref) async {
   await _checkNotificationDialog(context, ref);
 }
 
-Future<void> _checkMigrationDialog(
-    BuildContext context, WidgetRef ref) async {
+Future<void> _checkMigrationDialog(BuildContext context, WidgetRef ref) async {
   final prefs = ref.read(sharedPreferencesProvider);
   if (prefs.getBool('supabase_migration_dialog_pending_v1') != true) return;
   await prefs.remove('supabase_migration_dialog_pending_v1');
