@@ -45,7 +45,6 @@ class NotificationDbController {
             'contents TEXT NOT NULL, '
             'sendAt TEXT NOT NULL, '
             'savedAt TEXT NOT NULL, '
-            'isRead INTEGER NOT NULL, '
             'headerImage BLOB, '
             'CHECK(title != "" OR contents != "") '
             ');',
@@ -58,9 +57,6 @@ class NotificationDbController {
           );
         },
         onUpgrade: (db, oldVersion, newVersion) async {
-          if (oldVersion < 2) {
-            // バージョン2での変更があればここに記述
-          }
           if (oldVersion < 3) {
             await db.execute(
               'CREATE TABLE $tableSettings('
@@ -69,8 +65,31 @@ class NotificationDbController {
               ');',
             );
           }
+          if (oldVersion < 4) {
+            // isRead列をSupabaseに移行するため、既存データを保持しつつテーブルを再作成
+            await db.execute(
+              'ALTER TABLE notification RENAME TO notification_old',
+            );
+            await db.execute(
+              'CREATE TABLE notification('
+              'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'type TEXT NOT NULL, '
+              'title TEXT NOT NULL, '
+              'contents TEXT NOT NULL, '
+              'sendAt TEXT NOT NULL, '
+              'savedAt TEXT NOT NULL, '
+              'headerImage BLOB, '
+              'CHECK(title != "" OR contents != "") '
+              ');',
+            );
+            await db.execute(
+              'INSERT INTO notification (id, type, title, contents, sendAt, savedAt, headerImage) '
+              'SELECT id, type, title, contents, sendAt, savedAt, headerImage FROM notification_old',
+            );
+            await db.execute('DROP TABLE IF EXISTS notification_old');
+          }
         },
-        version: 3,
+        version: 4,
       );
     } catch (error, stackTrace) {
       return Future.error(error, stackTrace);
@@ -122,21 +141,8 @@ class NotificationDbController {
     });
   }
 
-  static Future<void> markAsRead(int id) async {
+  static Future<void> deleteAllNotifications() async {
     final Database db = await database;
-    await db.update(
-      'notification',
-      {'isRead': 1},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  static Future<void> markAsReadAll() async {
-    final Database db = await database;
-    await db.update(
-      'notification',
-      {'isRead': 1},
-    );
+    await db.delete('notification');
   }
 }

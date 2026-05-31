@@ -4,16 +4,55 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/data/repositories/search_repository_impl.dart';
+import 'package:kenryo_tankyu/features/search/domain/models/search_result.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
 
+class SearchResultCacheNotifier extends Notifier<Map<int, SearchResult>> {
+  @override
+  Map<int, SearchResult> build() {
+    ref.listen(searchProvider, (previous, next) {
+      state = {};
+    });
+    return {};
+  }
+
+  SearchResult? get(int page) => state[page];
+
+  void set(int page, SearchResult result) {
+    state = {...state, page: result};
+  }
+}
+
+final searchResultCacheProvider = NotifierProvider.autoDispose<
+    SearchResultCacheNotifier,
+    Map<int, SearchResult>>(SearchResultCacheNotifier.new);
+
+class SearchPageNotifier extends Notifier<int> {
+  @override
+  int build() {
+    ref.listen(searchProvider, (previous, next) {
+      state = 0;
+    });
+    return 0;
+  }
+
+  void setPage(int page) => state = page;
+}
+
+final searchPageProvider =
+    NotifierProvider.autoDispose<SearchPageNotifier, int>(() {
+  return SearchPageNotifier();
+});
+
 final algoliaSearchProvider =
-    FutureProvider.autoDispose<List<Searched>?>((ref) async {
+    FutureProvider.autoDispose<SearchResult?>((ref) async {
   final isConnected = ref.watch(isConnectedProvider);
   if (!isConnected) {
     throw const NetworkFailure();
@@ -22,15 +61,37 @@ final algoliaSearchProvider =
   final search =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
 
+  final page = ref.watch(searchPageProvider);
+  final cache = ref.watch(searchResultCacheProvider.notifier);
+
+  final cached = cache.get(page);
+  if (cached != null) {
+    return cached;
+  }
+
   final repository = ref.watch(searchRepositoryProvider);
   final historyRepository = ref.watch(searchHistoryRepositoryProvider);
 
-  final result = await repository.search(params: search);
+  final result = await repository.search(params: search, page: page);
+
+  if (result != null && page == 0) {
+    // Save history side effect (first page only)
+    final searchWithMeta =
+        search.copyWith(savedAt: DateTime.now(), numberOfHits: result.nbHits);
+    try {
+      await historyRepository.insertHistory(searchWithMeta);
+      ref.read(searchHistoryCacheProvider.notifier).addOrUpdate(searchWithMeta);
+    } catch (e) {
+      debugPrint('Failed to save search history: $e');
+    }
+  }
+
+  if (result == null && page > 0) {
+    return SearchResult(hits: [], page: page, nbPages: page, nbHits: 0);
+  }
 
   if (result != null) {
-    // Save history side effect
-    await historyRepository.insertHistory(
-        search.copyWith(savedAt: DateTime.now(), numberOfHits: result.length));
+    cache.set(page, result);
   }
 
   return result;
@@ -44,7 +105,7 @@ final sortedListProvider =
 class SortedListNotifier extends Notifier<List<Searched>> {
   @override
   List<Searched> build() {
-    final data = ref.watch(algoliaSearchProvider).asData?.value ?? [];
+    final data = ref.watch(algoliaSearchProvider).asData?.value?.hits ?? [];
     return data;
   }
 

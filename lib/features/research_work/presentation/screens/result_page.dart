@@ -22,6 +22,7 @@ class ResultPage extends ConsumerStatefulWidget {
 
 class _ResultPageMainState extends ConsumerState<ResultPage> {
   final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
+  ProviderSubscription<AsyncValue<Searched>>? _staleCheckSub;
 
   @override
   void initState() {
@@ -32,16 +33,53 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
     Future.delayed(Duration.zero, () {
       screenListener.watch();
     });
+
+    // listenManual + fireImmediately: true で、キャッシュ済みの場合も含めて
+    // loading → data 遷移を一度だけ検知して陳腐化チェックを実行する。
+    // WidgetRef.listen は fireImmediately 非対応のためここで登録する。
+    _staleCheckSub = ref.listenManual(
+      researchWorkProvider(widget.documentID),
+      (prev, next) {
+        if (prev?.hasValue != true && next.hasValue) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ref
+                  .read(researchWorkProvider(widget.documentID).notifier)
+                  .refreshIfStale();
+            }
+          });
+        }
+      },
+      fireImmediately: true,
+    );
   }
 
   @override
   void dispose() {
+    _staleCheckSub?.close();
     screenListener.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // likes のバックグラウンド更新中はスナックバーを表示する
+    ref.listen(isRefreshingLikesProvider(widget.documentID), (prev, next) {
+      if (!context.mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      if (next) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('データが古いため更新しています...'),
+            duration: Duration(seconds: 30),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else if (prev == true) {
+        messenger.clearSnackBars();
+      }
+    });
+
     final currentIndex = ref.watch(isFullScreenProvider) ? 1 : 0; //全画面表示かどうか
     final AsyncValue<Searched> searched =
         ref.watch(searchedItemProvider(widget.documentID));

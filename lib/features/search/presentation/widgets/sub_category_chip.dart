@@ -27,8 +27,13 @@ class SubCategoryChip extends ConsumerWidget {
             label: Text(exactSubCategoryList[index].displayName),
             selected:
                 exactSubCategoryList.indexOf(selectedSubCategory) == index,
-            onSelected: (_) =>
-                notifier.selectedSubCategory(exactSubCategoryList[index]));
+            onSelected: (_) {
+              if (selectedSubCategory == exactSubCategoryList[index]) {
+                notifier.selectedSubCategory(SubCategory.none);
+              } else {
+                notifier.selectedSubCategory(exactSubCategoryList[index]);
+              }
+            });
       }).toList(),
     );
   }

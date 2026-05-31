@@ -41,7 +41,7 @@ class LibraryList extends ConsumerWidget {
                           final searched = searcheds[index];
                           return ResultPreviewContent(
                             searched: searched,
-                            forLibrary: true,
+                            mode: ResultPreviewMode.library,
                           );
                         });
                       },

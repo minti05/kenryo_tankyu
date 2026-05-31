@@ -1,9 +1,19 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
+import 'package:kenryo_tankyu/core/providers/supabase_provider.dart';
+import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
+import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
+import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
 
 part 'auth_provider.g.dart';
 
@@ -16,6 +26,29 @@ Stream<User?> authStateChanges(Ref ref) {
 class AuthNotifier extends _$AuthNotifier {
   @override
   Auth build() {
+    ref.listen<AsyncValue<User?>>(
+      authStateChangesProvider,
+      fireImmediately: true,
+      (_, next) {
+        next.whenData((user) {
+          if (user != null && user.emailVerified) {
+            // FavoriteIdsCache は authStateChangesProvider を watch して自己初期化するため不要
+            unawaited(
+              ref.read(searchHistoryCacheProvider.notifier).initialize(),
+            );
+            unawaited(
+              ref
+                  .read(readNotificationIdsProvider.notifier)
+                  .initialize(user.uid),
+            );
+          } else {
+            // FavoriteIdsCache は authStateChangesProvider を watch して自動リセットするため不要
+            ref.invalidate(searchHistoryCacheProvider);
+            ref.invalidate(readNotificationIdsProvider);
+          }
+        });
+      },
+    );
     return const Auth();
   }
 
@@ -93,6 +126,16 @@ class AuthNotifier extends _$AuthNotifier {
   Future<void> deleteAccount() async {
     final authRepo = ref.read(authRepositoryProvider);
     final userRepo = ref.read(userRepositoryProvider);
+    // deleteUser()後にauthStateChangesが発火してAuthNotifierが破棄される可能性があるため、
+    // ref.readで取得するデータソースは非同期処理の前にすべて退避しておく。
+    final pdfDs = ref.read(pdfLocalDataSourceProvider);
+    final searchHistoryDs = ref.read(searchHistoryDataSourceProvider);
+    final browsingHistoryDs = ref.read(browsingHistoryDataSourceProvider);
+    final favoritesDs = ref.read(favoritesRemoteDataSourceProvider);
+    // readNotificationIdsProvider は deleteUser() 後に invalidate・dispose されるため、
+    // Notifier 経由ではなく SupabaseClient を直接退避して削除する。
+    final supabaseClient = ref.read(supabaseClientProvider);
+
     final user = authRepo.currentUser;
     if (user == null || user.email == null) return;
     final email = user.email!;
@@ -108,5 +151,45 @@ class AuthNotifier extends _$AuthNotifier {
       } catch (_) {}
       rethrow;
     }
+    // アカウント削除成功後、全ローカルデータを消去（失敗してもアカウント削除は成功とみなす）
+    await _clearAllLocalData(
+      userId: user.uid,
+      pdfDs: pdfDs,
+      searchHistoryDs: searchHistoryDs,
+      browsingHistoryDs: browsingHistoryDs,
+      favoritesDs: favoritesDs,
+      supabaseClient: supabaseClient,
+    );
+  }
+
+  Future<void> _clearAllLocalData({
+    required String userId,
+    required PdfLocalDataSource pdfDs,
+    required SearchHistoryDataSource searchHistoryDs,
+    required BrowsingHistoryDataSource browsingHistoryDs,
+    required FavoritesRemoteDataSource favoritesDs,
+    required SupabaseClient supabaseClient,
+  }) async {
+    try {
+      await pdfDs.deleteAllPdf();
+    } catch (_) {}
+    try {
+      await searchHistoryDs.deleteAllHistory(userId);
+    } catch (_) {}
+    try {
+      await browsingHistoryDs.deleteAllHistory(userId);
+    } catch (_) {}
+    try {
+      await favoritesDs.deleteAllFavorites(userId);
+    } catch (_) {}
+    try {
+      await supabaseClient
+          .from('notification_reads')
+          .delete()
+          .eq('user_id', userId);
+    } catch (_) {}
+    try {
+      await NotificationDbController.deleteAllNotifications();
+    } catch (_) {}
   }
 }

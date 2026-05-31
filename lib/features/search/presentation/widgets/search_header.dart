@@ -85,7 +85,7 @@ class _SearchHeaderState extends ConsumerState<SearchHeader> {
         content == '　'); //検索ワードに余分に空白が入っていた場合、消去する todo しっかり機能していないかも。
     notifier.addKeyWord(word);
     //検索結果画面に遷移
-    context.pushReplacement('/resultList');
+    context.push('/resultList');
   }
 
   void _onChanged(String text) {

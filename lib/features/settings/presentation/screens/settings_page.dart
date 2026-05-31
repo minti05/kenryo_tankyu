@@ -1,3 +1,5 @@
+import 'package:kenryo_tankyu/features/settings/presentation/widgets/delete_data_dialog.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +154,11 @@ class SettingsPage extends ConsumerWidget {
                   )
                 : const SizedBox(),
             ListTile(
+              title: const Text('履歴の削除'),
+              leading: const Icon(Icons.history),
+              onTap: () => _showDeleteDataDialog(context, ref),
+            ),
+            ListTile(
               title: const Text('ログアウト'),
               leading: const Icon(Icons.logout),
               onTap: () async {
@@ -237,6 +244,56 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showDeleteDataDialog(
+      BuildContext context, WidgetRef ref) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+
+    final List<DateTime> historyDates;
+    final List<({DateTime date, int bytes})> pdfEntries;
+    try {
+      historyDates = await repository.getAllHistorySavedDates();
+      pdfEntries = await repository.getAllPdfCacheEntries();
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('データの取得に失敗しました')),
+        );
+      }
+      return;
+    }
+    if (!context.mounted) return;
+
+    final result = await showDialog<String?>(
+      context: context,
+      builder: (_) => DeleteDataDialog(
+        historyDates: historyDates,
+        pdfEntries: pdfEntries,
+        onDeleteAllHistory: () async {
+          await ref.read(historyControllerProvider.notifier).deleteAllHistory();
+        },
+        onDeleteHistoryBefore: (before) async {
+          await ref
+              .read(historyControllerProvider.notifier)
+              .deleteHistoryBefore(before);
+        },
+        onDeleteAllPdf: () async {
+          await ref.read(pdfCacheControllerProvider.notifier).deleteAll();
+        },
+        onDeletePdfBefore: (before) async {
+          await ref
+              .read(pdfCacheControllerProvider.notifier)
+              .deleteBefore(before);
+        },
+      ),
+    );
+
+    if (result != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
+    }
   }
 
   void _showPermissionDeniedDialog(BuildContext context) {

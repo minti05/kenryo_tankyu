@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/constants/work/sub_category_value.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
 import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 
@@ -12,7 +12,6 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/search_header
 import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_list.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/search_history_list.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
-import 'package:kenryo_tankyu/presentation/widget/widget.dart';
 
 class SearchPage extends ConsumerWidget {
   const SearchPage({super.key});
@@ -64,8 +63,7 @@ class SearchPage extends ConsumerWidget {
                     title: const Text('またはカテゴリから選ぶ'),
                     trailing: const Icon(Icons.navigate_next),
                     onTap: () {
-                      ref.read(footerProvider.notifier).state = 1;
-                      context.go('/explore');
+                      context.push('/categorySelect');
                     },
                   );
                 }
@@ -100,12 +98,16 @@ class SearchPage extends ConsumerWidget {
                                 child: const Text('キャンセル'),
                               ),
                               TextButton(
-                                onPressed: () {
-                                  ref
+                                onPressed: () async {
+                                  await ref
                                       .read(searchHistoryRepositoryProvider)
                                       .deleteAllHistory();
-                                  ref.invalidate(searchHistoryProvider);
-                                  Navigator.of(context).pop();
+                                  ref
+                                      .read(searchHistoryCacheProvider.notifier)
+                                      .clear();
+                                  if (context.mounted) {
+                                    Navigator.of(context).pop();
+                                  }
                                 },
                                 child: const Text('削除'),
                               ),
@@ -130,11 +132,11 @@ class SearchPage extends ConsumerWidget {
     final notifier = ref.read(searchProvider.notifier);
     if (suggestCategory != Category.none) {
       notifier.selectedCategory(suggestCategory);
-      context.pushReplacement('/subCategory');
+      context.push('/subCategory');
     } else {
       notifier.selectedCategory(whatCategory);
       notifier.selectedSubCategory(suggestSubCategory);
-      context.pushReplacement('/resultList');
+      context.push('/resultList');
     }
   }
 
@@ -144,7 +146,6 @@ class SearchPage extends ConsumerWidget {
         data.category == Category.none &&
         data.subCategory == SubCategory.none &&
         data.enterYear == EnterYear.undefined &&
-        data.eventName == EventName.undefined &&
         data.course == Course.undefined;
     if (isAllEmpty) {
       return const SizedBox();
@@ -166,7 +167,7 @@ class SearchPage extends ConsumerWidget {
             trailing: IconButton(
               icon: const Icon(Icons.search_sharp),
               onPressed: () {
-                context.pushReplacement('/resultList');
+                context.push('/resultList');
               },
             ),
           ),

@@ -3,11 +3,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
-import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/user_archive_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/repositories/user_archive_repository_impl.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
@@ -18,18 +20,53 @@ part 'user_archive_providers.g.dart';
 
 @riverpod
 UserArchiveRepository userArchiveRepository(Ref ref) {
-  final historyDataSource = ref.watch(searchedHistoryLocalDataSourceProvider);
+  final browsingHistoryDataSource =
+      ref.watch(browsingHistoryDataSourceProvider);
+  final favoritesDataSource = ref.watch(favoritesRemoteDataSourceProvider);
   final pdfDataSource = ref.watch(pdfLocalDataSourceProvider);
   final recommendedDataSource =
       ref.watch(recommendedWorksLocalDataSourceProvider);
   final remoteDataSource = ref.watch(userArchiveRemoteDataSourceProvider);
 
   return UserArchiveRepositoryImpl(
-    historyDataSource,
+    browsingHistoryDataSource,
+    favoritesDataSource,
     pdfDataSource,
     recommendedDataSource,
     remoteDataSource,
   );
+}
+
+@Riverpod(keepAlive: true)
+class FavoriteIdsCache extends _$FavoriteIdsCache {
+  @override
+  Future<Set<int>> build() async {
+    // auth ストリームの最初の値を待つ。
+    // ログイン/ログアウト時に authStateChangesProvider が変わると自動で再実行される。
+    final user = await ref.watch(authStateChangesProvider.future);
+    if (user == null || !user.emailVerified) return {};
+    return await ref
+        .read(favoritesRemoteDataSourceProvider)
+        .getFavoriteIds(user.uid);
+  }
+
+  Future<void> add(int id) async {
+    try {
+      final current = await future;
+      state = AsyncData({...current, id});
+    } catch (_) {
+      state = AsyncData({id});
+    }
+  }
+
+  Future<void> remove(int id) async {
+    try {
+      final current = await future;
+      state = AsyncData(current.difference({id}));
+    } catch (_) {
+      state = const AsyncData({});
+    }
+  }
 }
 
 /// ボタン連打防止を管理するProvider
@@ -65,12 +102,32 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
     state = const AsyncLoading<bool>();
 
     state = await AsyncValue.guard(() async {
-      // Repository handles both local DB and remote Firestore updates
       await repository.changeFavoriteState(documentID, nextIsFavorite);
 
-      // 関連するProviderを無効化
-      ref.invalidate(searchedHistoryProvider);
-      ref.invalidate(researchWorkProvider(documentID));
+      // インメモリキャッシュを即時更新
+      if (nextIsFavorite) {
+        ref.read(favoriteIdsCacheProvider.notifier).add(documentID);
+      } else {
+        ref.read(favoriteIdsCacheProvider.notifier).remove(documentID);
+      }
+
+      // searchedHistoryProvider(false) は favoriteIdsCacheProvider を watch しているため
+      // FavoriteIdsCache 更新で自動再計算される。お気に入りタブのみ明示的に無効化する。
+      ref.invalidate(searchedHistoryProvider(true));
+
+      // researchWork の state を直接更新（invalidate だと browsing_history の
+      // キャッシュ更新タイミングと競合して古い likes が表示されるため）
+      final current = ref.read(researchWorkProvider(documentID)).asData?.value;
+      if (current != null) {
+        final newLikes =
+            (current.likes + (nextIsFavorite ? 1 : -1)).clamp(0, 999999);
+        ref
+            .read(researchWorkProvider(documentID).notifier)
+            .updateForFavoriteChange(
+              isFavorite: nextIsFavorite,
+              likes: newLikes,
+            );
+      }
 
       return nextIsFavorite;
     });
@@ -107,10 +164,26 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
 @riverpod
 Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
   final repository = ref.watch(userArchiveRepositoryProvider);
+
+  // キャッシュが既にあれば同期的に取得し、ローディング状態を経由しない。
+  // これにより お気に入り追加・削除時の UI ちらつき（再ローディング）を防ぐ。
+  // 初回ロード時（asData が null）のみ future を await してローディング状態を伝播させる。
+  final favoriteIdsValue = ref.watch(favoriteIdsCacheProvider);
+  final favoriteIds = favoriteIdsValue.asData?.value;
+  if (favoriteIds == null) {
+    await ref.watch(favoriteIdsCacheProvider.future);
+    return null;
+  }
+
   if (onlyShowFavorite) {
-    return repository.getFavoriteHistory();
+    if (favoriteIds.isEmpty) return null;
+    return repository.getFavoriteHistoryByIds(favoriteIds);
   } else {
-    return repository.getAllHistory();
+    final history = await repository.getAllHistory();
+    if (history == null) return null;
+    return history
+        .map((h) => h.copyWith(isFavorite: favoriteIds.contains(h.documentID)))
+        .toList();
   }
 }
 
@@ -119,10 +192,51 @@ class HistoryController extends _$HistoryController {
   @override
   void build() {}
 
-  Future<void> deleteHistory(int id) async {
+  Future<void> deleteHistory(int id, {bool isFavorite = false}) async {
     final repository = ref.read(userArchiveRepositoryProvider);
-    await repository.deleteHistory(id);
-    ref.invalidate(searchedHistoryProvider);
+    if (isFavorite) {
+      await repository.deleteHistoryWithFavorite(id);
+      if (!ref.mounted) return;
+      ref.read(favoriteIdsCacheProvider.notifier).remove(id);
+      // (false) は FavoriteIdsCache の remove により自動再計算される
+      ref.invalidate(searchedHistoryProvider(true));
+    } else {
+      await repository.deleteHistory(id);
+      if (!ref.mounted) return;
+      ref.invalidate(searchedHistoryProvider(false));
+    }
+  }
+
+  Future<void> deleteAllHistory() async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteAllHistory();
+    if (!ref.mounted) return;
+    ref.invalidate(searchedHistoryProvider(false));
+    ref.invalidate(searchedHistoryProvider(true));
+  }
+
+  Future<void> deleteHistoryBefore(DateTime date) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteHistoryBefore(date);
+    if (!ref.mounted) return;
+    ref.invalidate(searchedHistoryProvider(false));
+    ref.invalidate(searchedHistoryProvider(true));
+  }
+}
+
+@riverpod
+class PdfCacheController extends _$PdfCacheController {
+  @override
+  void build() {}
+
+  Future<void> deleteAll() async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deleteAllPdfCache();
+  }
+
+  Future<void> deleteBefore(DateTime date) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    await repository.deletePdfCacheBefore(date);
   }
 }
 

@@ -55,15 +55,10 @@ class SearchDropButton extends ConsumerWidget {
     final selectedValue = value ?? '';
 
     switch (name) {
-      case '期間':
+      case '年度指定':
         notifier.selectedYear(EnterYear.values.firstWhere(
-            (element) => element.displayName.toString() == selectedValue,
+            (element) => element.label == selectedValue,
             orElse: () => EnterYear.undefined));
-        break;
-      case 'イベント名':
-        notifier.selectedEventName(EventName.values.firstWhere(
-            (element) => element.displayName == selectedValue,
-            orElse: () => EventName.undefined));
         break;
       case '学科指定':
         notifier.selectedCourse(Course.values.firstWhere(

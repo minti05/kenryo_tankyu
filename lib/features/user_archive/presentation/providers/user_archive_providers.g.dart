@@ -51,7 +51,49 @@ final class UserArchiveRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$userArchiveRepositoryHash() =>
-    r'c6db8d55d13a427585aad30fe5e7eb0f4dc33f40';
+    r'0cc9ca50197c441d2241527354e8fb97cf3d3d4f';
+
+@ProviderFor(FavoriteIdsCache)
+const favoriteIdsCacheProvider = FavoriteIdsCacheProvider._();
+
+final class FavoriteIdsCacheProvider
+    extends $AsyncNotifierProvider<FavoriteIdsCache, Set<int>> {
+  const FavoriteIdsCacheProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'favoriteIdsCacheProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$favoriteIdsCacheHash();
+
+  @$internal
+  @override
+  FavoriteIdsCache create() => FavoriteIdsCache();
+}
+
+String _$favoriteIdsCacheHash() => r'6d9b76398c88e8734def2b30944d92564c8a068b';
+
+abstract class _$FavoriteIdsCache extends $AsyncNotifier<Set<int>> {
+  FutureOr<Set<int>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<Set<int>>, Set<int>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<Set<int>>, Set<int>>,
+        AsyncValue<Set<int>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
 
 /// ボタン連打防止を管理するProvider
 
@@ -149,7 +191,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'b82606851c4d45565a570aa3fc3382050df14ad2';
+    r'f2756f3f96e88d606957700f9a7be88d089bf311';
 
 final class UserIsFavoriteStateFamily extends $Family
     with
@@ -248,7 +290,7 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$searchedHistoryHash() => r'fd22fd316566e36e9625f532e610097f8e1a7382';
+String _$searchedHistoryHash() => r'73fc7538c5477eef98cc6742da99d5c74c9700af';
 
 final class SearchedHistoryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Searched>?>, bool> {
@@ -302,9 +344,57 @@ final class HistoryControllerProvider
   }
 }
 
-String _$historyControllerHash() => r'5bb6a2466d2600e84fa82192f464ee5109583862';
+String _$historyControllerHash() => r'56f12497211c6200902c5cab557b7b0a7b0f6ee6';
 
 abstract class _$HistoryController extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    build();
+    final ref = this.ref as $Ref<void, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<void, void>, void, Object?, Object?>;
+    element.handleValue(ref, null);
+  }
+}
+
+@ProviderFor(PdfCacheController)
+const pdfCacheControllerProvider = PdfCacheControllerProvider._();
+
+final class PdfCacheControllerProvider
+    extends $NotifierProvider<PdfCacheController, void> {
+  const PdfCacheControllerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'pdfCacheControllerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pdfCacheControllerHash();
+
+  @$internal
+  @override
+  PdfCacheController create() => PdfCacheController();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$pdfCacheControllerHash() =>
+    r'969f3994bf6af81a592ef9af351753dd9dffcf07';
+
+abstract class _$PdfCacheController extends $Notifier<void> {
   void build();
   @$mustCallSuper
   @override

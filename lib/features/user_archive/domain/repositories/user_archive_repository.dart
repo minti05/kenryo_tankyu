@@ -1,14 +1,23 @@
 import 'dart:typed_data';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/user_archive/domain/models/archive_stats.dart';
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 
 abstract class UserArchiveRepository {
   // History
   Future<List<Searched>?> getAllHistory();
   Future<List<Searched>?> getFavoriteHistory();
+  Future<List<Searched>?> getFavoriteHistoryByIds(Set<int> ids);
   Future<void> insertHistory(Searched searched);
   Future<Searched?> getHistory(int documentID);
   Future<void> deleteHistory(int documentID);
+  Future<void> deleteHistoryWithFavorite(int documentID);
+  Future<void> deleteAllHistory();
+  Future<void> deleteHistoryBefore(DateTime date);
+  Future<HistoryStats> getHistoryStats();
+  Future<List<DateTime>> getAllHistorySavedDates();
+  Future<void> updateHistoryWork(int documentID, Searched latest);
+  Future<void> updateHistoryViewedAt(int documentID);
 
   // Favorite (combines local DB and potentially remote updates)
   Future<void> changeFavoriteState(int documentID, bool nextIsFavorite);
@@ -23,6 +32,10 @@ abstract class UserArchiveRepository {
   Future<Uint8List?> getPdf(String id, EnterYear enterYear);
   Future<Uint8List?> getTeacherPdf(String id);
   Future<Uint8List?> getRemotePdfForTeacher(String id);
+  Future<void> deleteAllPdfCache();
+  Future<void> deletePdfCacheBefore(DateTime date);
+  Future<PdfCacheStats> getPdfCacheStats();
+  Future<List<PdfCacheEntry>> getAllPdfCacheEntries();
 
   // Recommended Works
   Future<void> saveRecommendedWorks(Searched searched1, Searched searched2);

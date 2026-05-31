@@ -18,7 +18,7 @@ class DisplaySubCategoryList extends ConsumerWidget {
         ListTile(
           title: const Text('すべて'),
           trailing: const Icon(Icons.navigate_next),
-          onTap: () => context.pushReplacement('/resultList'),
+          onTap: () => context.push('/resultList'),
         ),
         const Padding(
           padding: EdgeInsets.only(left: 8.0, right: 8.0),
@@ -37,7 +37,7 @@ class DisplaySubCategoryList extends ConsumerWidget {
                   title: Text(subCategoryList[index].displayName),
                   onTap: () {
                     notifier.selectedSubCategory(subCategoryList[index]);
-                    context.pushReplacement('/resultList');
+                    context.push('/resultList');
                   },
                 ),
               );

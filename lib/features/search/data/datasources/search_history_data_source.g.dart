@@ -22,7 +22,7 @@ final class SearchHistoryDataSourceProvider extends $FunctionalProvider<
           argument: null,
           retry: null,
           name: r'searchHistoryDataSourceProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -51,4 +51,4 @@ final class SearchHistoryDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$searchHistoryDataSourceHash() =>
-    r'cefca60f2848d1cc70192dc8f9fb67f5afd059dd';
+    r'9b1cb3506770eb4c2c7dcfd2928cda0b74aea32a';

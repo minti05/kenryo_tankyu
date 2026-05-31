@@ -49,3 +49,10 @@ app.*.map.json
 
 # AI prompt
 /CLAUDE.md
+
+# Firebase CLI
+.firebase/
+firepit-log.txt
+
+# Supabase config (distributed manually)
+assets/supabase_config.json
