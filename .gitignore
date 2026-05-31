@@ -53,3 +53,6 @@ app.*.map.json
 # Firebase CLI
 .firebase/
 firepit-log.txt
+
+# Environment variables
+.env

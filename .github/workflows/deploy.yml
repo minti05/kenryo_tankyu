@@ -35,6 +35,11 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Create .env
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+
       - name: Flutter pub get
         run: flutter pub get
 
