@@ -118,6 +118,23 @@ class BrowsingHistoryDataSource {
     return (count: dates.length, oldest: dates.first, newest: dates.last);
   }
 
+  /// お気に入り操作に伴う likes の差分更新（現在値を取得してから +delta）
+  Future<void> updateLikes(String userId, int documentID, int delta) async {
+    final row = await _client
+        .from('browsing_history')
+        .select('likes')
+        .eq('user_id', userId)
+        .eq('document_id', documentID)
+        .maybeSingle();
+    if (row == null) return;
+    final current = row['likes'] as int;
+    await _client
+        .from('browsing_history')
+        .update({'likes': (current + delta).clamp(0, 999999)})
+        .eq('user_id', userId)
+        .eq('document_id', documentID);
+  }
+
   /// likes 等の作品データを最新値で更新（viewed_at は変更しない）
   Future<void> updateWorkInHistory(
       String userId, int documentID, Searched latest) async {

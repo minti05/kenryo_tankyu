@@ -172,11 +172,22 @@ class UserArchiveRepositoryImpl
       throw mapException(e);
     }
 
+    // browsing_history の likes をバックグラウンドで更新（失敗しても無視）
+    _updateBrowsingHistoryLikesSilently(
+        userId, documentID, nextIsFavorite ? 1 : -1);
+
     // SQLite の isFavorite も同期（セッション⑥で削除予定）
     await _legacyHistoryDataSource.changeFavoriteState(
         documentID, nextIsFavorite);
     await _legacyHistoryDataSource.updateLikes(
         documentID, nextIsFavorite ? 1 : -1);
+  }
+
+  void _updateBrowsingHistoryLikesSilently(
+      String userId, int documentID, int delta) {
+    _browsingHistoryDataSource
+        .updateLikes(userId, documentID, delta)
+        .catchError((_) {});
   }
 
   @override

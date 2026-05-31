@@ -101,9 +101,22 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
         ref.read(favoriteIdsCacheProvider.notifier).remove(documentID);
       }
 
-      // 関連するProviderを無効化
+      // 履歴一覧を無効化
       ref.invalidate(searchedHistoryProvider);
-      ref.invalidate(researchWorkProvider(documentID));
+
+      // researchWork の state を直接更新（invalidate だと browsing_history の
+      // キャッシュ更新タイミングと競合して古い likes が表示されるため）
+      final current = ref.read(researchWorkProvider(documentID)).asData?.value;
+      if (current != null) {
+        final newLikes =
+            (current.likes + (nextIsFavorite ? 1 : -1)).clamp(0, 999999);
+        ref
+            .read(researchWorkProvider(documentID).notifier)
+            .updateForFavoriteChange(
+              isFavorite: nextIsFavorite,
+              likes: newLikes,
+            );
+      }
 
       return nextIsFavorite;
     });

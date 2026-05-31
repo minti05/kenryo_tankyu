@@ -56,6 +56,13 @@ class ResearchWork extends _$ResearchWork {
     return result;
   }
 
+  /// お気に入り操作後に UI を即時更新する（invalidate による再フェッチを使わない）
+  void updateForFavoriteChange({required bool isFavorite, required int likes}) {
+    state = state.whenData(
+      (s) => s.copyWith(isFavorite: isFavorite, likes: likes),
+    );
+  }
+
   Future<void> _refreshLikesIfStale(
     int documentID,
     DateTime viewedAt,
