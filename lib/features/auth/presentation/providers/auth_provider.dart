@@ -4,6 +4,7 @@ import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
+import 'package:kenryo_tankyu/core/providers/supabase_provider.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
 import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
 import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
@@ -13,6 +14,7 @@ import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_r
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
 
 part 'auth_provider.g.dart';
 
@@ -133,7 +135,9 @@ class AuthNotifier extends _$AuthNotifier {
     final searchHistoryDs = ref.read(searchHistoryDataSourceProvider);
     final browsingHistoryDs = ref.read(browsingHistoryDataSourceProvider);
     final favoritesDs = ref.read(favoritesRemoteDataSourceProvider);
-    final readNotifIds = ref.read(readNotificationIdsProvider.notifier);
+    // readNotificationIdsProvider は deleteUser() 後に invalidate・dispose されるため、
+    // Notifier 経由ではなく SupabaseClient を直接退避して削除する。
+    final supabaseClient = ref.read(supabaseClientProvider);
 
     final user = authRepo.currentUser;
     if (user == null || user.email == null) return;
@@ -157,7 +161,7 @@ class AuthNotifier extends _$AuthNotifier {
       searchHistoryDs: searchHistoryDs,
       browsingHistoryDs: browsingHistoryDs,
       favoritesDs: favoritesDs,
-      readNotifIds: readNotifIds,
+      supabaseClient: supabaseClient,
     );
   }
 
@@ -167,7 +171,7 @@ class AuthNotifier extends _$AuthNotifier {
     required SearchHistoryDataSource searchHistoryDs,
     required BrowsingHistoryDataSource browsingHistoryDs,
     required FavoritesRemoteDataSource favoritesDs,
-    required ReadNotificationIds readNotifIds,
+    required SupabaseClient supabaseClient,
   }) async {
     try {
       await pdfDs.deleteAllPdf();
@@ -182,7 +186,10 @@ class AuthNotifier extends _$AuthNotifier {
       await favoritesDs.deleteAllFavorites(userId);
     } catch (_) {}
     try {
-      await readNotifIds.deleteAll(userId);
+      await supabaseClient
+          .from('notification_reads')
+          .delete()
+          .eq('user_id', userId);
     } catch (_) {}
     try {
       await NotificationDbController.deleteAllNotifications();

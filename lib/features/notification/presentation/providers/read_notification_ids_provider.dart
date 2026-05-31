@@ -66,12 +66,4 @@ class ReadNotificationIds extends _$ReadNotificationIds {
       }),
     );
   }
-
-  Future<void> deleteAll(String userId) async {
-    await ref
-        .read(supabaseClientProvider)
-        .from('notification_reads')
-        .delete()
-        .eq('user_id', userId);
-  }
 }
