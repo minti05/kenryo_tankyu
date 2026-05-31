@@ -56,3 +56,4 @@ firepit-log.txt
 
 # Environment variables
 .env
+assets/supabase_config.json

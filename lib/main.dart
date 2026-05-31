@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
@@ -33,19 +35,13 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-
-  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
-    throw StateError(
-      'SUPABASE_URL または SUPABASE_ANON_KEY が設定されていません。\n'
-      '--dart-define-from-file=.env オプションを付けてアプリを起動してください。',
-    );
-  }
+  final supabaseConfig = jsonDecode(
+    await rootBundle.loadString('assets/supabase_config.json'),
+  ) as Map<String, dynamic>;
 
   await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
+    url: supabaseConfig['url'] as String,
+    anonKey: supabaseConfig['anon_key'] as String,
   );
 
   final sharedPreferences = await SharedPreferences.getInstance();
