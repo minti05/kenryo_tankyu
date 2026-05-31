@@ -67,6 +67,16 @@ class BrowsingHistoryDataSource {
         .eq('document_id', documentID);
   }
 
+  /// browsing_history と favorites を Postgres トランザクションで原子的に削除する。
+  /// Supabase に delete_history_with_favorite RPC 関数が必要
+  /// (document/supabase_rpc_delete_history_with_favorite.sql を参照)。
+  Future<void> deleteHistoryAndFavorite(String userId, int documentId) async {
+    await _client.rpc('delete_history_with_favorite', params: {
+      'p_user_id': userId,
+      'p_document_id': documentId,
+    });
+  }
+
   Future<void> deleteAllHistory(String userId) async {
     await _client.from('browsing_history').delete().eq('user_id', userId);
   }

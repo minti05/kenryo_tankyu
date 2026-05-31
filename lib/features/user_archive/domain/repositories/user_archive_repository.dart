@@ -10,6 +10,7 @@ abstract class UserArchiveRepository {
   Future<void> insertHistory(Searched searched);
   Future<Searched?> getHistory(int documentID);
   Future<void> deleteHistory(int documentID);
+  Future<void> deleteHistoryWithFavorite(int documentID);
   Future<void> deleteAllHistory();
   Future<void> deleteHistoryBefore(DateTime date);
   Future<HistoryStats> getHistoryStats();

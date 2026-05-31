@@ -19,8 +19,11 @@ final forceReloadProvider = StateProvider.autoDispose<bool>((ref) => false);
 
 @riverpod
 class ResearchWork extends _$ResearchWork {
+  late int _documentID;
+
   @override
   Future<Searched> build(int documentID) async {
+    _documentID = documentID;
     final repository = ref.watch(researchWorkRepositoryProvider);
     final archiveRepo = ref.watch(userArchiveRepositoryProvider);
     final forceReload = ref.read(forceReloadProvider);
@@ -36,26 +39,17 @@ class ResearchWork extends _$ResearchWork {
       return combined;
     }
 
-    final Searched result;
     if (forceReload) {
-      result = await fetchFromServer();
-    } else {
-      final cached = await archiveRepo.getHistory(documentID);
-      if (cached != null) {
-        result = cached.copyWith(isCached: false);
-        unawaited(
-            archiveRepo.updateHistoryViewedAt(documentID).catchError((_) {}));
-      } else {
-        result = await fetchFromServer();
-      }
+      return await fetchFromServer();
     }
 
-    // キャッシュから取得した場合のみ陳腐化チェックを実施
-    if (result.savedAt != null) {
-      unawaited(_refreshLikesIfStale(documentID, result.savedAt!, result));
+    final cached = await archiveRepo.getHistory(documentID);
+    if (cached != null) {
+      unawaited(
+          archiveRepo.updateHistoryViewedAt(documentID).catchError((_) {}));
+      return cached.copyWith(isCached: false);
     }
-
-    return result;
+    return await fetchFromServer();
   }
 
   /// お気に入り操作後に UI を即時更新する（invalidate による再フェッチを使わない）
@@ -65,22 +59,26 @@ class ResearchWork extends _$ResearchWork {
     );
   }
 
-  Future<void> _refreshLikesIfStale(
-    int documentID,
-    DateTime viewedAt,
-    Searched current,
-  ) async {
+  /// UI 側から明示的に呼ぶ陳腐化チェック。state が AsyncData でない場合や
+  /// 90 日以内のキャッシュの場合は何もしない。
+  Future<void> refreshIfStale() async {
+    final data = state.asData?.value;
+    if (data?.savedAt == null) return;
+    final viewedAt = data!.savedAt!;
     if (DateTime.now().difference(viewedAt) < const Duration(days: 90)) return;
+    await _doRefresh(viewedAt, data);
+  }
 
+  Future<void> _doRefresh(DateTime viewedAt, Searched current) async {
     if (!ref.mounted) return;
-    ref.read(isRefreshingLikesProvider(documentID).notifier).set(true);
+    ref.read(isRefreshingLikesProvider(_documentID).notifier).set(true);
 
     try {
       final repository = ref.read(researchWorkRepositoryProvider);
       final archiveRepo = ref.read(userArchiveRepositoryProvider);
       final userId = FirebaseAuth.instance.currentUser?.uid;
 
-      final latest = await repository.getWork(documentID.toString());
+      final latest = await repository.getWork(_documentID.toString());
       final updated =
           latest.copyWith(isFavorite: current.isFavorite, isCached: false);
 
@@ -88,13 +86,13 @@ class ResearchWork extends _$ResearchWork {
       state = AsyncData(updated);
 
       if (userId != null) {
-        unawaited(archiveRepo.updateHistoryWork(documentID, updated));
+        unawaited(archiveRepo.updateHistoryWork(_documentID, updated));
       }
     } catch (_) {
       // バックグラウンド更新の失敗はサイレントに無視
     } finally {
       if (ref.mounted) {
-        ref.read(isRefreshingLikesProvider(documentID).notifier).set(false);
+        ref.read(isRefreshingLikesProvider(_documentID).notifier).set(false);
       }
     }
   }

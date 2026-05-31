@@ -61,6 +61,19 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
       }
     });
 
+    // loading → data に変わった瞬間に一度だけ陳腐化チェックを実行
+    ref.listen(researchWorkProvider(widget.documentID), (prev, next) {
+      if (prev?.hasValue != true && next.hasValue) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ref
+                .read(researchWorkProvider(widget.documentID).notifier)
+                .refreshIfStale();
+          }
+        });
+      }
+    });
+
     final currentIndex = ref.watch(isFullScreenProvider) ? 1 : 0; //全画面表示かどうか
     final AsyncValue<Searched> searched =
         ref.watch(searchedItemProvider(widget.documentID));
