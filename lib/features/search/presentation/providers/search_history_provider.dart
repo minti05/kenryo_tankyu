@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -12,7 +11,7 @@ class SearchHistoryCache extends _$SearchHistoryCache {
   @override
   Future<List<Search>?> build() async => null;
 
-  Future<void> initialize(String userId) async {
+  Future<void> initialize() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
       () => ref.read(searchHistoryRepositoryProvider).getAllHistory(),
@@ -20,9 +19,7 @@ class SearchHistoryCache extends _$SearchHistoryCache {
   }
 
   Future<void> reload() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) return;
-    await initialize(userId);
+    await initialize();
   }
 
   void addOrUpdate(Search search) {

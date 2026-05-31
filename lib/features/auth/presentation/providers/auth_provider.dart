@@ -33,9 +33,7 @@ class AuthNotifier extends _$AuthNotifier {
               ref.read(favoriteIdsCacheProvider.notifier).initialize(user.uid),
             );
             unawaited(
-              ref
-                  .read(searchHistoryCacheProvider.notifier)
-                  .initialize(user.uid),
+              ref.read(searchHistoryCacheProvider.notifier).initialize(),
             );
           } else {
             ref.invalidate(favoriteIdsCacheProvider);
