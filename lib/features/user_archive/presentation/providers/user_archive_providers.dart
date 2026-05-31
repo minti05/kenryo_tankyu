@@ -165,7 +165,9 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
 Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
   final repository = ref.watch(userArchiveRepositoryProvider);
   if (onlyShowFavorite) {
-    return repository.getFavoriteHistory();
+    final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
+    if (favoriteIds.isEmpty) return null;
+    return repository.getFavoriteHistoryByIds(favoriteIds);
   } else {
     final history = await repository.getAllHistory();
     if (history == null) return null;
