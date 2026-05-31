@@ -6,6 +6,7 @@ import 'package:kenryo_tankyu/features/auth/presentation/providers/user_reposito
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
 import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
@@ -31,8 +32,12 @@ class AuthNotifier extends _$AuthNotifier {
             unawaited(
               ref.read(favoriteIdsCacheProvider.notifier).initialize(user.uid),
             );
+            unawaited(
+              ref.read(searchHistoryCacheProvider.notifier).initialize(),
+            );
           } else {
             ref.invalidate(favoriteIdsCacheProvider);
+            ref.invalidate(searchHistoryCacheProvider);
           }
         });
       },
@@ -137,6 +142,7 @@ class AuthNotifier extends _$AuthNotifier {
     }
     // アカウント削除成功後、全ローカルデータを消去（失敗してもアカウント削除は成功とみなす）
     await _clearAllLocalData(
+      userId: user.uid,
       searchedHistoryDs: searchedHistoryDs,
       pdfDs: pdfDs,
       searchHistoryDs: searchHistoryDs,
@@ -144,6 +150,7 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   Future<void> _clearAllLocalData({
+    required String userId,
     required SearchedHistoryLocalDataSource searchedHistoryDs,
     required PdfLocalDataSource pdfDs,
     required SearchHistoryDataSource searchHistoryDs,
@@ -155,7 +162,7 @@ class AuthNotifier extends _$AuthNotifier {
       await pdfDs.deleteAllPdf();
     } catch (_) {}
     try {
-      await searchHistoryDs.deleteAllHistory();
+      await searchHistoryDs.deleteAllHistory(userId);
     } catch (_) {}
     try {
       await NotificationDbController.deleteAllNotifications();

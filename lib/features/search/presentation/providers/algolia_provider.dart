@@ -9,6 +9,7 @@ import 'package:kenryo_tankyu/features/search/presentation/providers/search_prov
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_repository_provider.dart';
 
 final forceRefreshProvider = StateProvider.autoDispose<bool>((ref) => false);
@@ -75,8 +76,10 @@ final algoliaSearchProvider =
 
   if (result != null && page == 0) {
     // Save history side effect (first page only)
-    await historyRepository.insertHistory(
-        search.copyWith(savedAt: DateTime.now(), numberOfHits: result.nbHits));
+    final searchWithMeta =
+        search.copyWith(savedAt: DateTime.now(), numberOfHits: result.nbHits);
+    await historyRepository.insertHistory(searchWithMeta);
+    ref.read(searchHistoryCacheProvider.notifier).addOrUpdate(searchWithMeta);
   }
 
   if (result == null && page > 0) {

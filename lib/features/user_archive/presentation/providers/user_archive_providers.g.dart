@@ -196,7 +196,7 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'c478737a523ceebc50049715c72d38d5d0d00fc9';
+    r'f2756f3f96e88d606957700f9a7be88d089bf311';
 
 final class UserIsFavoriteStateFamily extends $Family
     with
@@ -295,7 +295,7 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$searchedHistoryHash() => r'fd22fd316566e36e9625f532e610097f8e1a7382';
+String _$searchedHistoryHash() => r'f413d39021c6d21fe54b9e7ad1b1bbd826e1de71';
 
 final class SearchedHistoryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Searched>?>, bool> {
