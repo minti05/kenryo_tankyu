@@ -49,7 +49,7 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
           hits: hits
               .map((object) => Searched.fromAlgolia(
                     object,
-                    favoriteIds.contains(int.parse(object.objectID)),
+                    favoriteIds.contains(int.tryParse(object.objectID) ?? -1),
                   ))
               .toList(),
           page: response.page ?? page,
@@ -92,7 +92,7 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
         final hits = resp.hits;
         results.addAll(hits.map((e) => Searched.fromAlgolia(
               e,
-              favoriteIds.contains(int.parse(e.objectID)),
+              favoriteIds.contains(int.tryParse(e.objectID) ?? -1),
             )));
       }
     } catch (e) {

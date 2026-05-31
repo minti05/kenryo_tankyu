@@ -44,6 +44,9 @@ class UserArchiveRepositoryImpl
     try {
       final favoriteIds = await _favoritesDataSource.getFavoriteIds(userId);
       if (favoriteIds.isEmpty) return null;
+      // セッション③完了まで SQLite の閲覧履歴を取得源とする。
+      // そのため新デバイスや履歴削除後はお気に入り一覧に表示されない制約がある。
+      // browsing_history の Supabase 移行後に Supabase から直接取得する実装に切り替える。
       final allHistory = await _historyDataSource.getAllHistory();
       if (allHistory == null) return null;
       final favorites = allHistory

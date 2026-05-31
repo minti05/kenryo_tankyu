@@ -42,7 +42,11 @@ class FavoriteIdsCache extends _$FavoriteIdsCache {
 
   Future<void> initialize(String userId) async {
     final dataSource = ref.read(favoritesRemoteDataSourceProvider);
-    state = await dataSource.getFavoriteIds(userId);
+    try {
+      state = await dataSource.getFavoriteIds(userId);
+    } catch (_) {
+      state = {};
+    }
   }
 
   void add(int id) => state = {...state, id};
