@@ -66,8 +66,10 @@ class NotificationDbController {
             );
           }
           if (oldVersion < 4) {
-            // isRead列をSupabaseに移行するため、notificationテーブルを再作成
-            await db.execute('DROP TABLE IF EXISTS notification');
+            // isRead列をSupabaseに移行するため、既存データを保持しつつテーブルを再作成
+            await db.execute(
+              'ALTER TABLE notification RENAME TO notification_old',
+            );
             await db.execute(
               'CREATE TABLE notification('
               'id INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -80,6 +82,11 @@ class NotificationDbController {
               'CHECK(title != "" OR contents != "") '
               ');',
             );
+            await db.execute(
+              'INSERT INTO notification (id, type, title, contents, sendAt, savedAt, headerImage) '
+              'SELECT id, type, title, contents, sendAt, savedAt, headerImage FROM notification_old',
+            );
+            await db.execute('DROP TABLE IF EXISTS notification_old');
           }
         },
         version: 4,

@@ -20,7 +20,9 @@ class _NotificationPopupState extends ConsumerState<NotificationPopup> {
   @override
   void initState() {
     super.initState();
-    _markAsRead();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _markAsRead();
+    });
   }
 
   void _markAsRead() {
