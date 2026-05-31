@@ -111,8 +111,9 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
         ref.read(favoriteIdsCacheProvider.notifier).remove(documentID);
       }
 
-      // 履歴一覧を無効化
-      ref.invalidate(searchedHistoryProvider);
+      // searchedHistoryProvider(false) は favoriteIdsCacheProvider を watch しているため
+      // FavoriteIdsCache 更新で自動再計算される。お気に入りタブのみ明示的に無効化する。
+      ref.invalidate(searchedHistoryProvider(true));
 
       // researchWork の state を直接更新（invalidate だと browsing_history の
       // キャッシュ更新タイミングと競合して古い likes が表示されるため）
@@ -188,25 +189,29 @@ class HistoryController extends _$HistoryController {
       await repository.deleteHistoryWithFavorite(id);
       if (!ref.mounted) return;
       ref.read(favoriteIdsCacheProvider.notifier).remove(id);
+      // (false) は FavoriteIdsCache の remove により自動再計算される
+      ref.invalidate(searchedHistoryProvider(true));
     } else {
       await repository.deleteHistory(id);
+      if (!ref.mounted) return;
+      ref.invalidate(searchedHistoryProvider(false));
     }
-    if (!ref.mounted) return;
-    ref.invalidate(searchedHistoryProvider);
   }
 
   Future<void> deleteAllHistory() async {
     final repository = ref.read(userArchiveRepositoryProvider);
     await repository.deleteAllHistory();
     if (!ref.mounted) return;
-    ref.invalidate(searchedHistoryProvider);
+    ref.invalidate(searchedHistoryProvider(false));
+    ref.invalidate(searchedHistoryProvider(true));
   }
 
   Future<void> deleteHistoryBefore(DateTime date) async {
     final repository = ref.read(userArchiveRepositoryProvider);
     await repository.deleteHistoryBefore(date);
     if (!ref.mounted) return;
-    ref.invalidate(searchedHistoryProvider);
+    ref.invalidate(searchedHistoryProvider(false));
+    ref.invalidate(searchedHistoryProvider(true));
   }
 }
 
