@@ -23,6 +23,7 @@ class ResultPage extends ConsumerStatefulWidget {
 class _ResultPageMainState extends ConsumerState<ResultPage> {
   final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
   ScaffoldMessengerState? _messenger;
+  ProviderSubscription<AsyncValue<Searched>>? _staleCheckSub;
 
   @override
   void initState() {
@@ -33,10 +34,30 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
     Future.delayed(Duration.zero, () {
       screenListener.watch();
     });
+
+    // listenManual + fireImmediately: true で、キャッシュ済みの場合も含めて
+    // loading → data 遷移を一度だけ検知して陳腐化チェックを実行する。
+    // WidgetRef.listen は fireImmediately 非対応のためここで登録する。
+    _staleCheckSub = ref.listenManual(
+      researchWorkProvider(widget.documentID),
+      (prev, next) {
+        if (prev?.hasValue != true && next.hasValue) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ref
+                  .read(researchWorkProvider(widget.documentID).notifier)
+                  .refreshIfStale();
+            }
+          });
+        }
+      },
+      fireImmediately: true,
+    );
   }
 
   @override
   void dispose() {
+    _staleCheckSub?.close();
     _messenger?.clearSnackBars();
     screenListener.dispose();
     super.dispose();

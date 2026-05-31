@@ -51,13 +51,13 @@ final class UserArchiveRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$userArchiveRepositoryHash() =>
-    r'3144510063e2dec0a0491edf826b82ec6e79712e';
+    r'0cc9ca50197c441d2241527354e8fb97cf3d3d4f';
 
 @ProviderFor(FavoriteIdsCache)
 const favoriteIdsCacheProvider = FavoriteIdsCacheProvider._();
 
 final class FavoriteIdsCacheProvider
-    extends $NotifierProvider<FavoriteIdsCache, Set<int>> {
+    extends $AsyncNotifierProvider<FavoriteIdsCache, Set<int>> {
   const FavoriteIdsCacheProvider._()
       : super(
           from: null,
@@ -75,27 +75,22 @@ final class FavoriteIdsCacheProvider
   @$internal
   @override
   FavoriteIdsCache create() => FavoriteIdsCache();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(Set<int> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<Set<int>>(value),
-    );
-  }
 }
 
-String _$favoriteIdsCacheHash() => r'601decced1c010a9a800c8bdc9a85aa7463d33e4';
+String _$favoriteIdsCacheHash() => r'6d9b76398c88e8734def2b30944d92564c8a068b';
 
-abstract class _$FavoriteIdsCache extends $Notifier<Set<int>> {
-  Set<int> build();
+abstract class _$FavoriteIdsCache extends $AsyncNotifier<Set<int>> {
+  FutureOr<Set<int>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<Set<int>, Set<int>>;
+    final ref = this.ref as $Ref<AsyncValue<Set<int>>, Set<int>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<Set<int>, Set<int>>, Set<int>, Object?, Object?>;
+        AnyNotifier<AsyncValue<Set<int>>, Set<int>>,
+        AsyncValue<Set<int>>,
+        Object?,
+        Object?>;
     element.handleValue(ref, created);
   }
 }
@@ -295,7 +290,7 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$searchedHistoryHash() => r'f413d39021c6d21fe54b9e7ad1b1bbd826e1de71';
+String _$searchedHistoryHash() => r'73fc7538c5477eef98cc6742da99d5c74c9700af';
 
 final class SearchedHistoryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Searched>?>, bool> {
@@ -349,7 +344,7 @@ final class HistoryControllerProvider
   }
 }
 
-String _$historyControllerHash() => r'32a690092760aa7ca5bdf626dbbad41a4941b8d5';
+String _$historyControllerHash() => r'56f12497211c6200902c5cab557b7b0a7b0f6ee6';
 
 abstract class _$HistoryController extends $Notifier<void> {
   void build();

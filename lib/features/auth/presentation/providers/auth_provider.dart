@@ -12,7 +12,6 @@ import 'package:kenryo_tankyu/features/search/presentation/providers/search_hist
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
-import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
 
@@ -33,9 +32,7 @@ class AuthNotifier extends _$AuthNotifier {
       (_, next) {
         next.whenData((user) {
           if (user != null && user.emailVerified) {
-            unawaited(
-              ref.read(favoriteIdsCacheProvider.notifier).initialize(user.uid),
-            );
+            // FavoriteIdsCache は authStateChangesProvider を watch して自己初期化するため不要
             unawaited(
               ref.read(searchHistoryCacheProvider.notifier).initialize(),
             );
@@ -45,7 +42,7 @@ class AuthNotifier extends _$AuthNotifier {
                   .initialize(user.uid),
             );
           } else {
-            ref.invalidate(favoriteIdsCacheProvider);
+            // FavoriteIdsCache は authStateChangesProvider を watch して自動リセットするため不要
             ref.invalidate(searchHistoryCacheProvider);
             ref.invalidate(readNotificationIdsProvider);
           }

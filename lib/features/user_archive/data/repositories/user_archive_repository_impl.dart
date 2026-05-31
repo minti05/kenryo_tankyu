@@ -87,6 +87,23 @@ class UserArchiveRepositoryImpl
   }
 
   @override
+  Future<void> deleteHistoryWithFavorite(int documentID) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+    try {
+      // Postgres トランザクション（RPC）で browsing_history + favorites を原子的に削除
+      await _browsingHistoryDataSource.deleteHistoryAndFavorite(
+          userId, documentID);
+    } catch (e) {
+      throw mapException(e);
+    }
+    // Firestore の likes をデクリメント（失敗しても無視）
+    try {
+      await updateRemoteLikes(documentID, false);
+    } catch (_) {}
+  }
+
+  @override
   Future<void> deleteAllHistory() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;

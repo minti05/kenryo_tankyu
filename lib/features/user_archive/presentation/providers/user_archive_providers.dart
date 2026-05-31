@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
@@ -39,19 +40,33 @@ UserArchiveRepository userArchiveRepository(Ref ref) {
 @Riverpod(keepAlive: true)
 class FavoriteIdsCache extends _$FavoriteIdsCache {
   @override
-  Set<int> build() => {};
+  Future<Set<int>> build() async {
+    // auth ストリームの最初の値を待つ。
+    // ログイン/ログアウト時に authStateChangesProvider が変わると自動で再実行される。
+    final user = await ref.watch(authStateChangesProvider.future);
+    if (user == null || !user.emailVerified) return {};
+    return await ref
+        .read(favoritesRemoteDataSourceProvider)
+        .getFavoriteIds(user.uid);
+  }
 
-  Future<void> initialize(String userId) async {
-    final dataSource = ref.read(favoritesRemoteDataSourceProvider);
+  Future<void> add(int id) async {
     try {
-      state = await dataSource.getFavoriteIds(userId);
+      final current = await future;
+      state = AsyncData({...current, id});
     } catch (_) {
-      state = {};
+      state = AsyncData({id});
     }
   }
 
-  void add(int id) => state = {...state, id};
-  void remove(int id) => state = state.difference({id});
+  Future<void> remove(int id) async {
+    try {
+      final current = await future;
+      state = AsyncData(current.difference({id}));
+    } catch (_) {
+      state = const AsyncData({});
+    }
+  }
 }
 
 /// ボタン連打防止を管理するProvider
@@ -153,8 +168,9 @@ Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
   } else {
     final history = await repository.getAllHistory();
     if (history == null) return null;
-    // FavoriteIdsCache はインメモリキャッシュなので Supabase を叩かない
-    final favoriteIds = ref.read(favoriteIdsCacheProvider);
+    // FavoriteIdsCache の初期化完了を待ってから isFavorite を付与する。
+    // これにより初期化前に全件 unfavorited になる競合状態を防ぐ。
+    final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
     return history
         .map((h) => h.copyWith(isFavorite: favoriteIds.contains(h.documentID)))
         .toList();
@@ -166,9 +182,15 @@ class HistoryController extends _$HistoryController {
   @override
   void build() {}
 
-  Future<void> deleteHistory(int id) async {
+  Future<void> deleteHistory(int id, {bool isFavorite = false}) async {
     final repository = ref.read(userArchiveRepositoryProvider);
-    await repository.deleteHistory(id);
+    if (isFavorite) {
+      await repository.deleteHistoryWithFavorite(id);
+      if (!ref.mounted) return;
+      ref.read(favoriteIdsCacheProvider.notifier).remove(id);
+    } else {
+      await repository.deleteHistory(id);
+    }
     if (!ref.mounted) return;
     ref.invalidate(searchedHistoryProvider);
   }

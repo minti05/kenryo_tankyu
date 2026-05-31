@@ -126,6 +126,6 @@ SearchRepository searchRepository(Ref ref) {
   final dataSource = ref.watch(searchDataSourceProvider);
   return SearchRepositoryImpl(
     dataSource,
-    () => ref.read(favoriteIdsCacheProvider),
+    () => ref.read(favoriteIdsCacheProvider).asData?.value ?? {},
   );
 }

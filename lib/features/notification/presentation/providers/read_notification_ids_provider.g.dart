@@ -42,7 +42,7 @@ final class ReadNotificationIdsProvider
 }
 
 String _$readNotificationIdsHash() =>
-    r'5ebd09016feaeae549f851ff6cedf4a17c721a30';
+    r'9a635cb0fc2565620dd08207ffbbfec03904107a';
 
 abstract class _$ReadNotificationIds extends $Notifier<Set<String>> {
   Set<String> build();
