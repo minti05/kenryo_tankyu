@@ -164,16 +164,23 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
 @riverpod
 Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
   final repository = ref.watch(userArchiveRepositoryProvider);
+
+  // キャッシュが既にあれば同期的に取得し、ローディング状態を経由しない。
+  // これにより お気に入り追加・削除時の UI ちらつき（再ローディング）を防ぐ。
+  // 初回ロード時（asData が null）のみ future を await してローディング状態を伝播させる。
+  final favoriteIdsValue = ref.watch(favoriteIdsCacheProvider);
+  final favoriteIds = favoriteIdsValue.asData?.value;
+  if (favoriteIds == null) {
+    await ref.watch(favoriteIdsCacheProvider.future);
+    return null;
+  }
+
   if (onlyShowFavorite) {
-    final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
     if (favoriteIds.isEmpty) return null;
     return repository.getFavoriteHistoryByIds(favoriteIds);
   } else {
     final history = await repository.getAllHistory();
     if (history == null) return null;
-    // FavoriteIdsCache の初期化完了を待ってから isFavorite を付与する。
-    // これにより初期化前に全件 unfavorited になる競合状態を防ぐ。
-    final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
     return history
         .map((h) => h.copyWith(isFavorite: favoriteIds.contains(h.documentID)))
         .toList();
