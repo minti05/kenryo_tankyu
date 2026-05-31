@@ -50,14 +50,22 @@ class FavoriteIdsCache extends _$FavoriteIdsCache {
         .getFavoriteIds(user.uid);
   }
 
-  void add(int id) {
-    final current = state.asData?.value ?? {};
-    state = AsyncData({...current, id});
+  Future<void> add(int id) async {
+    try {
+      final current = await future;
+      state = AsyncData({...current, id});
+    } catch (_) {
+      state = AsyncData({id});
+    }
   }
 
-  void remove(int id) {
-    final current = state.asData?.value ?? {};
-    state = AsyncData(current.difference({id}));
+  Future<void> remove(int id) async {
+    try {
+      final current = await future;
+      state = AsyncData(current.difference({id}));
+    } catch (_) {
+      state = const AsyncData({});
+    }
   }
 }
 
