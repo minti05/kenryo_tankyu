@@ -29,7 +29,11 @@ class ResultPreviewContent extends ConsumerWidget {
                 builder: (context) {
                   return AlertDialog(
                     title: const Text('履歴を消去しますか？'),
-                    content: Text('「${searched.title}」の履歴を消去しますか？'),
+                    content: Text(
+                      searched.isFavorite
+                          ? '「${searched.title}」の履歴を消去しますか？\n\nこの作品はお気に入りに登録されています。消去すると、お気に入り状態も同時に解除されます。'
+                          : '「${searched.title}」の履歴を消去しますか？',
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () {
@@ -41,7 +45,10 @@ class ResultPreviewContent extends ConsumerWidget {
                         onPressed: () async {
                           await ref
                               .read(historyControllerProvider.notifier)
-                              .deleteHistory(searched.documentID);
+                              .deleteHistory(
+                                searched.documentID,
+                                isFavorite: searched.isFavorite,
+                              );
                           if (context.mounted) {
                             Navigator.of(context).pop();
                           }

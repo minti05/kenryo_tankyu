@@ -16,7 +16,6 @@ _NotificationContent _$NotificationContentFromJson(Map<String, dynamic> json) =>
       contents: json['contents'] as String,
       sendAt: const DateTimeConverter().fromJson(json['sendAt'] as String),
       savedAt: const DateTimeConverter().fromJson(json['savedAt'] as String),
-      isRead: json['isRead'] as bool,
     );
 
 Map<String, dynamic> _$NotificationContentToJson(
@@ -29,5 +28,4 @@ Map<String, dynamic> _$NotificationContentToJson(
       'contents': instance.contents,
       'sendAt': const DateTimeConverter().toJson(instance.sendAt),
       'savedAt': const DateTimeConverter().toJson(instance.savedAt),
-      'isRead': instance.isRead,
     };

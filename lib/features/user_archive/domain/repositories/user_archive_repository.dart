@@ -7,13 +7,17 @@ abstract class UserArchiveRepository {
   // History
   Future<List<Searched>?> getAllHistory();
   Future<List<Searched>?> getFavoriteHistory();
+  Future<List<Searched>?> getFavoriteHistoryByIds(Set<int> ids);
   Future<void> insertHistory(Searched searched);
   Future<Searched?> getHistory(int documentID);
   Future<void> deleteHistory(int documentID);
+  Future<void> deleteHistoryWithFavorite(int documentID);
   Future<void> deleteAllHistory();
   Future<void> deleteHistoryBefore(DateTime date);
   Future<HistoryStats> getHistoryStats();
   Future<List<DateTime>> getAllHistorySavedDates();
+  Future<void> updateHistoryWork(int documentID, Searched latest);
+  Future<void> updateHistoryViewedAt(int documentID);
 
   // Favorite (combines local DB and potentially remote updates)
   Future<void> changeFavoriteState(int documentID, bool nextIsFavorite);

@@ -1,7 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:kenryo_tankyu/features/notification/domain/models/notification_content.dart';
+import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
 import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
 
@@ -9,7 +10,6 @@ class NotificationNotifier
     extends Notifier<AsyncValue<List<NotificationContent>>> {
   @override
   AsyncValue<List<NotificationContent>> build() {
-    // 接続状態を監視し、回復時に再取得
     ref.listen(isConnectedProvider, (previous, next) {
       if (previous == false && next == true) {
         refresh();
@@ -37,39 +37,14 @@ class NotificationNotifier
     }
   }
 
-  Future<bool> markAsRead(int id) async {
-    try {
-      final repository = ref.read(notificationRepositoryProvider);
-      await repository.markAsRead(id);
+  Future<void> markAsReadAll() async {
+    final user = ref.read(authStateChangesProvider).asData?.value;
+    if (user == null) return;
 
-      state.whenData((notifications) {
-        state = AsyncValue.data(notifications.map((notification) {
-          if (notification.id == id.toString()) {
-            return notification.copyWith(isRead: true);
-          }
-          return notification;
-        }).toList());
-      });
-      return true;
-    } catch (e) {
-      // エラーログ出力などを行い、上位には成功/失敗を返すのみにする
-      debugPrint('markAsRead error: $e');
-      return false;
-    }
-  }
-
-  Future<bool> markAsReadAll() async {
-    try {
-      // TODO: リポジトリに指定がない場合は全件更新を検討
-      // 現状は state にあるものをすべて true にする
-      state.whenData((notifications) {
-        state = AsyncValue.data(
-            notifications.map((n) => n.copyWith(isRead: true)).toList());
-      });
-      return true;
-    } catch (e) {
-      return false;
-    }
+    final allIds = state.asData?.value.map((n) => n.id).toSet() ?? {};
+    await ref
+        .read(readNotificationIdsProvider.notifier)
+        .markAllAsRead(user.uid, allIds);
   }
 
   Future<void> refresh() async {

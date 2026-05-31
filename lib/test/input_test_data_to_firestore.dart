@@ -10,7 +10,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容1',
     sendAt: DateTime.now().subtract(Duration(days: 1)),
     savedAt: DateTime.now().subtract(Duration(days: 1)),
-    isRead: false,
     type: NotificationType.system,
   ),
   NotificationContent(
@@ -20,7 +19,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容2',
     sendAt: DateTime.now().subtract(Duration(days: 2)),
     savedAt: DateTime.now().subtract(Duration(days: 2)),
-    isRead: true,
     type: NotificationType.system,
   ),
   NotificationContent(
@@ -30,7 +28,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容3',
     sendAt: DateTime.now().subtract(Duration(days: 3)),
     savedAt: DateTime.now().subtract(Duration(days: 3)),
-    isRead: false,
     type: NotificationType.info,
   ),
   NotificationContent(
@@ -40,7 +37,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容4',
     sendAt: DateTime.now().subtract(Duration(days: 4)),
     savedAt: DateTime.now().subtract(Duration(days: 4)),
-    isRead: true,
     type: NotificationType.warning,
   ),
   NotificationContent(
@@ -50,7 +46,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容5',
     sendAt: DateTime.now().subtract(Duration(days: 5)),
     savedAt: DateTime.now().subtract(Duration(days: 5)),
-    isRead: false,
     type: NotificationType.system,
   ),
   NotificationContent(
@@ -60,7 +55,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容6',
     sendAt: DateTime.now().subtract(Duration(days: 6)),
     savedAt: DateTime.now().subtract(Duration(days: 6)),
-    isRead: true,
     type: NotificationType.info,
   ),
   NotificationContent(
@@ -70,7 +64,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容7',
     sendAt: DateTime.now().subtract(Duration(days: 7)),
     savedAt: DateTime.now().subtract(Duration(days: 7)),
-    isRead: false,
     type: NotificationType.warning,
   ),
   NotificationContent(
@@ -80,7 +73,6 @@ List<NotificationContent> testNotifications = [
     contents: '内容8',
     sendAt: DateTime.now().subtract(Duration(days: 8)),
     savedAt: DateTime.now().subtract(Duration(days: 8)),
-    isRead: true,
     type: NotificationType.system,
   ),
 ];
@@ -91,7 +83,6 @@ class FirestoreUpload {
     for (final notification in notifications) {
       //保存しないフィールドを削除
       final json = notification.toJson();
-      json.remove('isRead');
       json.remove('savedAt');
       json.remove('id');
       //sendAtをtimestampに変換

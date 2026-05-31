@@ -89,4 +89,55 @@ abstract class Searched with _$Searched {
     json['savedAt'] = DateTime.now().toIso8601String();
     return json;
   }
+
+  /// Supabase の browsing_history テーブル用（user_id・viewed_at は含まない）
+  Map<String, dynamic> toSupabase() {
+    return {
+      'document_id': documentID,
+      'title': title,
+      'author': author,
+      'category1': const CategoryEnumConverter().toJson(category1),
+      'sub_category1': const SubCategoryEnumConverter().toJson(subCategory1),
+      'category2': const CategoryEnumConverter().toJson(category2),
+      'sub_category2': const SubCategoryEnumConverter().toJson(subCategory2),
+      'enter_year': const EnterYearEnumConverter().toJson(enterYear),
+      'event_name': const EventNameEnumConverter().toJson(eventName),
+      'course': const CourseEnumConverter().toJson(course),
+      'likes': likes,
+      'exists_slide': existsSlide,
+      'exists_report': existsReport,
+      'exists_thesis': existsThesis,
+      'exists_poster': existsPoster,
+    };
+  }
+
+  factory Searched.fromSupabase(Map<String, dynamic> row,
+      {bool isFavorite = false}) {
+    return Searched(
+      documentID: row['document_id'] as int,
+      isFavorite: isFavorite,
+      category1:
+          const CategoryEnumConverter().fromJson(row['category1'] as String),
+      subCategory1: const SubCategoryEnumConverter()
+          .fromJson(row['sub_category1'] as String),
+      category2:
+          const CategoryEnumConverter().fromJson(row['category2'] as String),
+      subCategory2: const SubCategoryEnumConverter()
+          .fromJson(row['sub_category2'] as String),
+      enterYear:
+          const EnterYearEnumConverter().fromJson(row['enter_year'] as int),
+      eventName:
+          const EventNameEnumConverter().fromJson(row['event_name'] as String),
+      course: const CourseEnumConverter().fromJson(row['course'] as String),
+      title: row['title'] as String,
+      author: row['author'] as String,
+      likes: row['likes'] as int,
+      existsSlide: row['exists_slide'] as bool,
+      existsReport: row['exists_report'] as bool,
+      existsThesis: row['exists_thesis'] as bool,
+      existsPoster: row['exists_poster'] as bool,
+      savedAt: DateTime.parse(row['viewed_at'] as String).toLocal(),
+      isCached: true,
+    );
+  }
 }
