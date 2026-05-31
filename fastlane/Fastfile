@@ -45,6 +45,7 @@ platform :ios do
 
     sh(
       "cd .. && flutter build ios --release --no-codesign" \
+      " --dart-define-from-file=.env" \
       " --build-name=#{ver[:name]} --build-number=#{ver[:number]}",
     )
 
