@@ -5,6 +5,7 @@ import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_reposito
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
+import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
 import 'package:kenryo_tankyu/features/search/data/datasources/search_history_data_source.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
@@ -35,9 +36,15 @@ class AuthNotifier extends _$AuthNotifier {
             unawaited(
               ref.read(searchHistoryCacheProvider.notifier).initialize(),
             );
+            unawaited(
+              ref
+                  .read(readNotificationIdsProvider.notifier)
+                  .initialize(user.uid),
+            );
           } else {
             ref.invalidate(favoriteIdsCacheProvider);
             ref.invalidate(searchHistoryCacheProvider);
+            ref.invalidate(readNotificationIdsProvider);
           }
         });
       },

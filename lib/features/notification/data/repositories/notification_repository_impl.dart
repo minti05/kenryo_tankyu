@@ -30,15 +30,6 @@ class NotificationRepositoryImpl
       throw mapException(e);
     }
   }
-
-  @override
-  Future<void> markAsRead(int id) async {
-    try {
-      await _localDataSource.markAsRead(id);
-    } catch (e) {
-      throw mapException(e);
-    }
-  }
 }
 
 @riverpod
