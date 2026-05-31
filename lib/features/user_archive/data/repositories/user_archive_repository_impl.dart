@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/browsing_history_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
@@ -14,24 +15,29 @@ import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_arc
 class UserArchiveRepositoryImpl
     with ErrorMapper
     implements UserArchiveRepository {
-  final SearchedHistoryLocalDataSource _historyDataSource;
+  final BrowsingHistoryDataSource _browsingHistoryDataSource;
   final FavoritesRemoteDataSource _favoritesDataSource;
   final PdfLocalDataSource _pdfDataSource;
   final RecommendedWorksLocalDataSource _recommendedDataSource;
   final UserArchiveRemoteDataSource _remoteDataSource;
+  // SQLite の isFavorite 同期用（セッション⑥で削除予定）
+  final SearchedHistoryLocalDataSource _legacyHistoryDataSource;
 
   UserArchiveRepositoryImpl(
-    this._historyDataSource,
+    this._browsingHistoryDataSource,
     this._favoritesDataSource,
     this._pdfDataSource,
     this._recommendedDataSource,
     this._remoteDataSource,
+    this._legacyHistoryDataSource,
   );
 
   @override
   Future<List<Searched>?> getAllHistory() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
     try {
-      return await _historyDataSource.getAllHistory();
+      return await _browsingHistoryDataSource.getAllHistory(userId);
     } catch (e) {
       throw mapException(e);
     }
@@ -44,16 +50,8 @@ class UserArchiveRepositoryImpl
     try {
       final favoriteIds = await _favoritesDataSource.getFavoriteIds(userId);
       if (favoriteIds.isEmpty) return null;
-      // セッション③完了まで SQLite の閲覧履歴を取得源とする。
-      // そのため新デバイスや履歴削除後はお気に入り一覧に表示されない制約がある。
-      // browsing_history の Supabase 移行後に Supabase から直接取得する実装に切り替える。
-      final allHistory = await _historyDataSource.getAllHistory();
-      if (allHistory == null) return null;
-      final favorites = allHistory
-          .where((h) => favoriteIds.contains(h.documentID))
-          .map((h) => h.copyWith(isFavorite: true))
-          .toList();
-      return favorites.isEmpty ? null : favorites;
+      return await _browsingHistoryDataSource.getHistoryByIds(
+          userId, favoriteIds);
     } catch (e) {
       throw mapException(e);
     }
@@ -61,8 +59,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<void> insertHistory(Searched searched) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
     try {
-      await _historyDataSource.insertHistory(searched);
+      await _browsingHistoryDataSource.recordView(userId, searched);
     } catch (e) {
       throw mapException(e);
     }
@@ -70,8 +70,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<Searched?> getHistory(int documentID) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
     try {
-      return await _historyDataSource.getHistory(documentID);
+      return await _browsingHistoryDataSource.getHistory(userId, documentID);
     } catch (e) {
       throw mapException(e);
     }
@@ -79,8 +81,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<void> deleteHistory(int documentID) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
     try {
-      await _historyDataSource.deleteHistory(documentID);
+      await _browsingHistoryDataSource.deleteHistory(userId, documentID);
     } catch (e) {
       throw mapException(e);
     }
@@ -88,8 +92,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<void> deleteAllHistory() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
     try {
-      await _historyDataSource.deleteAllHistory();
+      await _browsingHistoryDataSource.deleteAllHistory(userId);
     } catch (e) {
       throw mapException(e);
     }
@@ -97,8 +103,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<void> deleteHistoryBefore(DateTime date) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
     try {
-      await _historyDataSource.deleteHistoryBefore(date);
+      await _browsingHistoryDataSource.deleteHistoryBefore(userId, date);
     } catch (e) {
       throw mapException(e);
     }
@@ -106,8 +114,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<HistoryStats> getHistoryStats() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return (count: 0, oldest: null, newest: null);
     try {
-      return await _historyDataSource.getHistoryStats();
+      return await _browsingHistoryDataSource.getHistoryStats(userId);
     } catch (e) {
       throw mapException(e);
     }
@@ -115,8 +125,22 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<List<DateTime>> getAllHistorySavedDates() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return [];
     try {
-      return await _historyDataSource.getAllSavedDates();
+      return await _browsingHistoryDataSource.getAllViewedDates(userId);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<void> updateHistoryWork(int documentID, Searched latest) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+    try {
+      await _browsingHistoryDataSource.updateWorkInHistory(
+          userId, documentID, latest);
     } catch (e) {
       throw mapException(e);
     }
@@ -148,9 +172,22 @@ class UserArchiveRepositoryImpl
       throw mapException(e);
     }
 
+    // browsing_history の likes をバックグラウンドで更新（失敗しても無視）
+    _updateBrowsingHistoryLikesSilently(
+        userId, documentID, nextIsFavorite ? 1 : -1);
+
     // SQLite の isFavorite も同期（セッション⑥で削除予定）
-    await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
-    await _historyDataSource.updateLikes(documentID, nextIsFavorite ? 1 : -1);
+    await _legacyHistoryDataSource.changeFavoriteState(
+        documentID, nextIsFavorite);
+    await _legacyHistoryDataSource.updateLikes(
+        documentID, nextIsFavorite ? 1 : -1);
+  }
+
+  void _updateBrowsingHistoryLikesSilently(
+      String userId, int documentID, int delta) {
+    _browsingHistoryDataSource
+        .updateLikes(userId, documentID, delta)
+        .catchError((_) {});
   }
 
   @override
