@@ -7,14 +7,16 @@ import 'package:kenryo_tankyu/features/search/data/datasources/search_data_sourc
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search_result.dart';
 import 'package:kenryo_tankyu/features/search/domain/repositories/search_repository.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_repository_impl.g.dart';
 
 class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
-  SearchRepositoryImpl(this._dataSource);
+  SearchRepositoryImpl(this._dataSource, this._getFavoriteIds);
 
   final SearchDataSource _dataSource;
+  final Set<int> Function() _getFavoriteIds;
 
   @override
   Future<SearchResult?> search({
@@ -42,9 +44,13 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
       if (hits.isEmpty) {
         return null;
       } else {
+        final favoriteIds = _getFavoriteIds();
         return SearchResult(
           hits: hits
-              .map((object) => Searched.fromAlgolia(object, false))
+              .map((object) => Searched.fromAlgolia(
+                    object,
+                    favoriteIds.contains(int.parse(object.objectID)),
+                  ))
               .toList(),
           page: response.page ?? page,
           nbPages: response.nbPages ?? 1,
@@ -72,6 +78,7 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
     }
 
     try {
+      final favoriteIds = _getFavoriteIds();
       for (final page in pages) {
         final query = SearchForHits(
           indexName: 'firestore',
@@ -83,7 +90,10 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
             .searchIndex(request: query)
             .timeout(const Duration(seconds: 5));
         final hits = resp.hits;
-        results.addAll(hits.map((e) => Searched.fromAlgolia(e, false)));
+        results.addAll(hits.map((e) => Searched.fromAlgolia(
+              e,
+              favoriteIds.contains(int.parse(e.objectID)),
+            )));
       }
     } catch (e) {
       throw mapException(e);
@@ -114,5 +124,8 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
 @riverpod
 SearchRepository searchRepository(Ref ref) {
   final dataSource = ref.watch(searchDataSourceProvider);
-  return SearchRepositoryImpl(dataSource);
+  return SearchRepositoryImpl(
+    dataSource,
+    () => ref.read(favoriteIdsCacheProvider),
+  );
 }

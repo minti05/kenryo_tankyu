@@ -5,6 +5,7 @@ import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
@@ -19,6 +20,7 @@ part 'user_archive_providers.g.dart';
 @riverpod
 UserArchiveRepository userArchiveRepository(Ref ref) {
   final historyDataSource = ref.watch(searchedHistoryLocalDataSourceProvider);
+  final favoritesDataSource = ref.watch(favoritesRemoteDataSourceProvider);
   final pdfDataSource = ref.watch(pdfLocalDataSourceProvider);
   final recommendedDataSource =
       ref.watch(recommendedWorksLocalDataSourceProvider);
@@ -26,10 +28,25 @@ UserArchiveRepository userArchiveRepository(Ref ref) {
 
   return UserArchiveRepositoryImpl(
     historyDataSource,
+    favoritesDataSource,
     pdfDataSource,
     recommendedDataSource,
     remoteDataSource,
   );
+}
+
+@Riverpod(keepAlive: true)
+class FavoriteIdsCache extends _$FavoriteIdsCache {
+  @override
+  Set<int> build() => {};
+
+  Future<void> initialize(String userId) async {
+    final dataSource = ref.read(favoritesRemoteDataSourceProvider);
+    state = await dataSource.getFavoriteIds(userId);
+  }
+
+  void add(int id) => state = {...state, id};
+  void remove(int id) => state = state.difference({id});
 }
 
 /// ボタン連打防止を管理するProvider
@@ -65,8 +82,14 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
     state = const AsyncLoading<bool>();
 
     state = await AsyncValue.guard(() async {
-      // Repository handles both local DB and remote Firestore updates
       await repository.changeFavoriteState(documentID, nextIsFavorite);
+
+      // インメモリキャッシュを即時更新
+      if (nextIsFavorite) {
+        ref.read(favoriteIdsCacheProvider.notifier).add(documentID);
+      } else {
+        ref.read(favoriteIdsCacheProvider.notifier).remove(documentID);
+      }
 
       // 関連するProviderを無効化
       ref.invalidate(searchedHistoryProvider);

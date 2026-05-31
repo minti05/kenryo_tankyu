@@ -1,7 +1,9 @@
 import 'dart:typed_data';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/user_archive/data/datasources/favorites_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/pdf_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/recommended_works_local_data_source.dart';
 import 'package:kenryo_tankyu/features/user_archive/data/datasources/searched_history_local_data_source.dart';
@@ -13,12 +15,14 @@ class UserArchiveRepositoryImpl
     with ErrorMapper
     implements UserArchiveRepository {
   final SearchedHistoryLocalDataSource _historyDataSource;
+  final FavoritesRemoteDataSource _favoritesDataSource;
   final PdfLocalDataSource _pdfDataSource;
   final RecommendedWorksLocalDataSource _recommendedDataSource;
   final UserArchiveRemoteDataSource _remoteDataSource;
 
   UserArchiveRepositoryImpl(
     this._historyDataSource,
+    this._favoritesDataSource,
     this._pdfDataSource,
     this._recommendedDataSource,
     this._remoteDataSource,
@@ -35,8 +39,18 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<List<Searched>?> getFavoriteHistory() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
     try {
-      return await _historyDataSource.getFavoriteHistory();
+      final favoriteIds = await _favoritesDataSource.getFavoriteIds(userId);
+      if (favoriteIds.isEmpty) return null;
+      final allHistory = await _historyDataSource.getAllHistory();
+      if (allHistory == null) return null;
+      final favorites = allHistory
+          .where((h) => favoriteIds.contains(h.documentID))
+          .map((h) => h.copyWith(isFavorite: true))
+          .toList();
+      return favorites.isEmpty ? null : favorites;
     } catch (e) {
       throw mapException(e);
     }
@@ -107,24 +121,32 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<void> changeFavoriteState(int documentID, bool nextIsFavorite) async {
-    // isFavorite は楽観的に SQLite へ即時保存。
-    // likes カウントは Firestore の更新が確認できた後にのみ SQLite を更新する。
-    // Firestore 失敗時のみ isFavorite をロールバックして不整合を防ぐ。
-    // updateLikes（SQLite）の失敗時はロールバック不要（Firestore は既に成功済み）。
-    final previousIsFavorite = !nextIsFavorite;
-    await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) throw mapException(Exception('ログインしていません'));
+
+    // Supabase favorites テーブルを更新（主ストア）
+    if (nextIsFavorite) {
+      await _favoritesDataSource.addFavorite(userId, documentID);
+    } else {
+      await _favoritesDataSource.removeFavorite(userId, documentID);
+    }
+
+    // Firestore の likes カウントを更新（失敗時は Supabase をロールバック）
     try {
       await updateRemoteLikes(documentID, nextIsFavorite);
     } catch (e) {
-      // Firestore 失敗: SQLite の isFavorite をロールバック
       try {
-        await _historyDataSource.changeFavoriteState(
-            documentID, previousIsFavorite);
-      } catch (_) {
-        // ロールバック自体が失敗した場合は無視
-      }
+        if (nextIsFavorite) {
+          await _favoritesDataSource.removeFavorite(userId, documentID);
+        } else {
+          await _favoritesDataSource.addFavorite(userId, documentID);
+        }
+      } catch (_) {}
       throw mapException(e);
     }
+
+    // SQLite の isFavorite も同期（セッション⑥で削除予定）
+    await _historyDataSource.changeFavoriteState(documentID, nextIsFavorite);
     await _historyDataSource.updateLikes(documentID, nextIsFavorite ? 1 : -1);
   }
 
@@ -141,8 +163,10 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<bool> getFavoriteState(int documentID) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return false;
     try {
-      return await _historyDataSource.getFavoriteState(documentID);
+      return await _favoritesDataSource.isFavorite(userId, documentID);
     } catch (e) {
       throw mapException(e);
     }
@@ -150,8 +174,13 @@ class UserArchiveRepositoryImpl
 
   @override
   Future<List<int>?>? getSomeFavoriteState(List<int> documentIDs) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
     try {
-      return await _historyDataSource.getSomeFavoriteState(documentIDs);
+      final favoriteIds = await _favoritesDataSource.getFavoriteIds(userId);
+      final result =
+          documentIDs.where((id) => favoriteIds.contains(id)).toList();
+      return result.isEmpty ? null : result;
     } catch (e) {
       throw mapException(e);
     }
