@@ -59,8 +59,11 @@ class DisplayPdf extends ConsumerWidget {
               error: (error, _) {
                 if (error is ServerFailure &&
                     error.code == 'object-not-found') {
-                  return const Center(
-                    child: Text('ファイルが見つかりませんでした'),
+                  return const CommonErrorView(
+                    error: ServerFailure(
+                      message: 'ファイルが見つかりませんでした',
+                      code: 'object-not-found',
+                    ),
                   );
                 }
                 return CommonErrorView(
