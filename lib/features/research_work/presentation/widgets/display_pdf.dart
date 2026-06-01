@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -55,12 +56,20 @@ class DisplayPdf extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => CommonErrorView(
-                error: error,
-                onRetry: () => ref.invalidate(
-                  pdfProvider(nowWatchingPdf, searched.enterYear),
-                ),
-              ),
+              error: (error, _) {
+                if (error is ServerFailure &&
+                    error.code == 'object-not-found') {
+                  return const Center(
+                    child: Text('ファイルが見つかりませんでした'),
+                  );
+                }
+                return CommonErrorView(
+                  error: error,
+                  onRetry: () => ref.invalidate(
+                    pdfProvider(nowWatchingPdf, searched.enterYear),
+                  ),
+                );
+              },
             );
           }),
           Align(
