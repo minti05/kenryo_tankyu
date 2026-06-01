@@ -161,29 +161,73 @@ class UserIsFavoriteState extends _$UserIsFavoriteState {
   }
 }
 
+/// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+/// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+/// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
 @riverpod
-Future<List<Searched>?> searchedHistory(Ref ref, bool onlyShowFavorite) async {
-  final repository = ref.watch(userArchiveRepositoryProvider);
+class SearchedHistoryNotifier extends _$SearchedHistoryNotifier {
+  static const _pageSize = 20;
 
-  // キャッシュが既にあれば同期的に取得し、ローディング状態を経由しない。
-  // これにより お気に入り追加・削除時の UI ちらつき（再ローディング）を防ぐ。
-  // 初回ロード時（asData が null）のみ future を await してローディング状態を伝播させる。
-  final favoriteIdsValue = ref.watch(favoriteIdsCacheProvider);
-  final favoriteIds = favoriteIdsValue.asData?.value;
-  if (favoriteIds == null) {
-    await ref.watch(favoriteIdsCacheProvider.future);
-    return null;
+  /// まだ取得できるページがあるか
+  bool _hasMore = true;
+
+  /// 追加ロード中の多重呼び出しを防ぐフラグ
+  bool _isFetchingMore = false;
+
+  bool get hasMore => _hasMore;
+
+  @override
+  Future<List<Searched>> build(bool onlyShowFavorite) async {
+    _hasMore = true;
+    _isFetchingMore = false;
+
+    // お気に入りIDキャッシュが揃うまで待機
+    final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
+
+    final items = await _fetchPage(0, favoriteIds);
+    _hasMore = items.length >= _pageSize;
+    return items;
   }
 
-  if (onlyShowFavorite) {
-    if (favoriteIds.isEmpty) return null;
-    return repository.getFavoriteHistoryByIds(favoriteIds);
-  } else {
-    final history = await repository.getAllHistory();
-    if (history == null) return null;
-    return history
-        .map((h) => h.copyWith(isFavorite: favoriteIds.contains(h.documentID)))
-        .toList();
+  Future<void> fetchMore() async {
+    if (!_hasMore || _isFetchingMore) return;
+    final current = state.asData?.value;
+    if (current == null) return;
+
+    _isFetchingMore = true;
+    try {
+      final favoriteIds =
+          ref.read(favoriteIdsCacheProvider).asData?.value ?? {};
+      final newItems = await _fetchPage(current.length, favoriteIds);
+      if (!ref.mounted) return;
+      _hasMore = newItems.length >= _pageSize;
+      state = AsyncData([...current, ...newItems]);
+    } finally {
+      _isFetchingMore = false;
+    }
+  }
+
+  Future<List<Searched>> _fetchPage(int offset, Set<int> favoriteIds) async {
+    final repository = ref.read(userArchiveRepositoryProvider);
+    if (onlyShowFavorite) {
+      if (favoriteIds.isEmpty) return [];
+      final items = await repository.getFavoriteHistoryPaged(
+        favoriteIds,
+        from: offset,
+        limit: _pageSize,
+      );
+      return items ?? [];
+    } else {
+      final items = await repository.getHistoryPaged(
+        from: offset,
+        limit: _pageSize,
+      );
+      if (items == null) return [];
+      return items
+          .map(
+              (h) => h.copyWith(isFavorite: favoriteIds.contains(h.documentID)))
+          .toList();
+    }
   }
 }
 

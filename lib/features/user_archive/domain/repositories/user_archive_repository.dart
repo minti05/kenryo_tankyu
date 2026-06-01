@@ -6,8 +6,14 @@ import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 abstract class UserArchiveRepository {
   // History
   Future<List<Searched>?> getAllHistory();
+  Future<List<Searched>?> getHistoryPaged({int from = 0, int limit = 20});
   Future<List<Searched>?> getFavoriteHistory();
   Future<List<Searched>?> getFavoriteHistoryByIds(Set<int> ids);
+  Future<List<Searched>?> getFavoriteHistoryPaged(
+    Set<int> ids, {
+    int from = 0,
+    int limit = 20,
+  });
   Future<void> insertHistory(Searched searched);
   Future<Searched?> getHistory(int documentID);
   Future<void> deleteHistory(int documentID);
