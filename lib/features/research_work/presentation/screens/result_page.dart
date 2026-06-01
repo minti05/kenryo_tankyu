@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/screens/pdf_expand_page.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/utils/share_helper.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/header_for_result.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_title.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_details_table.dart';
@@ -128,14 +129,25 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
   }
 
   void _showAlertDialog() {
+    if (!mounted) return;
+    final searchedAsync = ref.read(searchedItemProvider(widget.documentID));
+    final searched = searchedAsync.hasValue ? searchedAsync.requireValue : null;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('⚠️注意⚠ｚ️'),
+          title: const Text('⚠️注意⚠️'),
           content: const Text(
               'スクリーンショットを検知しました。\nプライバシー保護の観点から、第三者に撮った画面を共有しないでください。'),
           actions: [
+            if (searched != null)
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await shareSearched(searched);
+                },
+                child: const Text('代わりに共有する...'),
+              ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
