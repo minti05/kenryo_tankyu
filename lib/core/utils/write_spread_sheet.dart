@@ -32,7 +32,7 @@ class EditSpreadSheet {
       String userEmail, int documentID) async {
     // 認証情報ファイルの読み込み
     final credentials = await rootBundle
-        .loadString('assets/your_service_account_credentials.json');
+        .loadString('assets/sheets_service_account.json');
     final jsonCredentials = jsonDecode(credentials);
 
     // OAuth2クライアントを作成

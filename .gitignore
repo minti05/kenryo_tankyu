@@ -34,7 +34,7 @@ migrate_working_dir/
 /build/
 
 # My specify ignore
-/assets/your_service_account_credentials.json
+/assets/sheets_service_account.json
 
 # Symbolication related
 app.*.symbols

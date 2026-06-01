@@ -110,7 +110,7 @@ flutter:
     - assets/images/category_old/
     - assets/images/categories/
     - assets/images/app_icon/
-    - assets/your_service_account_credentials.json
+    - assets/sheets_service_account.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
