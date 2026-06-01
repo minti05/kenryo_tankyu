@@ -129,6 +129,7 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
   }
 
   void _showAlertDialog() {
+    if (!mounted) return;
     final searchedAsync = ref.read(searchedItemProvider(widget.documentID));
     final searched = searchedAsync.hasValue ? searchedAsync.requireValue : null;
     showDialog(
