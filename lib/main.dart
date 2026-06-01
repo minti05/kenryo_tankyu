@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
@@ -38,13 +37,11 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final supabaseConfig = jsonDecode(
-    await rootBundle.loadString('assets/supabase_config.json'),
-  ) as Map<String, dynamic>;
+  await dotenv.load(fileName: 'assets/.env');
 
   await Supabase.initialize(
-    url: supabaseConfig['url'] as String,
-    anonKey: supabaseConfig['anon_key'] as String,
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   final sharedPreferences = await SharedPreferences.getInstance();
