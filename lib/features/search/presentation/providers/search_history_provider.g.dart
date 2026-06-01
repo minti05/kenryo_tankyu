@@ -34,7 +34,7 @@ final class SearchHistoryCacheProvider
 }
 
 String _$searchHistoryCacheHash() =>
-    r'255fd3a7e018fbebd7df5d79fc3fd55290551337';
+    r'55a0fc32376ab58e602c718ea9f359e194a44cf0';
 
 abstract class _$SearchHistoryCache extends $AsyncNotifier<List<Search>?> {
   FutureOr<List<Search>?> build();

@@ -49,4 +49,4 @@ final class SearchRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$searchRepositoryHash() => r'b8b084724253ff80c1ff6cb607664b54c16360ae';
+String _$searchRepositoryHash() => r'4218f581009a5f348c3858e81e25c882374be6f4';
