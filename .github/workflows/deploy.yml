@@ -60,7 +60,7 @@ jobs:
       - name: Restore Firebase credentials
         env:
           FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
-        run: printf "%s" "$FIREBASE_CREDENTIALS" > assets/your_service_account_credentials.json
+        run: printf "%s" "$FIREBASE_CREDENTIALS" > assets/sheets_service_account.json
 
       # match が証明書リポジトリに SSH でアクセスするための設定
       - name: Configure SSH for match
