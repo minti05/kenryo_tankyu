@@ -72,8 +72,9 @@ class PdfLocalDataSource {
     final DocumentType documentType =
         DocumentType.values.firstWhere((e) => e.idSuffix == id.substring(7));
 
-    final pathReference = _storage.ref().child(
-        'works_2025_latest/${enterYear.name}/${documentType.name}/$id.pdf');
+    final pathReference = _storage
+        .ref()
+        .child('works/${enterYear.name}/${documentType.name}/$id.pdf');
     const storage = 1024 * 1024 * 3;
 
     ///これ以上のサイズ（3MB）のファイルは読み込めないように設定してあります。

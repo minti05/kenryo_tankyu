@@ -31,8 +31,8 @@ class EditSpreadSheet {
   Future<void> addDataToSheet(String range, List<String> values,
       String userEmail, int documentID) async {
     // 認証情報ファイルの読み込み
-    final credentials = await rootBundle
-        .loadString('assets/your_service_account_credentials.json');
+    final credentials =
+        await rootBundle.loadString('assets/sheets_service_account.json');
     final jsonCredentials = jsonDecode(credentials);
 
     // OAuth2クライアントを作成

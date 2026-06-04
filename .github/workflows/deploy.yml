@@ -35,11 +35,11 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Create Supabase config
+      - name: Create .env
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        run: printf '{"url":"%s","anon_key":"%s"}' "$SUPABASE_URL" "$SUPABASE_ANON_KEY" > assets/supabase_config.json
+        run: printf 'SUPABASE_URL=%s\nSUPABASE_ANON_KEY=%s\n' "$SUPABASE_URL" "$SUPABASE_ANON_KEY" > assets/.env
 
       - name: Flutter pub get
         run: flutter pub get
@@ -60,7 +60,7 @@ jobs:
       - name: Restore Firebase credentials
         env:
           FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
-        run: printf "%s" "$FIREBASE_CREDENTIALS" > assets/your_service_account_credentials.json
+        run: printf "%s" "$FIREBASE_CREDENTIALS" > assets/sheets_service_account.json
 
       # match が証明書リポジトリに SSH でアクセスするための設定
       - name: Configure SSH for match
