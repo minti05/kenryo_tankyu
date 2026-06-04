@@ -34,7 +34,7 @@ migrate_working_dir/
 /build/
 
 # My specify ignore
-/assets/your_service_account_credentials.json
+/assets/sheets_service_account.json
 
 # Symbolication related
 app.*.symbols
@@ -54,5 +54,5 @@ app.*.map.json
 .firebase/
 firepit-log.txt
 
-# Supabase config (distributed manually)
-assets/supabase_config.json
+# Env file (distributed manually; use assets/.env.example as template)
+assets/.env
