@@ -39,9 +39,18 @@ Future<void> main() async {
 
   await dotenv.load(fileName: 'assets/.env');
 
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    throw StateError(
+      'assets/.env に SUPABASE_URL または SUPABASE_ANON_KEY が定義されていません。'
+      'assets/.env.example を参考に assets/.env を作成してください。',
+    );
+  }
+
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   final sharedPreferences = await SharedPreferences.getInstance();
