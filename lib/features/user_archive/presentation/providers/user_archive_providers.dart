@@ -185,7 +185,7 @@ class SearchedHistoryNotifier extends _$SearchedHistoryNotifier {
     final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
 
     final items = await _fetchPage(0, favoriteIds);
-    _hasMore = items.length >= _pageSize;
+    _hasMore = items.length == _pageSize;
     return items;
   }
 
@@ -200,7 +200,7 @@ class SearchedHistoryNotifier extends _$SearchedHistoryNotifier {
           ref.read(favoriteIdsCacheProvider).asData?.value ?? {};
       final newItems = await _fetchPage(current.length, favoriteIds);
       if (!ref.mounted) return;
-      _hasMore = newItems.length >= _pageSize;
+      _hasMore = newItems.length == _pageSize;
       state = AsyncData([...current, ...newItems]);
     } finally {
       _isFetchingMore = false;
