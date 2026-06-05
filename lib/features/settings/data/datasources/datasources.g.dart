@@ -10,13 +10,13 @@ part of 'datasources.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(settingsDataSource)
-const settingsDataSourceProvider = SettingsDataSourceProvider._();
+final settingsDataSourceProvider = SettingsDataSourceProvider._();
 
 final class SettingsDataSourceProvider extends $FunctionalProvider<
     SettingsDataSource,
     SettingsDataSource,
     SettingsDataSource> with $Provider<SettingsDataSource> {
-  const SettingsDataSourceProvider._()
+  SettingsDataSourceProvider._()
       : super(
           from: null,
           argument: null,

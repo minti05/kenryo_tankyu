@@ -10,11 +10,11 @@ part of 'search_history_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(SearchHistoryCache)
-const searchHistoryCacheProvider = SearchHistoryCacheProvider._();
+final searchHistoryCacheProvider = SearchHistoryCacheProvider._();
 
 final class SearchHistoryCacheProvider
     extends $AsyncNotifierProvider<SearchHistoryCache, List<Search>?> {
-  const SearchHistoryCacheProvider._()
+  SearchHistoryCacheProvider._()
       : super(
           from: null,
           argument: null,
@@ -41,13 +41,12 @@ abstract class _$SearchHistoryCache extends $AsyncNotifier<List<Search>?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<List<Search>?>, List<Search>?>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<List<Search>?>, List<Search>?>,
         AsyncValue<List<Search>?>,
         Object?,
         Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

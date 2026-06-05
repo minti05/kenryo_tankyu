@@ -10,13 +10,13 @@ part of 'search_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(searchDataSource)
-const searchDataSourceProvider = SearchDataSourceProvider._();
+final searchDataSourceProvider = SearchDataSourceProvider._();
 
 final class SearchDataSourceProvider extends $FunctionalProvider<
     SearchDataSource,
     SearchDataSource,
     SearchDataSource> with $Provider<SearchDataSource> {
-  const SearchDataSourceProvider._()
+  SearchDataSourceProvider._()
       : super(
           from: null,
           argument: null,

@@ -10,12 +10,12 @@ part of 'auth_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(authStateChanges)
-const authStateChangesProvider = AuthStateChangesProvider._();
+final authStateChangesProvider = AuthStateChangesProvider._();
 
 final class AuthStateChangesProvider
     extends $FunctionalProvider<AsyncValue<User?>, User?, Stream<User?>>
     with $FutureModifier<User?>, $StreamProvider<User?> {
-  const AuthStateChangesProvider._()
+  AuthStateChangesProvider._()
       : super(
           from: null,
           argument: null,
@@ -43,10 +43,10 @@ final class AuthStateChangesProvider
 String _$authStateChangesHash() => r'f95512f3016c4609549bf37ef775d5ac547a7179';
 
 @ProviderFor(AuthNotifier)
-const authProvider = AuthNotifierProvider._();
+final authProvider = AuthNotifierProvider._();
 
 final class AuthNotifierProvider extends $NotifierProvider<AuthNotifier, Auth> {
-  const AuthNotifierProvider._()
+  AuthNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -73,17 +73,16 @@ final class AuthNotifierProvider extends $NotifierProvider<AuthNotifier, Auth> {
   }
 }
 
-String _$authNotifierHash() => r'833627c63f0f131408f4298cbf5537bca2f75ff3';
+String _$authNotifierHash() => r'c3374bc1ae0b901437a360b0b1da043e5a04c6c8';
 
 abstract class _$AuthNotifier extends $Notifier<Auth> {
   Auth build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<Auth, Auth>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<Auth, Auth>, Auth, Object?, Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

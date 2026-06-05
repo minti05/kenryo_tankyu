@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.2.0+1
+version: 1.2.1+1
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
@@ -35,7 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  go_router: ^16.3.0
+  go_router: ^17.2.3
   flutter_riverpod: ^3.0.3
   firebase_core: ^4.2.1
   firebase_messaging: ^16.0.4
@@ -44,6 +44,8 @@ dependencies:
   google_sign_in: ^7.2.0
   equatable: ^2.0.5
   firebase_storage: ^13.0.4
+  firebase_crashlytics: ^5.2.3
+  firebase_analytics: ^12.4.2
   cached_network_image: ^3.3.1
   freezed_annotation: ^3.1.0
   path_provider: ^2.1.2
@@ -54,7 +56,7 @@ dependencies:
   external_path: ^2.2.0
   json_annotation: ^4.9.0
   shared_preferences: ^2.2.3
-  googleapis: ^15.0.0
+  googleapis: ^16.0.0
   googleapis_auth: ^2.0.0
   flutter_pdfview: ^1.3.2
   screenshot_callback: ^3.0.1
@@ -69,6 +71,7 @@ dependencies:
   connectivity_plus: ^7.0.0
   share_plus: ^12.0.2
   supabase_flutter: ^2.8.4
+  flutter_dotenv: ^6.0.1
 
 dev_dependencies:
   flutter_test:
@@ -83,7 +86,7 @@ dev_dependencies:
   freezed: ^3.2.3
   build_runner: ^2.4.8
   json_serializable: ^6.7.1
-  riverpod_generator: ^3.0.3
+  riverpod_generator: ^4.0.0+1
   flutter_native_splash: ^2.3.10
   flutter_launcher_icons: ^0.14.2
   go_router_builder: ^4.1.1
@@ -101,7 +104,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/supabase_config.json
+    - assets/.env
     - assets/images/
     - assets/images/text/
     - assets/files/sample.pdf
@@ -109,7 +112,7 @@ flutter:
     - assets/images/category_old/
     - assets/images/categories/
     - assets/images/app_icon/
-    - assets/your_service_account_credentials.json
+    - assets/sheets_service_account.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

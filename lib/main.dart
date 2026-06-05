@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
@@ -13,6 +11,7 @@ import 'package:kenryo_tankyu/core/router/router.dart';
 import 'package:kenryo_tankyu/core/theme/theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
+import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -21,30 +20,28 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // グローバルエラーハンドラーの設定
-  FlutterError.onError = (FlutterErrorDetails details) {
-    debugPrint('FlutterError: ${details.exception}');
-    debugPrintStack(stackTrace: details.stack);
-  };
-
-  PlatformDispatcher.instance.onError = (Object error, StackTrace stackTrace) {
-    debugPrint('PlatformError: $error');
-    debugPrintStack(stackTrace: stackTrace);
-    return true;
-  };
-
   // 依存性の事前初期化 (Strict Initialization)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final supabaseConfig = jsonDecode(
-    await rootBundle.loadString('assets/supabase_config.json'),
-  ) as Map<String, dynamic>;
+  // Crashlytics / Analytics の初期化 (グローバルエラーハンドラーを含む)
+  await FirebaseTrackingService.initialize();
+
+  await dotenv.load(fileName: 'assets/.env');
+
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    throw StateError(
+      'assets/.env に SUPABASE_URL または SUPABASE_ANON_KEY が定義されていません。'
+      'assets/.env.example を参考に assets/.env を作成してください。',
+    );
+  }
 
   await Supabase.initialize(
-    url: supabaseConfig['url'] as String,
-    anonKey: supabaseConfig['anon_key'] as String,
+    url: supabaseUrl,
+    publishableKey: supabaseAnonKey,
   );
 
   final sharedPreferences = await SharedPreferences.getInstance();

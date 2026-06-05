@@ -10,13 +10,13 @@ part of 'search_history_repository_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(searchHistoryRepository)
-const searchHistoryRepositoryProvider = SearchHistoryRepositoryProvider._();
+final searchHistoryRepositoryProvider = SearchHistoryRepositoryProvider._();
 
 final class SearchHistoryRepositoryProvider extends $FunctionalProvider<
     SearchHistoryRepository,
     SearchHistoryRepository,
     SearchHistoryRepository> with $Provider<SearchHistoryRepository> {
-  const SearchHistoryRepositoryProvider._()
+  SearchHistoryRepositoryProvider._()
       : super(
           from: null,
           argument: null,
