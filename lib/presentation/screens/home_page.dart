@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -100,7 +101,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 16),
             if (kDebugMode)
               TextButton(
-                onPressed: () => throw Exception('Crashlytics test exception'),
+                onPressed: () => FirebaseCrashlytics.instance.crash(),
                 child: const Text('Throw Test Exception'),
               ),
           ],

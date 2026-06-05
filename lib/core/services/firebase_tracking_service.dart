@@ -8,7 +8,9 @@ class FirebaseTrackingService {
 
   /// アプリ起動時に呼ぶ。Flutter/Platformエラーを Crashlytics に流す。
   static Future<void> initialize() async {
-    await _crashlytics.setCrashlyticsCollectionEnabled(!kDebugMode);
+    // デバッグビルドでも Crashlytics を有効にする（テスト・検証用途）
+    // 本番同様の動作を確認するには flutter run --profile を推奨
+    await _crashlytics.setCrashlyticsCollectionEnabled(true);
 
     FlutterError.onError = (FlutterErrorDetails details) {
       if (kDebugMode) {
