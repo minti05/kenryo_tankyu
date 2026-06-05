@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -97,6 +98,11 @@ class _HomePageState extends ConsumerState<HomePage> {
               },
             ),
             const SizedBox(height: 16),
+            if (kDebugMode)
+              TextButton(
+                onPressed: () => throw Exception('Crashlytics test exception'),
+                child: const Text('Throw Test Exception'),
+              ),
           ],
         ),
       ),

@@ -19,9 +19,20 @@ class FirebaseTrackingService {
     };
 
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+      if (kDebugMode) {
+        // デバッグ時は Crashlytics に送らず、エラーをコンソールへ流す
+        return false;
+      }
       _crashlytics.recordError(error, stack, fatal: true);
       return true;
     };
+  }
+
+  /// ログイン中ユーザーのメールアドレスを Crashlytics に紐付ける。
+  /// ログアウト時は null を渡してクリアする。
+  static Future<void> setUserEmail(String? email) async {
+    await _crashlytics.setUserIdentifier(email ?? '');
+    await _analytics.setUserId(id: email);
   }
 
   /// PDFが Storage に存在しない (object-not-found) エラーを記録する。
@@ -39,20 +50,22 @@ class FirebaseTrackingService {
     );
   }
 
-  /// ログイン失敗を記録する。
+  /// ログイン失敗を記録する（連続失敗が閾値以上のときだけ呼ぶ想定）。
   static void logAuthFailure({
     required String method,
     required String errorCode,
     required String errorMessage,
+    required int failureCount,
   }) {
     _crashlytics.log(
-      'Auth failure: method=$method code=$errorCode message=$errorMessage',
+      'Auth failure #$failureCount: method=$method code=$errorCode message=$errorMessage',
     );
     _analytics.logEvent(
       name: 'auth_failure',
       parameters: {
         'method': method,
         'error_code': errorCode,
+        'failure_count': failureCount,
       },
     );
   }

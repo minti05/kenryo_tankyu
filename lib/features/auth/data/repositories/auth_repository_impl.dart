@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kenryo_tankyu/core/error/error_mapper.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
-import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:kenryo_tankyu/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:kenryo_tankyu/features/auth/domain/repositories/auth_repository.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
@@ -24,13 +23,7 @@ class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
           .signInWithEmailAndPassword(email: email, password: password)
           .timeout(const Duration(seconds: 10));
     } on FirebaseAuthException catch (e) {
-      final failure = _mapFirebaseException(e);
-      FirebaseTrackingService.logAuthFailure(
-        method: 'signIn',
-        errorCode: e.code,
-        errorMessage: e.message ?? '',
-      );
-      throw failure;
+      throw _mapFirebaseException(e);
     } catch (e) {
       throw mapException(e);
     }
@@ -44,13 +37,7 @@ class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
           .createUserWithEmailAndPassword(email: email, password: password)
           .timeout(const Duration(seconds: 10));
     } on FirebaseAuthException catch (e) {
-      final failure = _mapFirebaseException(e);
-      FirebaseTrackingService.logAuthFailure(
-        method: 'createUser',
-        errorCode: e.code,
-        errorMessage: e.message ?? '',
-      );
-      throw failure;
+      throw _mapFirebaseException(e);
     } catch (e) {
       throw mapException(e);
     }
