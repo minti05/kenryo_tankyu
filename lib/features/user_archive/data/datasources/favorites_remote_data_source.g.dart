@@ -10,13 +10,13 @@ part of 'favorites_remote_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(favoritesRemoteDataSource)
-const favoritesRemoteDataSourceProvider = FavoritesRemoteDataSourceProvider._();
+final favoritesRemoteDataSourceProvider = FavoritesRemoteDataSourceProvider._();
 
 final class FavoritesRemoteDataSourceProvider extends $FunctionalProvider<
     FavoritesRemoteDataSource,
     FavoritesRemoteDataSource,
     FavoritesRemoteDataSource> with $Provider<FavoritesRemoteDataSource> {
-  const FavoritesRemoteDataSourceProvider._()
+  FavoritesRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,

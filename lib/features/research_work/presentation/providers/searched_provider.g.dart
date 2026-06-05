@@ -10,11 +10,11 @@ part of 'searched_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ResearchWork)
-const researchWorkProvider = ResearchWorkFamily._();
+final researchWorkProvider = ResearchWorkFamily._();
 
 final class ResearchWorkProvider
     extends $AsyncNotifierProvider<ResearchWork, Searched> {
-  const ResearchWorkProvider._(
+  ResearchWorkProvider._(
       {required ResearchWorkFamily super.from, required int super.argument})
       : super(
           retry: null,
@@ -55,7 +55,7 @@ final class ResearchWorkFamily extends $Family
     with
         $ClassFamilyOverride<ResearchWork, AsyncValue<Searched>, Searched,
             FutureOr<Searched>, int> {
-  const ResearchWorkFamily._()
+  ResearchWorkFamily._()
       : super(
           retry: null,
           name: r'researchWorkProvider',
@@ -83,29 +83,30 @@ abstract class _$ResearchWork extends $AsyncNotifier<Searched> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(
-      _$args,
-    );
     final ref = this.ref as $Ref<AsyncValue<Searched>, Searched>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<Searched>, Searched>,
         AsyncValue<Searched>,
         Object?,
         Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
   }
 }
 
 /// likes のバックグラウンド更新中かどうかを管理するProvider（スナックバー表示に使用）
 
 @ProviderFor(IsRefreshingLikes)
-const isRefreshingLikesProvider = IsRefreshingLikesFamily._();
+final isRefreshingLikesProvider = IsRefreshingLikesFamily._();
 
 /// likes のバックグラウンド更新中かどうかを管理するProvider（スナックバー表示に使用）
 final class IsRefreshingLikesProvider
     extends $NotifierProvider<IsRefreshingLikes, bool> {
   /// likes のバックグラウンド更新中かどうかを管理するProvider（スナックバー表示に使用）
-  const IsRefreshingLikesProvider._(
+  IsRefreshingLikesProvider._(
       {required IsRefreshingLikesFamily super.from,
       required int super.argument})
       : super(
@@ -155,7 +156,7 @@ String _$isRefreshingLikesHash() => r'40a12be1a7035124b01fc174a12ae43c4313a683';
 
 final class IsRefreshingLikesFamily extends $Family
     with $ClassFamilyOverride<IsRefreshingLikes, bool, bool, bool, int> {
-  const IsRefreshingLikesFamily._()
+  IsRefreshingLikesFamily._()
       : super(
           retry: null,
           name: r'isRefreshingLikesProvider',
@@ -187,12 +188,13 @@ abstract class _$IsRefreshingLikes extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(
-      _$args,
-    );
     final ref = this.ref as $Ref<bool, bool>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<bool, bool>, bool, Object?, Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
   }
 }

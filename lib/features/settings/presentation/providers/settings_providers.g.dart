@@ -10,11 +10,11 @@ part of 'settings_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(SettingsNotifier)
-const settingsProvider = SettingsNotifierProvider._();
+final settingsProvider = SettingsNotifierProvider._();
 
 final class SettingsNotifierProvider
     extends $AsyncNotifierProvider<SettingsNotifier, void> {
-  const SettingsNotifierProvider._()
+  SettingsNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -40,24 +40,23 @@ abstract class _$SettingsNotifier extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, void>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(themeMode)
-const themeModeProvider = ThemeModeProvider._();
+final themeModeProvider = ThemeModeProvider._();
 
 final class ThemeModeProvider extends $FunctionalProvider<AsyncValue<ThemeMode>,
         ThemeMode, FutureOr<ThemeMode>>
     with $FutureModifier<ThemeMode>, $FutureProvider<ThemeMode> {
-  const ThemeModeProvider._()
+  ThemeModeProvider._()
       : super(
           from: null,
           argument: null,
@@ -85,12 +84,12 @@ final class ThemeModeProvider extends $FunctionalProvider<AsyncValue<ThemeMode>,
 String _$themeModeHash() => r'd4db32a6d830b04692f9b2d89de15f9f073c85f4';
 
 @ProviderFor(notificationEnabled)
-const notificationEnabledProvider = NotificationEnabledProvider._();
+final notificationEnabledProvider = NotificationEnabledProvider._();
 
 final class NotificationEnabledProvider
     extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
     with $FutureModifier<bool>, $FutureProvider<bool> {
-  const NotificationEnabledProvider._()
+  NotificationEnabledProvider._()
       : super(
           from: null,
           argument: null,
@@ -119,13 +118,13 @@ String _$notificationEnabledHash() =>
     r'15b79648d8f95a700baf52cad4729c3ff66db15a';
 
 @ProviderFor(hasShownNotificationDialog)
-const hasShownNotificationDialogProvider =
+final hasShownNotificationDialogProvider =
     HasShownNotificationDialogProvider._();
 
 final class HasShownNotificationDialogProvider
     extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
     with $FutureModifier<bool>, $FutureProvider<bool> {
-  const HasShownNotificationDialogProvider._()
+  HasShownNotificationDialogProvider._()
       : super(
           from: null,
           argument: null,

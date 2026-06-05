@@ -10,13 +10,13 @@ part of 'teacher_local_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(teacherLocalDataSource)
-const teacherLocalDataSourceProvider = TeacherLocalDataSourceProvider._();
+final teacherLocalDataSourceProvider = TeacherLocalDataSourceProvider._();
 
 final class TeacherLocalDataSourceProvider extends $FunctionalProvider<
     TeacherLocalDataSource,
     TeacherLocalDataSource,
     TeacherLocalDataSource> with $Provider<TeacherLocalDataSource> {
-  const TeacherLocalDataSourceProvider._()
+  TeacherLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,

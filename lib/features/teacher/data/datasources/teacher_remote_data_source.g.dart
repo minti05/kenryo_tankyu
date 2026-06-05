@@ -10,13 +10,13 @@ part of 'teacher_remote_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(teacherRemoteDataSource)
-const teacherRemoteDataSourceProvider = TeacherRemoteDataSourceProvider._();
+final teacherRemoteDataSourceProvider = TeacherRemoteDataSourceProvider._();
 
 final class TeacherRemoteDataSourceProvider extends $FunctionalProvider<
     TeacherRemoteDataSource,
     TeacherRemoteDataSource,
     TeacherRemoteDataSource> with $Provider<TeacherRemoteDataSource> {
-  const TeacherRemoteDataSourceProvider._()
+  TeacherRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,

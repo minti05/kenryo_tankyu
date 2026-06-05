@@ -10,13 +10,13 @@ part of 'browsing_history_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(browsingHistoryDataSource)
-const browsingHistoryDataSourceProvider = BrowsingHistoryDataSourceProvider._();
+final browsingHistoryDataSourceProvider = BrowsingHistoryDataSourceProvider._();
 
 final class BrowsingHistoryDataSourceProvider extends $FunctionalProvider<
     BrowsingHistoryDataSource,
     BrowsingHistoryDataSource,
     BrowsingHistoryDataSource> with $Provider<BrowsingHistoryDataSource> {
-  const BrowsingHistoryDataSourceProvider._()
+  BrowsingHistoryDataSourceProvider._()
       : super(
           from: null,
           argument: null,

@@ -5,6 +5,7 @@ import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class DisplayPdf extends ConsumerWidget {
@@ -56,9 +57,13 @@ class DisplayPdf extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) {
+              error: (error, stack) {
                 if (error is ServerFailure &&
                     error.code == 'object-not-found') {
+                  FirebaseTrackingService.logPdfNotFound(
+                    documentId: searched.documentID,
+                    pdfPath: nowWatchingPdf,
+                  );
                   return const CommonErrorView(
                     error: ServerFailure(
                       message: 'ファイルが見つかりませんでした',
@@ -66,6 +71,8 @@ class DisplayPdf extends ConsumerWidget {
                     ),
                   );
                 }
+                FirebaseTrackingService.recordError(error, stack,
+                    reason: 'pdf_load_error');
                 return CommonErrorView(
                   error: error,
                   onRetry: () => ref.invalidate(
