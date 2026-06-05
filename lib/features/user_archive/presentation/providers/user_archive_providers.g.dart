@@ -237,14 +237,24 @@ abstract class _$UserIsFavoriteState extends $AsyncNotifier<bool> {
   }
 }
 
-@ProviderFor(searchedHistory)
-final searchedHistoryProvider = SearchedHistoryFamily._();
+/// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+/// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+/// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
 
-final class SearchedHistoryProvider extends $FunctionalProvider<
-        AsyncValue<List<Searched>?>, List<Searched>?, FutureOr<List<Searched>?>>
-    with $FutureModifier<List<Searched>?>, $FutureProvider<List<Searched>?> {
-  SearchedHistoryProvider._(
-      {required SearchedHistoryFamily super.from, required bool super.argument})
+@ProviderFor(SearchedHistoryNotifier)
+final searchedHistoryProvider = SearchedHistoryNotifierFamily._();
+
+/// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+/// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+/// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
+final class SearchedHistoryNotifierProvider
+    extends $AsyncNotifierProvider<SearchedHistoryNotifier, List<Searched>> {
+  /// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+  /// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+  /// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
+  SearchedHistoryNotifierProvider._(
+      {required SearchedHistoryNotifierFamily super.from,
+      required bool super.argument})
       : super(
           retry: null,
           name: r'searchedHistoryProvider',
@@ -254,7 +264,7 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
         );
 
   @override
-  String debugGetCreateSourceHash() => _$searchedHistoryHash();
+  String debugGetCreateSourceHash() => _$searchedHistoryNotifierHash();
 
   @override
   String toString() {
@@ -265,22 +275,12 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<List<Searched>?> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<Searched>?> create(Ref ref) {
-    final argument = this.argument as bool;
-    return searchedHistory(
-      ref,
-      argument,
-    );
-  }
+  SearchedHistoryNotifier create() => SearchedHistoryNotifier();
 
   @override
   bool operator ==(Object other) {
-    return other is SearchedHistoryProvider && other.argument == argument;
+    return other is SearchedHistoryNotifierProvider &&
+        other.argument == argument;
   }
 
   @override
@@ -289,11 +289,22 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$searchedHistoryHash() => r'e14c7c6b4066773ed0d4719a59ba143ed4b306bb';
+String _$searchedHistoryNotifierHash() =>
+    r'f63bdebf5ef358526f779b0fe2c5448075414171';
 
-final class SearchedHistoryFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<Searched>?>, bool> {
-  SearchedHistoryFamily._()
+/// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+/// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+/// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
+
+final class SearchedHistoryNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<
+            SearchedHistoryNotifier,
+            AsyncValue<List<Searched>>,
+            List<Searched>,
+            FutureOr<List<Searched>>,
+            bool> {
+  SearchedHistoryNotifierFamily._()
       : super(
           retry: null,
           name: r'searchedHistoryProvider',
@@ -302,13 +313,46 @@ final class SearchedHistoryFamily extends $Family
           isAutoDispose: true,
         );
 
-  SearchedHistoryProvider call(
+  /// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+  /// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+  /// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
+
+  SearchedHistoryNotifierProvider call(
     bool onlyShowFavorite,
   ) =>
-      SearchedHistoryProvider._(argument: onlyShowFavorite, from: this);
+      SearchedHistoryNotifierProvider._(argument: onlyShowFavorite, from: this);
 
   @override
   String toString() => r'searchedHistoryProvider';
+}
+
+/// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
+/// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
+/// 初期ロードは20件。[fetchMore] を呼ぶと追加20件を末尾に追加する。
+
+abstract class _$SearchedHistoryNotifier
+    extends $AsyncNotifier<List<Searched>> {
+  late final _$args = ref.$arg as bool;
+  bool get onlyShowFavorite => _$args;
+
+  FutureOr<List<Searched>> build(
+    bool onlyShowFavorite,
+  );
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Searched>>, List<Searched>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Searched>>, List<Searched>>,
+        AsyncValue<List<Searched>>,
+        Object?,
+        Object?>;
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
+  }
 }
 
 @ProviderFor(HistoryController)
