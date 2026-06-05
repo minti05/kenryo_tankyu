@@ -32,7 +32,7 @@ target 'Runner' do
 
   # FirebaseFirestore のコンパイル済みバイナリを使用してビルドを高速化
   # https://github.com/invertase/firestore-ios-sdk-frameworks
-  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '12.4.0'
+  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '12.14.0'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
@@ -43,5 +43,9 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # Firebase/Storage 等が iOS 16.0 を要求するため、全 pod の最小バージョンを統一する
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+    end
   end
 end

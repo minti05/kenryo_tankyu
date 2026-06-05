@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:kenryo_tankyu/core/router/router.dart';
 import 'package:kenryo_tankyu/core/theme/theme.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kenryo_tankyu/core/providers/shared_preferences_provider.dart';
+import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -20,22 +20,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // グローバルエラーハンドラーの設定
-  FlutterError.onError = (FlutterErrorDetails details) {
-    debugPrint('FlutterError: ${details.exception}');
-    debugPrintStack(stackTrace: details.stack);
-  };
-
-  PlatformDispatcher.instance.onError = (Object error, StackTrace stackTrace) {
-    debugPrint('PlatformError: $error');
-    debugPrintStack(stackTrace: stackTrace);
-    return true;
-  };
-
   // 依存性の事前初期化 (Strict Initialization)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Crashlytics / Analytics の初期化 (グローバルエラーハンドラーを含む)
+  await FirebaseTrackingService.initialize();
 
   await dotenv.load(fileName: 'assets/.env');
 
@@ -50,7 +41,7 @@ Future<void> main() async {
 
   await Supabase.initialize(
     url: supabaseUrl,
-    anonKey: supabaseAnonKey,
+    publishableKey: supabaseAnonKey,
   );
 
   final sharedPreferences = await SharedPreferences.getInstance();

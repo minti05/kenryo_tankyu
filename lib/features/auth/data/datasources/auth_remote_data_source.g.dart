@@ -10,13 +10,13 @@ part of 'auth_remote_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(authRemoteDataSource)
-const authRemoteDataSourceProvider = AuthRemoteDataSourceProvider._();
+final authRemoteDataSourceProvider = AuthRemoteDataSourceProvider._();
 
 final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
     AuthRemoteDataSource,
     AuthRemoteDataSource,
     AuthRemoteDataSource> with $Provider<AuthRemoteDataSource> {
-  const AuthRemoteDataSourceProvider._()
+  AuthRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,

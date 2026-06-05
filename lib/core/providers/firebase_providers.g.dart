@@ -10,12 +10,12 @@ part of 'firebase_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(firebaseAuth)
-const firebaseAuthProvider = FirebaseAuthProvider._();
+final firebaseAuthProvider = FirebaseAuthProvider._();
 
 final class FirebaseAuthProvider
     extends $FunctionalProvider<FirebaseAuth, FirebaseAuth, FirebaseAuth>
     with $Provider<FirebaseAuth> {
-  const FirebaseAuthProvider._()
+  FirebaseAuthProvider._()
       : super(
           from: null,
           argument: null,
@@ -51,13 +51,13 @@ final class FirebaseAuthProvider
 String _$firebaseAuthHash() => r'912368c3df3f72e4295bf7a8cda93b9c5749d923';
 
 @ProviderFor(firebaseFirestore)
-const firebaseFirestoreProvider = FirebaseFirestoreProvider._();
+final firebaseFirestoreProvider = FirebaseFirestoreProvider._();
 
 final class FirebaseFirestoreProvider extends $FunctionalProvider<
     FirebaseFirestore,
     FirebaseFirestore,
     FirebaseFirestore> with $Provider<FirebaseFirestore> {
-  const FirebaseFirestoreProvider._()
+  FirebaseFirestoreProvider._()
       : super(
           from: null,
           argument: null,
@@ -94,11 +94,11 @@ final class FirebaseFirestoreProvider extends $FunctionalProvider<
 String _$firebaseFirestoreHash() => r'963402713bf9b7cc1fb259d619d9b0184d4dcec1';
 
 @ProviderFor(firebaseStorage)
-const firebaseStorageProvider = FirebaseStorageProvider._();
+final firebaseStorageProvider = FirebaseStorageProvider._();
 
 final class FirebaseStorageProvider extends $FunctionalProvider<FirebaseStorage,
     FirebaseStorage, FirebaseStorage> with $Provider<FirebaseStorage> {
-  const FirebaseStorageProvider._()
+  FirebaseStorageProvider._()
       : super(
           from: null,
           argument: null,
@@ -134,13 +134,13 @@ final class FirebaseStorageProvider extends $FunctionalProvider<FirebaseStorage,
 String _$firebaseStorageHash() => r'aa6946fd2a3470c4f3e2e72956076591cc63b435';
 
 @ProviderFor(firebaseMessaging)
-const firebaseMessagingProvider = FirebaseMessagingProvider._();
+final firebaseMessagingProvider = FirebaseMessagingProvider._();
 
 final class FirebaseMessagingProvider extends $FunctionalProvider<
     FirebaseMessaging,
     FirebaseMessaging,
     FirebaseMessaging> with $Provider<FirebaseMessaging> {
-  const FirebaseMessagingProvider._()
+  FirebaseMessagingProvider._()
       : super(
           from: null,
           argument: null,

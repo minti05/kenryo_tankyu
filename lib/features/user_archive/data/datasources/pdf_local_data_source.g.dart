@@ -10,13 +10,13 @@ part of 'pdf_local_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(pdfLocalDataSource)
-const pdfLocalDataSourceProvider = PdfLocalDataSourceProvider._();
+final pdfLocalDataSourceProvider = PdfLocalDataSourceProvider._();
 
 final class PdfLocalDataSourceProvider extends $FunctionalProvider<
     PdfLocalDataSource,
     PdfLocalDataSource,
     PdfLocalDataSource> with $Provider<PdfLocalDataSource> {
-  const PdfLocalDataSourceProvider._()
+  PdfLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,

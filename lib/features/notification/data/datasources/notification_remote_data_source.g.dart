@@ -10,14 +10,14 @@ part of 'notification_remote_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(notificationRemoteDataSource)
-const notificationRemoteDataSourceProvider =
+final notificationRemoteDataSourceProvider =
     NotificationRemoteDataSourceProvider._();
 
 final class NotificationRemoteDataSourceProvider extends $FunctionalProvider<
     NotificationRemoteDataSource,
     NotificationRemoteDataSource,
     NotificationRemoteDataSource> with $Provider<NotificationRemoteDataSource> {
-  const NotificationRemoteDataSourceProvider._()
+  NotificationRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,

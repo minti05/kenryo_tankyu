@@ -10,14 +10,14 @@ part of 'notification_local_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(notificationLocalDataSource)
-const notificationLocalDataSourceProvider =
+final notificationLocalDataSourceProvider =
     NotificationLocalDataSourceProvider._();
 
 final class NotificationLocalDataSourceProvider extends $FunctionalProvider<
     NotificationLocalDataSource,
     NotificationLocalDataSource,
     NotificationLocalDataSource> with $Provider<NotificationLocalDataSource> {
-  const NotificationLocalDataSourceProvider._()
+  NotificationLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,

@@ -10,13 +10,13 @@ part of 'user_archive_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(userArchiveRepository)
-const userArchiveRepositoryProvider = UserArchiveRepositoryProvider._();
+final userArchiveRepositoryProvider = UserArchiveRepositoryProvider._();
 
 final class UserArchiveRepositoryProvider extends $FunctionalProvider<
     UserArchiveRepository,
     UserArchiveRepository,
     UserArchiveRepository> with $Provider<UserArchiveRepository> {
-  const UserArchiveRepositoryProvider._()
+  UserArchiveRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -54,11 +54,11 @@ String _$userArchiveRepositoryHash() =>
     r'0cc9ca50197c441d2241527354e8fb97cf3d3d4f';
 
 @ProviderFor(FavoriteIdsCache)
-const favoriteIdsCacheProvider = FavoriteIdsCacheProvider._();
+final favoriteIdsCacheProvider = FavoriteIdsCacheProvider._();
 
 final class FavoriteIdsCacheProvider
     extends $AsyncNotifierProvider<FavoriteIdsCache, Set<int>> {
-  const FavoriteIdsCacheProvider._()
+  FavoriteIdsCacheProvider._()
       : super(
           from: null,
           argument: null,
@@ -77,34 +77,33 @@ final class FavoriteIdsCacheProvider
   FavoriteIdsCache create() => FavoriteIdsCache();
 }
 
-String _$favoriteIdsCacheHash() => r'6d9b76398c88e8734def2b30944d92564c8a068b';
+String _$favoriteIdsCacheHash() => r'e0be5972a5d472774a40ece494577d1f7c65d63b';
 
 abstract class _$FavoriteIdsCache extends $AsyncNotifier<Set<int>> {
   FutureOr<Set<int>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<Set<int>>, Set<int>>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<Set<int>>, Set<int>>,
         AsyncValue<Set<int>>,
         Object?,
         Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 /// ボタン連打防止を管理するProvider
 
 @ProviderFor(AbleChangeFavorite)
-const ableChangeFavoriteProvider = AbleChangeFavoriteProvider._();
+final ableChangeFavoriteProvider = AbleChangeFavoriteProvider._();
 
 /// ボタン連打防止を管理するProvider
 final class AbleChangeFavoriteProvider
     extends $NotifierProvider<AbleChangeFavorite, bool> {
   /// ボタン連打防止を管理するProvider
-  const AbleChangeFavoriteProvider._()
+  AbleChangeFavoriteProvider._()
       : super(
           from: null,
           argument: null,
@@ -141,20 +140,19 @@ abstract class _$AbleChangeFavorite extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<bool, bool>, bool, Object?, Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(UserIsFavoriteState)
-const userIsFavoriteStateProvider = UserIsFavoriteStateFamily._();
+final userIsFavoriteStateProvider = UserIsFavoriteStateFamily._();
 
 final class UserIsFavoriteStateProvider
     extends $AsyncNotifierProvider<UserIsFavoriteState, bool> {
-  const UserIsFavoriteStateProvider._(
+  UserIsFavoriteStateProvider._(
       {required UserIsFavoriteStateFamily super.from,
       required int super.argument})
       : super(
@@ -191,13 +189,13 @@ final class UserIsFavoriteStateProvider
 }
 
 String _$userIsFavoriteStateHash() =>
-    r'f2756f3f96e88d606957700f9a7be88d089bf311';
+    r'1f161d6fc02cc4f2d6228e21a227bebf14d2d9a3';
 
 final class UserIsFavoriteStateFamily extends $Family
     with
         $ClassFamilyOverride<UserIsFavoriteState, AsyncValue<bool>, bool,
             FutureOr<bool>, int> {
-  const UserIsFavoriteStateFamily._()
+  UserIsFavoriteStateFamily._()
       : super(
           retry: null,
           name: r'userIsFavoriteStateProvider',
@@ -225,26 +223,27 @@ abstract class _$UserIsFavoriteState extends $AsyncNotifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(
-      _$args,
-    );
     final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<bool>, bool>,
         AsyncValue<bool>,
         Object?,
         Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
   }
 }
 
 @ProviderFor(searchedHistory)
-const searchedHistoryProvider = SearchedHistoryFamily._();
+final searchedHistoryProvider = SearchedHistoryFamily._();
 
 final class SearchedHistoryProvider extends $FunctionalProvider<
         AsyncValue<List<Searched>?>, List<Searched>?, FutureOr<List<Searched>?>>
     with $FutureModifier<List<Searched>?>, $FutureProvider<List<Searched>?> {
-  const SearchedHistoryProvider._(
+  SearchedHistoryProvider._(
       {required SearchedHistoryFamily super.from, required bool super.argument})
       : super(
           retry: null,
@@ -290,11 +289,11 @@ final class SearchedHistoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$searchedHistoryHash() => r'73fc7538c5477eef98cc6742da99d5c74c9700af';
+String _$searchedHistoryHash() => r'e14c7c6b4066773ed0d4719a59ba143ed4b306bb';
 
 final class SearchedHistoryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Searched>?>, bool> {
-  const SearchedHistoryFamily._()
+  SearchedHistoryFamily._()
       : super(
           retry: null,
           name: r'searchedHistoryProvider',
@@ -313,11 +312,11 @@ final class SearchedHistoryFamily extends $Family
 }
 
 @ProviderFor(HistoryController)
-const historyControllerProvider = HistoryControllerProvider._();
+final historyControllerProvider = HistoryControllerProvider._();
 
 final class HistoryControllerProvider
     extends $NotifierProvider<HistoryController, void> {
-  const HistoryControllerProvider._()
+  HistoryControllerProvider._()
       : super(
           from: null,
           argument: null,
@@ -344,27 +343,26 @@ final class HistoryControllerProvider
   }
 }
 
-String _$historyControllerHash() => r'56f12497211c6200902c5cab557b7b0a7b0f6ee6';
+String _$historyControllerHash() => r'a86dc22a9a7a032448198a027fbb201896d5ad80';
 
 abstract class _$HistoryController extends $Notifier<void> {
   void build();
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<void, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<void, void>, void, Object?, Object?>;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(PdfCacheController)
-const pdfCacheControllerProvider = PdfCacheControllerProvider._();
+final pdfCacheControllerProvider = PdfCacheControllerProvider._();
 
 final class PdfCacheControllerProvider
     extends $NotifierProvider<PdfCacheController, void> {
-  const PdfCacheControllerProvider._()
+  PdfCacheControllerProvider._()
       : super(
           from: null,
           argument: null,
@@ -399,21 +397,20 @@ abstract class _$PdfCacheController extends $Notifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<void, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<void, void>, void, Object?, Object?>;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(pdf)
-const pdfProvider = PdfFamily._();
+final pdfProvider = PdfFamily._();
 
 final class PdfProvider extends $FunctionalProvider<AsyncValue<Uint8List?>,
         Uint8List?, FutureOr<Uint8List?>>
     with $FutureModifier<Uint8List?>, $FutureProvider<Uint8List?> {
-  const PdfProvider._(
+  PdfProvider._(
       {required PdfFamily super.from,
       required (
         String,
@@ -477,7 +474,7 @@ final class PdfFamily extends $Family
               String,
               EnterYear,
             )> {
-  const PdfFamily._()
+  PdfFamily._()
       : super(
           retry: null,
           name: r'pdfProvider',
@@ -500,12 +497,12 @@ final class PdfFamily extends $Family
 }
 
 @ProviderFor(teacherPdf)
-const teacherPdfProvider = TeacherPdfFamily._();
+final teacherPdfProvider = TeacherPdfFamily._();
 
 final class TeacherPdfProvider extends $FunctionalProvider<
         AsyncValue<Uint8List?>, Uint8List?, FutureOr<Uint8List?>>
     with $FutureModifier<Uint8List?>, $FutureProvider<Uint8List?> {
-  const TeacherPdfProvider._(
+  TeacherPdfProvider._(
       {required TeacherPdfFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -554,7 +551,7 @@ String _$teacherPdfHash() => r'057e15f2884799ab0241d6aacd45317bb29b587f';
 
 final class TeacherPdfFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Uint8List?>, String> {
-  const TeacherPdfFamily._()
+  TeacherPdfFamily._()
       : super(
           retry: null,
           name: r'teacherPdfProvider',
