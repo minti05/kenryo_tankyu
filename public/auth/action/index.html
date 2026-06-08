@@ -237,7 +237,9 @@
 
     function toggleVisibility(inputId, btnId) {
       const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
       input.type = input.type === 'password' ? 'text' : 'password';
+      if (btn) btn.textContent = input.type === 'password' ? '👁' : '🙈';
     }
 
     function bindPasswordFormEvents(onSubmit) {
@@ -256,8 +258,8 @@
       function updateSubmitState() {
         const allValid = v.isLengthValid && v.hasLetter && v.hasNumber;
         confirmInput.disabled = !allValid;
-        const confirmMatch = confirmInput.value.length >= 8 && confirmInput.value === pwInput.value;
-        submitBtn.disabled = !confirmMatch;
+        const confirmMatch = confirmInput.value === pwInput.value && confirmInput.value.length > 0;
+        submitBtn.disabled = !(allValid && confirmMatch);
       }
 
       pwInput.addEventListener('input', () => {
@@ -381,6 +383,7 @@
       card.innerHTML = buildPasswordFormHTML('パスワードの設定', 'アカウントを作成する');
       bindPasswordFormEvents(async (newPassword) => {
         const result = await auth.signInWithEmailLink(email, window.location.href);
+        if (!result.user) throw new Error('ユーザー情報の取得に失敗しました。');
         await result.user.updatePassword(newPassword);
         if (displayName) {
           await result.user.updateProfile({ displayName });
