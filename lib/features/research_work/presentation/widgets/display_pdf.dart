@@ -5,6 +5,7 @@ import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart
 import 'package:kenryo_tankyu/features/research_work/presentation/providers/searched_provider.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class DisplayPdf extends ConsumerWidget {
@@ -21,6 +22,24 @@ class DisplayPdf extends ConsumerWidget {
             final nowWatchingPdf = ref.watch(stringProvider);
             final pdfAsync =
                 ref.watch(pdfProvider(nowWatchingPdf, searched.enterYear));
+
+            // ログはbuild外で一度だけ送出する
+            ref.listen(pdfProvider(nowWatchingPdf, searched.enterYear),
+                (previous, next) {
+              if (previous?.hasError == true) return;
+              next.whenOrNull(error: (error, stack) {
+                if (error is ServerFailure &&
+                    error.code == 'object-not-found') {
+                  FirebaseTrackingService.logPdfNotFound(
+                    documentId: searched.documentID,
+                    pdfPath: nowWatchingPdf,
+                  );
+                } else {
+                  FirebaseTrackingService.recordError(error, stack,
+                      reason: 'pdf_load_error');
+                }
+              });
+            });
 
             return pdfAsync.when(
               data: (pdfData) {
@@ -56,7 +75,7 @@ class DisplayPdf extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) {
+              error: (error, stack) {
                 if (error is ServerFailure &&
                     error.code == 'object-not-found') {
                   return const CommonErrorView(

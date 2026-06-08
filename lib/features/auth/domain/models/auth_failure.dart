@@ -33,3 +33,13 @@ class UnknownAuthFailure extends AuthFailure {
   const UnknownAuthFailure({String? message, this.code})
       : super(message ?? '予期せぬエラーが発生しました。');
 }
+
+class NotRegisteredUser extends AuthFailure {
+  const NotRegisteredUser()
+      : super(
+            'このGoogleアカウントは縣陵アカウントではありません。\n松本県ヶ丘高校の@kenryo.ed.jpアカウントでサインインしてください。');
+}
+
+class GoogleSignInCancelled extends AuthFailure {
+  const GoogleSignInCancelled() : super('Googleサインインがキャンセルされました。');
+}

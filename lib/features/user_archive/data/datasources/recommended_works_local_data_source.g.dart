@@ -10,7 +10,7 @@ part of 'recommended_works_local_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(recommendedWorksLocalDataSource)
-const recommendedWorksLocalDataSourceProvider =
+final recommendedWorksLocalDataSourceProvider =
     RecommendedWorksLocalDataSourceProvider._();
 
 final class RecommendedWorksLocalDataSourceProvider extends $FunctionalProvider<
@@ -18,7 +18,7 @@ final class RecommendedWorksLocalDataSourceProvider extends $FunctionalProvider<
         RecommendedWorksLocalDataSource,
         RecommendedWorksLocalDataSource>
     with $Provider<RecommendedWorksLocalDataSource> {
-  const RecommendedWorksLocalDataSourceProvider._()
+  RecommendedWorksLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,

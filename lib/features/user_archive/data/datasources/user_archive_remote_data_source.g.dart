@@ -10,14 +10,14 @@ part of 'user_archive_remote_data_source.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(userArchiveRemoteDataSource)
-const userArchiveRemoteDataSourceProvider =
+final userArchiveRemoteDataSourceProvider =
     UserArchiveRemoteDataSourceProvider._();
 
 final class UserArchiveRemoteDataSourceProvider extends $FunctionalProvider<
     UserArchiveRemoteDataSource,
     UserArchiveRemoteDataSource,
     UserArchiveRemoteDataSource> with $Provider<UserArchiveRemoteDataSource> {
-  const UserArchiveRemoteDataSourceProvider._()
+  UserArchiveRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,

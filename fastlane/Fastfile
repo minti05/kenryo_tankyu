@@ -67,6 +67,12 @@ platform :ios do
       clean: false,
     )
 
+    # dSYM を Firebase Crashlytics にアップロード（クラッシュログのシンボル解決に必要）
+    upload_symbols_to_crashlytics(
+      dsym_path: lane_context[SharedValues::DSYM_OUTPUT_PATH],
+      gsp_path: "ios/Runner/GoogleService-Info.plist",
+    )
+
     api_key
   end
 end

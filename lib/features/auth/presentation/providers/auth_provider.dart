@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:kenryo_tankyu/core/constants/feature/user_value.dart";
+import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/user_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/domain/models/auth.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:kenryo_tankyu/core/providers/supabase_provider.dart';
 import 'package:kenryo_tankyu/features/notification/data/datasources/notification_db.dart';
 import 'package:kenryo_tankyu/features/notification/presentation/providers/read_notification_ids_provider.dart';
@@ -24,6 +26,9 @@ Stream<User?> authStateChanges(Ref ref) {
 
 @riverpod
 class AuthNotifier extends _$AuthNotifier {
+  // ログイン連続失敗回数（セッション内で保持）
+  int _loginFailureCount = 0;
+
   @override
   Auth build() {
     ref.listen<AsyncValue<User?>>(
@@ -32,6 +37,9 @@ class AuthNotifier extends _$AuthNotifier {
       (_, next) {
         next.whenData((user) {
           if (user != null && user.emailVerified) {
+            // ログイン成功時にユーザーメールを Crashlytics に紐付け
+            unawaited(FirebaseTrackingService.setUserEmail(user.email));
+            _loginFailureCount = 0;
             // FavoriteIdsCache は authStateChangesProvider を watch して自己初期化するため不要
             unawaited(
               ref.read(searchHistoryCacheProvider.notifier).initialize(),
@@ -42,6 +50,7 @@ class AuthNotifier extends _$AuthNotifier {
                   .initialize(user.uid),
             );
           } else {
+            unawaited(FirebaseTrackingService.setUserEmail(null));
             // FavoriteIdsCache は authStateChangesProvider を watch して自動リセットするため不要
             ref.invalidate(searchHistoryCacheProvider);
             ref.invalidate(readNotificationIdsProvider);
@@ -80,8 +89,23 @@ class AuthNotifier extends _$AuthNotifier {
     final authRepo = ref.read(authRepositoryProvider);
     final userRepo = ref.read(userRepositoryProvider);
     final email = rawEmail.contains('@') ? rawEmail : '$rawEmail@kenryo.ed.jp';
-    await authRepo.signInWithEmailAndPassword(email: email, password: password);
-    await userRepo.updateRegisteredStatus(email: email, isRegistered: true);
+    try {
+      await authRepo.signInWithEmailAndPassword(
+          email: email, password: password);
+      await userRepo.updateRegisteredStatus(email: email, isRegistered: true);
+    } catch (e) {
+      _loginFailureCount++;
+      // 2回目以降の失敗をトラッキング（操作ミスの1回は除外）
+      if (_loginFailureCount >= 2) {
+        FirebaseTrackingService.logAuthFailure(
+          method: 'signIn',
+          errorCode: e.runtimeType.toString(),
+          errorMessage: e.toString(),
+          failureCount: _loginFailureCount,
+        );
+      }
+      rethrow;
+    }
   }
 
   Future<void> sendVerifyEmail() async {
@@ -110,6 +134,33 @@ class AuthNotifier extends _$AuthNotifier {
         email: email, password: password);
     await authRepo.updateDisplayName(userName);
     await authRepo.sendEmailVerification();
+  }
+
+  Future<void> loginWithGoogle() async {
+    final authRepo = ref.read(authRepositoryProvider);
+    final userRepo = ref.read(userRepositoryProvider);
+
+    final signedIn = await authRepo.signInWithGoogle();
+    if (!signedIn) return;
+
+    final user = authRepo.currentUser;
+    final email = user?.email;
+    if (email == null || !email.endsWith('@kenryo.ed.jp')) {
+      await authRepo.signOut();
+      throw const NotRegisteredUser();
+    }
+
+    try {
+      final userData = await userRepo.verifyUserByEmail(email: email);
+      if (userData == null) {
+        await authRepo.signOut();
+        throw const NotRegisteredUser();
+      }
+      await userRepo.updateRegisteredStatus(email: email, isRegistered: true);
+    } catch (e) {
+      if (authRepo.currentUser != null) await authRepo.signOut();
+      rethrow;
+    }
   }
 
   Future<void> sendPasswordResetEmail(String email) async {

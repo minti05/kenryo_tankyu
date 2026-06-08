@@ -10,13 +10,13 @@ part of 'research_work_repository_impl.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(researchWorkRepository)
-const researchWorkRepositoryProvider = ResearchWorkRepositoryProvider._();
+final researchWorkRepositoryProvider = ResearchWorkRepositoryProvider._();
 
 final class ResearchWorkRepositoryProvider extends $FunctionalProvider<
     ResearchWorkRepository,
     ResearchWorkRepository,
     ResearchWorkRepository> with $Provider<ResearchWorkRepository> {
-  const ResearchWorkRepositoryProvider._()
+  ResearchWorkRepositoryProvider._()
       : super(
           from: null,
           argument: null,

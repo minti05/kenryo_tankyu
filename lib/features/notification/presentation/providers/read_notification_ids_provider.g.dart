@@ -10,11 +10,11 @@ part of 'read_notification_ids_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ReadNotificationIds)
-const readNotificationIdsProvider = ReadNotificationIdsProvider._();
+final readNotificationIdsProvider = ReadNotificationIdsProvider._();
 
 final class ReadNotificationIdsProvider
     extends $NotifierProvider<ReadNotificationIds, Set<String>> {
-  const ReadNotificationIdsProvider._()
+  ReadNotificationIdsProvider._()
       : super(
           from: null,
           argument: null,
@@ -42,17 +42,16 @@ final class ReadNotificationIdsProvider
 }
 
 String _$readNotificationIdsHash() =>
-    r'9a635cb0fc2565620dd08207ffbbfec03904107a';
+    r'08da3d4aff6c05bfe5a9b14daa754b00e5a9b127';
 
 abstract class _$ReadNotificationIds extends $Notifier<Set<String>> {
   Set<String> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<Set<String>, Set<String>>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<Set<String>, Set<String>>, Set<String>, Object?, Object?>;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

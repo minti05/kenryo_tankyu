@@ -26,6 +26,21 @@ class BrowsingHistoryDataSource {
     return rows.map((r) => Searched.fromSupabase(r)).toList();
   }
 
+  Future<List<Searched>?> getHistoryPaged(
+    String userId, {
+    int from = 0,
+    int limit = 20,
+  }) async {
+    final rows = await _client
+        .from('browsing_history')
+        .select()
+        .eq('user_id', userId)
+        .order('viewed_at', ascending: false)
+        .range(from, from + limit - 1);
+    if (rows.isEmpty) return null;
+    return rows.map((r) => Searched.fromSupabase(r)).toList();
+  }
+
   Future<List<Searched>?> getHistoryByIds(
       String userId, Set<int> documentIds) async {
     if (documentIds.isEmpty) return null;
@@ -35,6 +50,24 @@ class BrowsingHistoryDataSource {
         .eq('user_id', userId)
         .inFilter('document_id', documentIds.toList())
         .order('viewed_at', ascending: false);
+    if (rows.isEmpty) return null;
+    return rows.map((r) => Searched.fromSupabase(r, isFavorite: true)).toList();
+  }
+
+  Future<List<Searched>?> getHistoryByIdsPaged(
+    String userId,
+    Set<int> documentIds, {
+    int from = 0,
+    int limit = 20,
+  }) async {
+    if (documentIds.isEmpty) return null;
+    final rows = await _client
+        .from('browsing_history')
+        .select()
+        .eq('user_id', userId)
+        .inFilter('document_id', documentIds.toList())
+        .order('viewed_at', ascending: false)
+        .range(from, from + limit - 1);
     if (rows.isEmpty) return null;
     return rows.map((r) => Searched.fromSupabase(r, isFavorite: true)).toList();
   }

@@ -13,4 +13,5 @@ abstract class AuthRepository {
   Future<void> deleteUser();
   Future<void> sendEmailVerification();
   Future<void> reloadUser();
+  Future<bool> signInWithGoogle();
 }

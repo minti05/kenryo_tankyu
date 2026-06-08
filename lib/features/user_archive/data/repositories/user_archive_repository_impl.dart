@@ -40,6 +40,24 @@ class UserArchiveRepositoryImpl
   }
 
   @override
+  Future<List<Searched>?> getHistoryPaged({
+    int from = 0,
+    int limit = 20,
+  }) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
+    try {
+      return await _browsingHistoryDataSource.getHistoryPaged(
+        userId,
+        from: from,
+        limit: limit,
+      );
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
   Future<List<Searched>?> getFavoriteHistory() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return null;
@@ -59,6 +77,26 @@ class UserArchiveRepositoryImpl
     if (userId == null) return null;
     try {
       return await _browsingHistoryDataSource.getHistoryByIds(userId, ids);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<List<Searched>?> getFavoriteHistoryPaged(
+    Set<int> ids, {
+    int from = 0,
+    int limit = 20,
+  }) async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return null;
+    try {
+      return await _browsingHistoryDataSource.getHistoryByIdsPaged(
+        userId,
+        ids,
+        from: from,
+        limit: limit,
+      );
     } catch (e) {
       throw mapException(e);
     }

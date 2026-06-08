@@ -47,4 +47,24 @@ class UserRepositoryImpl with ErrorMapper implements UserRepository {
       throw mapException(e);
     }
   }
+
+  @override
+  Future<Map<String, dynamic>?> verifyUserByEmail(
+      {required String email}) async {
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      if (snapshot.docs.isNotEmpty) {
+        return snapshot.docs.first.data();
+      }
+      return null;
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
 }

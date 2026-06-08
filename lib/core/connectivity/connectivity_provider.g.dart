@@ -10,7 +10,7 @@ part of 'connectivity_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(connectivity)
-const connectivityProvider = ConnectivityProvider._();
+final connectivityProvider = ConnectivityProvider._();
 
 final class ConnectivityProvider extends $FunctionalProvider<
         AsyncValue<List<ConnectivityResult>>,
@@ -19,7 +19,7 @@ final class ConnectivityProvider extends $FunctionalProvider<
     with
         $FutureModifier<List<ConnectivityResult>>,
         $StreamProvider<List<ConnectivityResult>> {
-  const ConnectivityProvider._()
+  ConnectivityProvider._()
       : super(
           from: null,
           argument: null,
@@ -48,11 +48,11 @@ final class ConnectivityProvider extends $FunctionalProvider<
 String _$connectivityHash() => r'69c6e2db8337a9ff832358c4a079a4846fa6f28c';
 
 @ProviderFor(isConnected)
-const isConnectedProvider = IsConnectedProvider._();
+final isConnectedProvider = IsConnectedProvider._();
 
 final class IsConnectedProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
-  const IsConnectedProvider._()
+  IsConnectedProvider._()
       : super(
           from: null,
           argument: null,
