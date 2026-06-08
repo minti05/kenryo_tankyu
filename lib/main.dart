@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:kenryo_tankyu/firebase_options.dart';
 import 'package:kenryo_tankyu/core/router/router.dart';
@@ -27,6 +28,9 @@ Future<void> main() async {
 
   // Crashlytics / Analytics の初期化 (グローバルエラーハンドラーを含む)
   await FirebaseTrackingService.initialize();
+
+  // Google Sign-In の初期化（縣陵ドメイン限定）
+  await GoogleSignIn.instance.initialize(hostedDomain: 'kenryo.ed.jp');
 
   await dotenv.load(fileName: 'assets/.env');
 

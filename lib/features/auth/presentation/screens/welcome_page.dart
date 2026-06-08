@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
+import 'package:kenryo_tankyu/core/constants/app_unique_value.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
+import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class WelcomePage extends ConsumerWidget {
   const WelcomePage({super.key});
@@ -13,7 +15,7 @@ class WelcomePage extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
           child: Column(
             children: [
               const Spacer(flex: 1),
@@ -26,44 +28,86 @@ class WelcomePage extends ConsumerWidget {
               ),
               const SizedBox(height: 10),
               Image.asset(appIcon, width: 100),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Text(
-                  'このアプリは松本県ケ丘高等学校に在籍する生徒および職員が利用できる探究活動サポートアプリです。\n生徒のプライバシー保護のため、他の方はご利用いただけませんのでご了承ください。',
-                  style: Theme.of(context).textTheme.bodySmall!),
+                'このアプリは松本県ケ丘高等学校に在籍する生徒および職員が利用できる探究活動サポートアプリです。\n生徒のプライバシー保護のため、他の方はご利用いただけませんのでご了承ください。',
+                style: Theme.of(context).textTheme.bodySmall!,
+                textAlign: TextAlign.center,
+              ),
               const Spacer(flex: 1),
-              const Text('初めてアプリを使う方は'),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () => _showDialog(false, context, ref),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                ),
-                child: const Text('新規登録'),
+              _GoogleSignInButton(
+                onPressed: () => _signInWithGoogle(context, ref),
               ),
+              const SizedBox(height: 16),
+              _TermsText(context),
+              const Spacer(flex: 2),
+              _emailLoginSection(context, ref),
               const SizedBox(height: 20),
-              Text('既に登録済みの方は'),
-              const SizedBox(height: 10),
-              OutlinedButton(
-                onPressed: () => _showDialog(true, context, ref),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                ),
-                child: const Text('ログイン'),
-              ),
-              Spacer(flex: 2),
-              Text('Version: $version'),
+              Text('Version: $version',
+                  style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _signInWithGoogle(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(authProvider.notifier).loginWithGoogle();
+    } on NotRegisteredUser catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(e.message), duration: const Duration(seconds: 5)),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('サインインに失敗しました。もう一度お試しください。')),
+      );
+    }
+  }
+
+  Widget _emailLoginSection(BuildContext context, WidgetRef ref) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(child: Divider()),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text('または',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: Theme.of(context).colorScheme.outline)),
+            ),
+            const Expanded(child: Divider()),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => _showDialog(false, context, ref),
+              child: Text('新規登録（メール）',
+                  style: Theme.of(context).textTheme.bodySmall),
+            ),
+            Text('／',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: Theme.of(context).colorScheme.outline)),
+            TextButton(
+              onPressed: () => _showDialog(true, context, ref),
+              child: Text('ログイン（メール）',
+                  style: Theme.of(context).textTheme.bodySmall),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -137,6 +181,151 @@ class WelcomePage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _GoogleSignInButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _GoogleSignInButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          side: BorderSide(
+            color: isDark ? Colors.white54 : Colors.black26,
+          ),
+          backgroundColor:
+              isDark ? const Color(0xFF131314) : const Color(0xFFFFFFFF),
+          foregroundColor: isDark ? Colors.white : const Color(0xFF1F1F1F),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _GoogleLogo(),
+            const SizedBox(width: 12),
+            Text(
+              '縣陵アカウントでサインイン',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF1F1F1F),
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Google公式ブランドガイドラインに沿ったカラフルな「G」ロゴ
+class _GoogleLogo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(24, 24),
+      painter: _GoogleLogoPainter(),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // 各セクターの色
+    final colors = [
+      const Color(0xFF4285F4), // 青（右上）
+      const Color(0xFF34A853), // 緑（右下）
+      const Color(0xFFFBBC05), // 黄（左下）
+      const Color(0xFFEA4335), // 赤（左上）
+    ];
+
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    // 4つの四分円を描く
+    for (int i = 0; i < 4; i++) {
+      paint.color = colors[i];
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        (i * 90 - 90) * (3.14159 / 180),
+        90 * (3.14159 / 180),
+        true,
+        paint,
+      );
+    }
+
+    // 中央の白い円（ドーナツ形にする）
+    paint.color = Colors.white;
+    canvas.drawCircle(center, radius * 0.6, paint);
+
+    // 「G」の横棒（右側の白い矩形で四分円をカット）
+    final barPaint = Paint()
+      ..color = const Color(0xFF4285F4)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(
+      Rect.fromLTRB(center.dx, center.dy - radius * 0.22, center.dx + radius,
+          center.dy + radius * 0.22),
+      barPaint,
+    );
+
+    // 横棒の内側を白くする（ドーナツ効果を維持）
+    paint.color = Colors.white;
+    canvas.drawRect(
+      Rect.fromLTRB(center.dx, center.dy - radius * 0.22,
+          center.dx + radius * 0.6, center.dy + radius * 0.22),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _TermsText extends StatelessWidget {
+  final BuildContext parentContext;
+
+  const _TermsText(this.parentContext);
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+        children: [
+          const TextSpan(text: 'サインインすることで'),
+          TextSpan(
+            text: '利用規約',
+            style: const TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => launchUrl(termsOfServiceLink),
+          ),
+          const TextSpan(text: 'および'),
+          TextSpan(
+            text: 'プライバシーポリシー',
+            style: const TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => launchUrl(privacyPolicyLink),
+          ),
+          const TextSpan(text: 'に同意したものとみなします。'),
+        ],
       ),
     );
   }

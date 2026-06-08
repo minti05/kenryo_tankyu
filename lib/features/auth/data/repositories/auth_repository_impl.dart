@@ -105,6 +105,17 @@ class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
     }
   }
 
+  @override
+  Future<bool> signInWithGoogle() async {
+    try {
+      return await _dataSource.signInWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
   Failure _mapFirebaseException(FirebaseAuthException e) {
     if (e.code == 'unavailable' || e.code == 'network-request-failed') {
       return const NetworkFailure();
