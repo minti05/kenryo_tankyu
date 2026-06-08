@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:kenryo_tankyu/core/constants/app_unique_value.dart';
@@ -212,7 +213,8 @@ class _GoogleSignInButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _GoogleLogo(),
+            SvgPicture.asset('assets/images/google_logo.svg',
+                width: 24, height: 24),
             const SizedBox(width: 12),
             Text(
               '縣陵アカウントでサインイン',
@@ -226,72 +228,6 @@ class _GoogleSignInButton extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Google公式ブランドガイドラインに沿ったカラフルな「G」ロゴ
-class _GoogleLogo extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(24, 24),
-      painter: _GoogleLogoPainter(),
-    );
-  }
-}
-
-class _GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // 各セクターの色
-    final colors = [
-      const Color(0xFF4285F4), // 青（右上）
-      const Color(0xFF34A853), // 緑（右下）
-      const Color(0xFFFBBC05), // 黄（左下）
-      const Color(0xFFEA4335), // 赤（左上）
-    ];
-
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // 4つの四分円を描く
-    for (int i = 0; i < 4; i++) {
-      paint.color = colors[i];
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        (i * 90 - 90) * (3.14159 / 180),
-        90 * (3.14159 / 180),
-        true,
-        paint,
-      );
-    }
-
-    // 中央の白い円（ドーナツ形にする）
-    paint.color = Colors.white;
-    canvas.drawCircle(center, radius * 0.6, paint);
-
-    // 「G」の横棒（右側の白い矩形で四分円をカット）
-    final barPaint = Paint()
-      ..color = const Color(0xFF4285F4)
-      ..style = PaintingStyle.fill;
-    canvas.drawRect(
-      Rect.fromLTRB(center.dx, center.dy - radius * 0.22, center.dx + radius,
-          center.dy + radius * 0.22),
-      barPaint,
-    );
-
-    // 横棒の内側を白くする（ドーナツ効果を維持）
-    paint.color = Colors.white;
-    canvas.drawRect(
-      Rect.fromLTRB(center.dx, center.dy - radius * 0.22,
-          center.dx + radius * 0.6, center.dy + radius * 0.22),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _TermsText extends StatelessWidget {
