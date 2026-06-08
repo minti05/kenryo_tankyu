@@ -16,8 +16,8 @@ class PdfChoiceChip extends ConsumerWidget {
     final partOfId = searched.documentID.toString().substring(0, 7);
     final List<DocumentType> list = [];
     if (searched.existsSlide) list.add(DocumentType.slide);
-    if (searched.existsReport) list.add(DocumentType.report);
     if (searched.existsPoster) list.add(DocumentType.poster);
+    if (searched.existsReport) list.add(DocumentType.report);
     if (searched.existsThesis) list.add(DocumentType.thesis);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
