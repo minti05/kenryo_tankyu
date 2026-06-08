@@ -80,7 +80,7 @@ class _StreakCard extends StatelessWidget {
         child: Row(
           children: [
             Image.asset(
-              'assets/images/app_icon/icon.png',
+              'assets/images/app_icon.png',
               width: 28.w,
               height: 28.h,
             ),
