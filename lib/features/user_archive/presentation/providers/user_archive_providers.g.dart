@@ -290,7 +290,7 @@ final class SearchedHistoryNotifierProvider
 }
 
 String _$searchedHistoryNotifierHash() =>
-    r'f63bdebf5ef358526f779b0fe2c5448075414171';
+    r'37c3ee308f828d86b40a468a6f1f26b68aaf40a1';
 
 /// 無限スクロール対応の閲覧履歴 / お気に入りリスト。
 /// [onlyShowFavorite] が true のときはお気に入りのみ表示する。
