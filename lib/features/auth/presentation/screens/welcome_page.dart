@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:kenryo_tankyu/core/constants/app_unique_value.dart';
-import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
+import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 
 class WelcomePage extends ConsumerWidget {
@@ -56,16 +56,18 @@ class WelcomePage extends ConsumerWidget {
   Future<void> _signInWithGoogle(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(authProvider.notifier).loginWithGoogle();
-    } on NotRegisteredUser catch (e) {
+    } on Failure catch (e) {
+      debugPrint('[GoogleSignIn] Failure: ${e.message}');
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(e.message), duration: const Duration(seconds: 5)),
       );
     } catch (e) {
+      debugPrint('[GoogleSignIn] Unexpected error: $e');
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('サインインに失敗しました。もう一度お試しください。')),
+        SnackBar(content: Text('サインインに失敗しました。\n$e')),
       );
     }
   }

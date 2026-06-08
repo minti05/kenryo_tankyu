@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_remote_data_source.g.dart';
@@ -98,8 +99,31 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await _firebaseAuth.signInWithCredential(credential);
       return true;
     } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) return false;
-      rethrow;
+      switch (e.code) {
+        case GoogleSignInExceptionCode.canceled:
+        case GoogleSignInExceptionCode.interrupted:
+          // ユーザー操作によるキャンセル・中断は正常系
+          return false;
+        case GoogleSignInExceptionCode.clientConfigurationError:
+        case GoogleSignInExceptionCode.providerConfigurationError:
+          throw UnknownAuthFailure(
+            message: 'Google Sign-Inの設定に問題があります。開発者にお問い合わせください。',
+            code: e.code.name,
+          );
+        case GoogleSignInExceptionCode.uiUnavailable:
+          throw const UnknownAuthFailure(
+            message: 'Google Sign-Inの画面を表示できませんでした。もう一度お試しください。',
+          );
+        case GoogleSignInExceptionCode.userMismatch:
+          throw const UnknownAuthFailure(
+            message: '別のアカウントでサインインしています。一度サインアウトしてからお試しください。',
+          );
+        case GoogleSignInExceptionCode.unknownError:
+          throw UnknownAuthFailure(
+            message: e.description ?? '予期せぬエラーが発生しました。',
+            code: e.code.name,
+          );
+      }
     }
   }
 }
