@@ -83,7 +83,7 @@ class ResultListPage extends ConsumerWidget {
                                     ? '該当するデータはありません'
                                     : data.isLastPage && currentPage == 0
                                         ? '${hits.length}件ヒットしました'
-                                        : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中',
+                                        : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中（総${data.nbHits}件）',
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
