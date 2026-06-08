@@ -80,7 +80,7 @@ class WelcomePage extends ConsumerWidget {
             const Expanded(child: Divider()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text('または',
+              child: Text('または旧ログイン方法',
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall!

@@ -37,7 +37,7 @@ class UnknownAuthFailure extends AuthFailure {
 class NotRegisteredUser extends AuthFailure {
   const NotRegisteredUser()
       : super(
-            'このGoogleアカウントは縣陵探究アーカイブに登録されていません。\n縣陵の@kenryo.ed.jpアカウントでサインインしてください。');
+            'このGoogleアカウントは縣陵アカウントではありません。\n松本県ヶ丘高校の@kenryo.ed.jpアカウントでサインインしてください。');
 }
 
 class GoogleSignInCancelled extends AuthFailure {
