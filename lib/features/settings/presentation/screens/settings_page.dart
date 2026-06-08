@@ -34,8 +34,9 @@ class SettingsPage extends ConsumerWidget {
               onChanged: (bool value) async {
                 if (value) {
                   // iOS APNs への登録も含めた権限リクエスト
-                  final settings =
-                      await FirebaseMessaging.instance.requestPermission();
+                  final settings = await ref
+                      .read(firebaseMessagingProvider)
+                      .requestPermission();
                   debugPrint(
                       'Notification auth status: ${settings.authorizationStatus}');
 

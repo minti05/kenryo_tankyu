@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 
 class NotificationPermissionDialog extends ConsumerWidget {
@@ -54,7 +55,7 @@ class NotificationPermissionDialog extends ConsumerWidget {
 
             // iOS APNs への登録も含めた権限リクエスト
             final settings =
-                await FirebaseMessaging.instance.requestPermission();
+                await ref.read(firebaseMessagingProvider).requestPermission();
 
             if (!context.mounted) return;
 
