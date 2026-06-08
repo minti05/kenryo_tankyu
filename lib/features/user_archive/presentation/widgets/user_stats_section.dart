@@ -15,6 +15,8 @@ class UserStatsSection extends ConsumerWidget {
       loading: () => _StatsLayout(stats: null),
       error: (_, __) => const SizedBox.shrink(),
       data: (stats) => _StatsLayout(stats: stats),
+      // リフレッシュ中は前回データを表示し続ける（チラつき防止）
+      skipLoadingOnReload: true,
     );
   }
 }
@@ -71,6 +73,7 @@ class _StreakCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isLoading = streakDays == null;
     final days = streakDays ?? 0;
 
     return Card(
@@ -90,7 +93,7 @@ class _StreakCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$days日連続閲覧中！',
+                    isLoading ? '読み込み中...' : '$days日連続閲覧中！',
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
@@ -108,7 +111,7 @@ class _StreakCard extends StatelessWidget {
                 ],
               ),
             ),
-            _AnimatedDaysCounter(days: days),
+            if (!isLoading) _AnimatedDaysCounter(days: days),
           ],
         ),
       ),
@@ -145,8 +148,11 @@ class _AnimatedDaysCounterState extends State<_AnimatedDaysCounter>
   void didUpdateWidget(_AnimatedDaysCounter old) {
     super.didUpdateWidget(old);
     if (old.days != widget.days) {
-      _animation = Tween<double>(begin: 0, end: widget.days.toDouble())
-          .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+      // 前回の値から始めることで自然なカウントアップになる
+      _animation = Tween<double>(
+        begin: old.days.toDouble(),
+        end: widget.days.toDouble(),
+      ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
       _controller.forward(from: 0);
     }
   }
@@ -229,7 +235,9 @@ class _CountCardState extends State<_CountCard>
   void didUpdateWidget(_CountCard old) {
     super.didUpdateWidget(old);
     if (old.count != widget.count && widget.count != null) {
-      _animation = Tween<double>(begin: 0, end: widget.count!.toDouble())
+      // 前回の値から始めることで自然なカウントアップになる
+      final begin = (old.count ?? 0).toDouble();
+      _animation = Tween<double>(begin: begin, end: widget.count!.toDouble())
           .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
       _controller.forward(from: 0);
     }
@@ -257,7 +265,7 @@ class _CountCardState extends State<_CountCard>
                 ? SizedBox(
                     height: 24.h,
                     width: 24.w,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: const CircularProgressIndicator(strokeWidth: 2),
                   )
                 : AnimatedBuilder(
                     animation: _animation,

@@ -54,6 +54,17 @@ class UserStatsDataSource {
     return getStats(userId);
   }
 
+  /// インメモリのカウントアップに連動してキャッシュも更新する。
+  void updateCachedCounts({
+    required int todayViews,
+    required int weekViews,
+    required int totalViews,
+  }) {
+    _prefs.setInt(_keyTodayViews, todayViews);
+    _prefs.setInt(_keyWeekViews, weekViews);
+    _prefs.setInt(_keyTotalViews, totalViews);
+  }
+
   int _updateStreak() {
     final today = _todayString();
     final lastOpen = _prefs.getString(_keyLastOpenDate);
@@ -75,26 +86,27 @@ class UserStatsDataSource {
   }
 
   Future<UserStats> _fetchFromSupabase(String userId, int streak) async {
-    final now = DateTime.now().toUtc();
-    final todayStart = DateTime.utc(now.year, now.month, now.day);
+    // ローカル時間で「今日の開始」を求めてから UTC に変換（タイムゾーン対応）
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day).toUtc();
     final weekStart = todayStart.subtract(const Duration(days: 7));
 
     final results = await Future.wait([
       _client
           .from('browsing_history')
-          .select()
+          .select('document_id')
           .eq('user_id', userId)
           .gte('viewed_at', todayStart.toIso8601String())
           .count(CountOption.exact),
       _client
           .from('browsing_history')
-          .select()
+          .select('document_id')
           .eq('user_id', userId)
           .gte('viewed_at', weekStart.toIso8601String())
           .count(CountOption.exact),
       _client
           .from('browsing_history')
-          .select()
+          .select('document_id')
           .eq('user_id', userId)
           .count(CountOption.exact),
     ]);
@@ -130,8 +142,11 @@ class UserStatsDataSource {
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 
+  // Duration(days: 1) は DST で24時間とならない場合があるため
+  // DateTime コンストラクタの自動繰り下げを使う
   String _yesterdayString() {
-    final d = DateTime.now().subtract(const Duration(days: 1));
+    final now = DateTime.now();
+    final d = DateTime(now.year, now.month, now.day - 1);
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 }

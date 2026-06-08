@@ -25,10 +25,28 @@ class UserStatsNotifier extends _$UserStatsNotifier {
   Future<void> refresh() async {
     final user = ref.read(authStateChangesProvider).asData?.value;
     if (user == null || !user.emailVerified) return;
-    state = const AsyncLoading();
+    state = const AsyncLoading<UserStats>();
     state = await AsyncValue.guard(() async {
       final dataSource = ref.read(userStatsDataSourceProvider);
       return dataSource.refreshStats(user.uid);
     });
+  }
+
+  /// 新規閲覧時にインメモリカウントをインクリメントする。
+  /// Supabase への再フェッチなしで即時反映させる。
+  void incrementViewCount() {
+    final current = state.asData?.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(
+      todayViews: current.todayViews + 1,
+      weekViews: current.weekViews + 1,
+      totalViews: current.totalViews + 1,
+    ));
+    // キャッシュも更新して次回起動時に整合性を保つ
+    ref.read(userStatsDataSourceProvider).updateCachedCounts(
+          todayViews: current.todayViews + 1,
+          weekViews: current.weekViews + 1,
+          totalViews: current.totalViews + 1,
+        );
   }
 }

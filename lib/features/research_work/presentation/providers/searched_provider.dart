@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/features/research_work/data/repositories/research_work_repository_impl.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_stats_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'searched_provider.g.dart';
@@ -36,6 +37,8 @@ class ResearchWork extends _$ResearchWork {
         ref.read(forceReloadProvider.notifier).state = false;
       }
       await archiveRepo.insertHistory(combined);
+      // 新規閲覧としてカウントをリアルタイムに反映
+      ref.read(userStatsProvider.notifier).incrementViewCount();
       return combined;
     }
 
