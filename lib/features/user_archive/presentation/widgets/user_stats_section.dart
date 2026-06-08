@@ -79,7 +79,11 @@ class _StreakCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: [
-            Text('🔥', style: TextStyle(fontSize: 22.sp)),
+            Image.asset(
+              'assets/images/app_icon/icon.png',
+              width: 28.w,
+              height: 28.h,
+            ),
             SizedBox(width: 8.w),
             Expanded(
               child: Column(
@@ -159,13 +163,30 @@ class _AnimatedDaysCounterState extends State<_AnimatedDaysCounter>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, _) {
-        return Text(
-          '${_animation.value.toInt()}',
-          style: TextStyle(
-            fontSize: 32.sp,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.primary,
-          ),
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${_animation.value.toInt()}',
+              style: TextStyle(
+                fontSize: 32.sp,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 4.h),
+              child: Text(
+                '日',
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -241,13 +262,29 @@ class _CountCardState extends State<_CountCard>
                 : AnimatedBuilder(
                     animation: _animation,
                     builder: (context, _) {
-                      return Text(
-                        '${_animation.value.toInt()}',
-                        style: TextStyle(
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${_animation.value.toInt()}',
+                            style: TextStyle(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 2.h),
+                            child: Text(
+                              '件',
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -256,13 +293,6 @@ class _CountCardState extends State<_CountCard>
               widget.label,
               style: TextStyle(
                 fontSize: 11.sp,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-            Text(
-              '件閲覧',
-              style: TextStyle(
-                fontSize: 10.sp,
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
