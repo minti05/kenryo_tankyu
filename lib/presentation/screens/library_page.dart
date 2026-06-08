@@ -11,10 +11,29 @@ class LibraryPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
+          toolbarHeight: 0,
           bottom: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.history), text: '閲覧履歴'),
-              Tab(icon: Icon(Icons.favorite), text: 'お気に入り'),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.history),
+                    SizedBox(width: 6),
+                    Text('閲覧履歴'),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.favorite),
+                    SizedBox(width: 6),
+                    Text('お気に入り'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
