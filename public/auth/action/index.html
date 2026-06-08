@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>縣陵探究アーカイブ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+      color: #333;
+      padding: 40px 24px;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .conditions {
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+    }
+    .conditions p {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: #333;
+    }
+    .condition-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      color: #999;
+      transition: color 0.2s;
+    }
+    .condition-item.valid { color: #22a05a; }
+    .condition-item .check { font-size: 1rem; }
+    .field {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 44px 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: #1a73e8; }
+    input:disabled { background: #f0f0f0; color: #aaa; }
+    .toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #888;
+      font-size: 1.1rem;
+      padding: 0;
+    }
+    .error-text {
+      font-size: 0.78rem;
+      color: #d32f2f;
+      margin-top: 4px;
+      min-height: 1rem;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
+    .submit-btn:hover:not(:disabled) { background: #1558b0; }
+    .message {
+      text-align: center;
+      padding: 20px 0 8px;
+    }
+    .message .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .message h2 { font-size: 1.1rem; margin-bottom: 10px; }
+    .message p { font-size: 0.88rem; color: #666; line-height: 1.7; }
+    .error-card {
+      background: #fff3f3;
+      border: 1px solid #f5c6c6;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      color: #c62828;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #ddd;
+      border-top-color: #1a73e8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #666; font-size: 0.9rem; text-align: center; padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <a href="/">
+    <img class="logo" src="/icon.png" alt="縣陵探究アーカイブ" />
+  </a>
+  <h1>縣陵探究アーカイブ</h1>
+  <p class="subtitle">長野県松本県ヶ丘高等学校</p>
+
+  <div class="card" id="main-card">
+    <div class="loading-text"><span class="spinner"></span>読み込み中...</div>
+  </div>
+
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4E_Bx3HpO9y__ieQn99h4bTJ_UkJRLm0",
+      authDomain: "tankyu-app.firebaseapp.com",
+      projectId: "tankyu-app",
+      storageBucket: "tankyu-app.appspot.com",
+      messagingSenderId: "848862581518",
+      appId: "1:848862581518:web:8fa2916965eaf7a9387d5f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+    const oobCode = params.get('oobCode');
+    const card = document.getElementById('main-card');
+
+    // --- パスワードバリデーション (アプリ側 InputPassword に合わせる) ---
+    function validatePassword(value) {
+      return {
+        isLengthValid: value.length >= 8,
+        isAlphanumeric: /^[a-zA-Z0-9]+$/.test(value),
+        hasBothLettersAndNumbers: /(?=.*?[a-zA-Z])(?=.*?\d)/.test(value),
+      };
+    }
+
+    // --- 共通: パスワードフォームHTMLを生成 ---
+    function buildPasswordFormHTML(cardTitle, submitLabel) {
+      return `
+        <div class="card-title">${cardTitle}</div>
+        <div class="conditions">
+          <p>パスワードの条件</p>
+          <div class="condition-item" id="cond-length">
+            <span class="check">✓</span><span>8文字以上</span>
+          </div>
+          <div class="condition-item" id="cond-alnum">
+            <span class="check">✓</span><span>半角英数字（a-z, A-Z, 0-9）のみ</span>
+          </div>
+          <div class="condition-item" id="cond-both">
+            <span class="check">✓</span><span>英字と数字の組み合わせ</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">新規パスワード</label>
+          <div class="input-wrap">
+            <input type="password" id="password" autocomplete="new-password" placeholder="パスワードを入力" />
+            <button class="toggle-btn" type="button" onclick="toggleVisibility('password', 'eye1')" id="eye1">👁</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="confirm">新規パスワード（確認）</label>
+          <div class="input-wrap">
+            <input type="password" id="confirm" autocomplete="new-password" placeholder="もう一度入力" disabled />
+            <button class="toggle-btn" type="button" onclick="toggleVisibility('confirm', 'eye2')" id="eye2">👁</button>
+          </div>
+          <div class="error-text" id="confirm-error"></div>
+        </div>
+        <button class="submit-btn" id="submit-btn" disabled>${submitLabel}</button>
+        <div class="error-text" id="form-error" style="text-align:center;margin-top:8px;"></div>
+      `;
+    }
+
+    function toggleVisibility(inputId, btnId) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function bindPasswordFormEvents(onSubmit) {
+      const pwInput = document.getElementById('password');
+      const confirmInput = document.getElementById('confirm');
+      const submitBtn = document.getElementById('submit-btn');
+
+      let v = { isLengthValid: false, isAlphanumeric: false, hasBothLettersAndNumbers: false };
+
+      function updateConditionUI() {
+        document.getElementById('cond-length').classList.toggle('valid', v.isLengthValid);
+        document.getElementById('cond-alnum').classList.toggle('valid', v.isAlphanumeric);
+        document.getElementById('cond-both').classList.toggle('valid', v.hasBothLettersAndNumbers);
+      }
+
+      function updateSubmitState() {
+        const allValid = v.isLengthValid && v.isAlphanumeric && v.hasBothLettersAndNumbers;
+        confirmInput.disabled = !allValid;
+        const confirmMatch = confirmInput.value.length >= 8 && confirmInput.value === pwInput.value;
+        submitBtn.disabled = !confirmMatch;
+      }
+
+      pwInput.addEventListener('input', () => {
+        v = validatePassword(pwInput.value);
+        updateConditionUI();
+        updateSubmitState();
+        // 確認欄を再チェック
+        if (confirmInput.value) validateConfirm();
+      });
+
+      confirmInput.addEventListener('input', validateConfirm);
+
+      function validateConfirm() {
+        const errorEl = document.getElementById('confirm-error');
+        if (confirmInput.value && confirmInput.value !== pwInput.value) {
+          errorEl.textContent = 'パスワードが一致しません';
+        } else {
+          errorEl.textContent = '';
+        }
+        updateSubmitState();
+      }
+
+      submitBtn.addEventListener('click', async () => {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '処理中...';
+        document.getElementById('form-error').textContent = '';
+        try {
+          await onSubmit(pwInput.value);
+        } catch (e) {
+          document.getElementById('form-error').textContent = getErrorMessage(e);
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitBtn.dataset.label;
+        }
+      });
+
+      submitBtn.dataset.label = submitBtn.textContent;
+    }
+
+    // --- Firebase エラーメッセージ日本語化 ---
+    function getErrorMessage(error) {
+      const map = {
+        'auth/expired-action-code': 'リンクの有効期限が切れています。再度お試しください。',
+        'auth/invalid-action-code': 'リンクが無効です。再度お試しください。',
+        'auth/user-disabled': 'アカウントが無効化されています。',
+        'auth/user-not-found': 'ユーザーが見つかりません。',
+        'auth/weak-password': 'パスワードが弱すぎます。',
+        'auth/email-already-in-use': 'このメールアドレスはすでに使用されています。',
+      };
+      return map[error.code] || 'エラーが発生しました。もう一度お試しください。';
+    }
+
+    // --- 完了画面 ---
+    function showSuccess(message) {
+      card.innerHTML = `
+        <div class="message">
+          <div class="icon">✅</div>
+          <h2>完了しました</h2>
+          <p>${message}</p>
+        </div>
+      `;
+    }
+
+    // --- エラー画面 ---
+    function showError(message) {
+      card.innerHTML = `<div class="error-card">⚠️ ${message}</div>`;
+    }
+
+    // =========================================================
+    // モード分岐
+    // =========================================================
+
+    if (!mode || !oobCode) {
+      showError('無効なリンクです。メールのリンクから再度アクセスしてください。');
+    } else if (mode === 'resetPassword') {
+      handleResetPassword();
+    } else if (mode === 'signIn') {
+      handleSignIn();
+    } else {
+      showError('未対応のリンクです。');
+    }
+
+    // =========================================================
+    // mode=resetPassword
+    // =========================================================
+    async function handleResetPassword() {
+      try {
+        await auth.verifyPasswordResetCode(oobCode); // 有効性確認
+      } catch (e) {
+        showError(getErrorMessage(e));
+        return;
+      }
+
+      card.innerHTML = buildPasswordFormHTML('パスワードの再設定', 'パスワードを変更する');
+      bindPasswordFormEvents(async (newPassword) => {
+        await auth.confirmPasswordReset(oobCode, newPassword);
+        showSuccess('パスワードを変更しました。<br>アプリに戻り、新しいパスワードでログインしてください。');
+      });
+    }
+
+    // =========================================================
+    // mode=signIn (メールリンク新規登録)
+    // =========================================================
+    async function handleSignIn() {
+      let email = '';
+      let displayName = '';
+
+      try {
+        const continueUrl = params.get('continueUrl');
+        if (continueUrl) {
+          const cu = new URL(continueUrl);
+          email = cu.searchParams.get('email') || '';
+          displayName = cu.searchParams.get('name') || '';
+        }
+        if (!email) throw new Error('メールアドレスが取得できませんでした。');
+        if (!auth.isSignInWithEmailLink(window.location.href)) throw new Error('無効なサインインリンクです。');
+      } catch (e) {
+        showError(e.message || getErrorMessage(e));
+        return;
+      }
+
+      card.innerHTML = buildPasswordFormHTML('パスワードの設定', 'アカウントを作成する');
+      bindPasswordFormEvents(async (newPassword) => {
+        const result = await auth.signInWithEmailLink(email, window.location.href);
+        await result.user.updatePassword(newPassword);
+        if (displayName) {
+          await result.user.updateProfile({ displayName });
+        }
+        showSuccess('アカウントを作成しました。<br>アプリに戻って操作を続けてください。');
+      });
+    }
+  </script>
+</body>
+</html>
