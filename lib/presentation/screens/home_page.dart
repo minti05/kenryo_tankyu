@@ -5,6 +5,7 @@ import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/user_stats_section.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 import 'package:kenryo_tankyu/presentation/widget/startup_dialogs.dart';
 
@@ -49,6 +50,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
             ),
             const SizedBox(height: 8),
+            const UserStatsSection(),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
