@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -32,23 +33,24 @@ class SettingsPage extends ConsumerWidget {
               value: notification,
               onChanged: (bool value) async {
                 if (value) {
-                  final status = await Permission.notification.status;
-                  debugPrint('Current notification status: $status');
+                  // iOS APNs への登録も含めた権限リクエスト
+                  final settings = await ref
+                      .read(firebaseMessagingProvider)
+                      .requestPermission();
+                  debugPrint(
+                      'Notification auth status: ${settings.authorizationStatus}');
 
-                  if (status.isPermanentlyDenied ||
-                      (status.isDenied && !status.isLimited)) {
-                    // iOSで一度拒否されると request() ではダイアログが出ないことがあるため、状態を確認
-                    final requestStatus =
-                        await Permission.notification.request();
-                    debugPrint('Notification request result: $requestStatus');
+                  final granted = settings.authorizationStatus ==
+                          AuthorizationStatus.authorized ||
+                      settings.authorizationStatus ==
+                          AuthorizationStatus.provisional;
 
-                    if (!requestStatus.isGranted &&
-                        !requestStatus.isProvisional) {
-                      if (context.mounted) {
-                        _showPermissionDeniedDialog(context);
-                      }
-                      return;
+                  if (!granted) {
+                    // 拒否されている場合はシステム設定へ誘導
+                    if (context.mounted) {
+                      _showPermissionDeniedDialog(context);
                     }
+                    return;
                   }
 
                   // FCMトークンの取得を試みる（ブロックしない）

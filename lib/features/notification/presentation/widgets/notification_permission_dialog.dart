@@ -1,7 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class NotificationPermissionDialog extends ConsumerWidget {
   const NotificationPermissionDialog({super.key});
@@ -52,12 +53,16 @@ class NotificationPermissionDialog extends ConsumerWidget {
                 .read(settingsProvider.notifier)
                 .setHasShownNotificationDialog(true);
 
-            // OSの権限リクエスト
-            final status = await Permission.notification.request();
+            // iOS APNs への登録も含めた権限リクエスト
+            final settings =
+                await ref.read(firebaseMessagingProvider).requestPermission();
 
             if (!context.mounted) return;
 
-            if (status.isGranted) {
+            final granted = settings.authorizationStatus ==
+                    AuthorizationStatus.authorized ||
+                settings.authorizationStatus == AuthorizationStatus.provisional;
+            if (granted) {
               await ref.read(settingsProvider.notifier).setNotification(true);
             } else {
               await ref.read(settingsProvider.notifier).setNotification(false);
