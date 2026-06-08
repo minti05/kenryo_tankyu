@@ -23,6 +23,24 @@ class DisplayPdf extends ConsumerWidget {
             final pdfAsync =
                 ref.watch(pdfProvider(nowWatchingPdf, searched.enterYear));
 
+            // ログはbuild外で一度だけ送出する
+            ref.listen(pdfProvider(nowWatchingPdf, searched.enterYear),
+                (previous, next) {
+              if (previous?.hasError == true) return;
+              next.whenOrNull(error: (error, stack) {
+                if (error is ServerFailure &&
+                    error.code == 'object-not-found') {
+                  FirebaseTrackingService.logPdfNotFound(
+                    documentId: searched.documentID,
+                    pdfPath: nowWatchingPdf,
+                  );
+                } else {
+                  FirebaseTrackingService.recordError(error, stack,
+                      reason: 'pdf_load_error');
+                }
+              });
+            });
+
             return pdfAsync.when(
               data: (pdfData) {
                 if (pdfData == null) {
@@ -60,10 +78,6 @@ class DisplayPdf extends ConsumerWidget {
               error: (error, stack) {
                 if (error is ServerFailure &&
                     error.code == 'object-not-found') {
-                  FirebaseTrackingService.logPdfNotFound(
-                    documentId: searched.documentID,
-                    pdfPath: nowWatchingPdf,
-                  );
                   return const CommonErrorView(
                     error: ServerFailure(
                       message: 'ファイルが見つかりませんでした',
@@ -71,8 +85,6 @@ class DisplayPdf extends ConsumerWidget {
                     ),
                   );
                 }
-                FirebaseTrackingService.recordError(error, stack,
-                    reason: 'pdf_load_error');
                 return CommonErrorView(
                   error: error,
                   onRetry: () => ref.invalidate(

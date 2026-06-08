@@ -181,8 +181,30 @@ class SearchedHistoryNotifier extends _$SearchedHistoryNotifier {
     _hasMore = true;
     _isFetchingMore = false;
 
-    // お気に入りIDキャッシュが揃うまで待機
-    final favoriteIds = await ref.watch(favoriteIdsCacheProvider.future);
+    // お気に入り変更をインプレース更新（ref.watchにするとリスト全体がリセットされる）
+    ref.listen(favoriteIdsCacheProvider, (previous, next) {
+      final favoriteIds = next.asData?.value;
+      if (favoriteIds == null) return;
+      final current = state.asData?.value;
+      if (current == null) return;
+      if (onlyShowFavorite) {
+        state = AsyncData(
+          current
+              .where((item) => favoriteIds.contains(item.documentID))
+              .toList(),
+        );
+      } else {
+        state = AsyncData(
+          current
+              .map((item) => item.copyWith(
+                  isFavorite: favoriteIds.contains(item.documentID)))
+              .toList(),
+        );
+      }
+    });
+
+    // 初回のみ読み取る（再ビルドを防ぐためreadを使用）
+    final favoriteIds = await ref.read(favoriteIdsCacheProvider.future);
 
     final items = await _fetchPage(0, favoriteIds);
     _hasMore = items.length == _pageSize;
