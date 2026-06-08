@@ -31,7 +31,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final profileName = developer_mode
         ? 'ゲスト'
-        : ref.watch(authStateChangesProvider).asData?.value?.displayName ?? 'ゲスト';
+        : ref.watch(authStateChangesProvider).asData?.value?.displayName ??
+            'ゲスト';
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
