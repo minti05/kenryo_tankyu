@@ -190,12 +190,12 @@
     const oobCode = params.get('oobCode');
     const card = document.getElementById('main-card');
 
-    // --- パスワードバリデーション (アプリ側 InputPassword に合わせる) ---
+    // --- パスワードバリデーション ---
     function validatePassword(value) {
       return {
         isLengthValid: value.length >= 8,
-        isAlphanumeric: /^[a-zA-Z0-9]+$/.test(value),
-        hasBothLettersAndNumbers: /(?=.*?[a-zA-Z])(?=.*?\d)/.test(value),
+        hasLetter: /[a-zA-Z]/.test(value),
+        hasNumber: /\d/.test(value),
       };
     }
 
@@ -208,11 +208,11 @@
           <div class="condition-item" id="cond-length">
             <span class="check">✓</span><span>8文字以上</span>
           </div>
-          <div class="condition-item" id="cond-alnum">
-            <span class="check">✓</span><span>半角英数字（a-z, A-Z, 0-9）のみ</span>
+          <div class="condition-item" id="cond-letter">
+            <span class="check">✓</span><span>英字を含む（記号・スペース使用可）</span>
           </div>
-          <div class="condition-item" id="cond-both">
-            <span class="check">✓</span><span>英字と数字の組み合わせ</span>
+          <div class="condition-item" id="cond-number">
+            <span class="check">✓</span><span>数字を含む</span>
           </div>
         </div>
         <div class="field">
@@ -245,16 +245,16 @@
       const confirmInput = document.getElementById('confirm');
       const submitBtn = document.getElementById('submit-btn');
 
-      let v = { isLengthValid: false, isAlphanumeric: false, hasBothLettersAndNumbers: false };
+      let v = { isLengthValid: false, hasLetter: false, hasNumber: false };
 
       function updateConditionUI() {
         document.getElementById('cond-length').classList.toggle('valid', v.isLengthValid);
-        document.getElementById('cond-alnum').classList.toggle('valid', v.isAlphanumeric);
-        document.getElementById('cond-both').classList.toggle('valid', v.hasBothLettersAndNumbers);
+        document.getElementById('cond-letter').classList.toggle('valid', v.hasLetter);
+        document.getElementById('cond-number').classList.toggle('valid', v.hasNumber);
       }
 
       function updateSubmitState() {
-        const allValid = v.isLengthValid && v.isAlphanumeric && v.hasBothLettersAndNumbers;
+        const allValid = v.isLengthValid && v.hasLetter && v.hasNumber;
         confirmInput.disabled = !allValid;
         const confirmMatch = confirmInput.value.length >= 8 && confirmInput.value === pwInput.value;
         submitBtn.disabled = !confirmMatch;
