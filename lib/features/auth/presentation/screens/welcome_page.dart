@@ -40,7 +40,7 @@ class WelcomePage extends ConsumerWidget {
                 onPressed: () => _signInWithGoogle(context, ref),
               ),
               const SizedBox(height: 16),
-              _TermsText(context),
+              const _TermsText(),
               const Spacer(flex: 2),
               _emailLoginSection(context, ref),
               const SizedBox(height: 20),
@@ -233,9 +233,7 @@ class _GoogleSignInButton extends StatelessWidget {
 }
 
 class _TermsText extends StatelessWidget {
-  final BuildContext parentContext;
-
-  const _TermsText(this.parentContext);
+  const _TermsText();
 
   @override
   Widget build(BuildContext context) {
