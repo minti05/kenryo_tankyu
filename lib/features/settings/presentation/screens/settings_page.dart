@@ -264,8 +264,13 @@ class SettingsPage extends ConsumerWidget {
     try {
       final reauthenticated =
           await ref.read(authRepositoryProvider).reauthenticateWithGoogle();
-      if (!reauthenticated) return;
       if (!context.mounted) return;
+      if (!reauthenticated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Googleサインインがキャンセルされました')),
+        );
+        return;
+      }
       await ref.read(authProvider.notifier).deleteAccount();
     } on Failure catch (e) {
       if (!context.mounted) return;

@@ -109,6 +109,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<bool> reauthenticateWithGoogle() async {
     try {
+      // キャッシュされた認証情報を使わず、必ず再認証UIを表示させるためにサインアウトする
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {}
       final account = await GoogleSignIn.instance.authenticate();
       final idToken = account.authentication.idToken;
       final credential = GoogleAuthProvider.credential(idToken: idToken);
