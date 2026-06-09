@@ -31,8 +31,9 @@ class _OtherReasonFormState extends ConsumerState<OtherReasonForm> {
         _freeDescriptionController.text,
       );
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           const SnackBar(content: Text('送信しました。ご報告ありがとうございます。')),
         );
       }

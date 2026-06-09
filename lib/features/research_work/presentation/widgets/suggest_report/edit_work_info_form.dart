@@ -47,8 +47,9 @@ class _EditWorkInfoFormState extends ConsumerState<EditWorkInfoForm> {
         _selectedYear?.displayName.toString() ?? '',
       );
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           const SnackBar(content: Text('送信しました。ご報告ありがとうございます。')),
         );
       }
@@ -115,7 +116,8 @@ class _EditWorkInfoFormState extends ConsumerState<EditWorkInfoForm> {
             border: OutlineInputBorder(),
             isDense: true,
           ),
-          initialValue: _selectedYear,
+          initialValue:
+              _selectedYear == EnterYear.undefined ? null : _selectedYear,
           hint: const Text('入学年度を選択してください'),
           items: EnterYear.values
               .where((v) => v != EnterYear.undefined)

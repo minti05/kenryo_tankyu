@@ -45,8 +45,9 @@ class _CannotViewPdfFormState extends ConsumerState<CannotViewPdfForm> {
         _freeDescriptionController.text,
       );
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           const SnackBar(content: Text('送信しました。ご報告ありがとうございます。')),
         );
       }
@@ -81,7 +82,7 @@ class _CannotViewPdfFormState extends ConsumerState<CannotViewPdfForm> {
               title: Text(DocumentType.values[index].displayName),
               value: _selected[index],
               onChanged: (value) {
-                setState(() => _selected[index] = value!);
+                setState(() => _selected[index] = value ?? false);
               },
             );
           },

@@ -108,6 +108,7 @@ class _SuggestReportFormState extends State<_SuggestReportForm> {
             }).toList();
           },
           onChanged: (value) {
+            if (value == null) return;
             setState(() {
               _selected = ChangeInfoFromUserType.values
                   .firstWhere((e) => e.displayName == value);

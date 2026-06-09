@@ -118,12 +118,14 @@ class EditSpreadSheet {
       [SheetsApi.spreadsheetsScope],
     );
 
-    final sheetsApi = SheetsApi(client);
-    final request = ValueRange(values: [values]);
+    try {
+      final sheetsApi = SheetsApi(client);
+      final request = ValueRange(values: [values]);
 
-    await sheetsApi.spreadsheets.values
-        .append(request, _spreadsheetId, range, valueInputOption: 'RAW');
-
-    client.close();
+      await sheetsApi.spreadsheets.values
+          .append(request, _spreadsheetId, range, valueInputOption: 'RAW');
+    } finally {
+      client.close();
+    }
   }
 }
