@@ -24,6 +24,14 @@ abstract class Search with _$Search {
   @JsonSerializable(explicitToJson: true)
   const Search._();
 
+  bool get isEmpty =>
+      searchWord.isEmpty &&
+      category == Category.none &&
+      subCategory == SubCategory.none &&
+      enterYear == EnterYear.undefined &&
+      course == Course.undefined &&
+      eventName == EventName.undefined;
+
   const factory Search({
     @CategoryEnumConverter() required Category category,
     @SubCategoryEnumConverter() required SubCategory subCategory,

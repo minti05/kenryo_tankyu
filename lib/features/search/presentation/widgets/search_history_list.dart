@@ -8,6 +8,68 @@ import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_history_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 
+class _AutoScrollText extends StatefulWidget {
+  final String text;
+  const _AutoScrollText(this.text);
+
+  @override
+  State<_AutoScrollText> createState() => _AutoScrollTextState();
+}
+
+class _AutoScrollTextState extends State<_AutoScrollText> {
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startScroll());
+  }
+
+  Future<void> _startScroll() async {
+    if (!mounted || !_controller.hasClients) return;
+    double maxScroll;
+    try {
+      maxScroll = _controller.position.maxScrollExtent;
+    } catch (_) {
+      return;
+    }
+    if (maxScroll <= 0) return;
+    while (mounted) {
+      await Future.delayed(const Duration(seconds: 2));
+      if (!mounted || !_controller.hasClients) return;
+      try {
+        await _controller.animateTo(
+          maxScroll,
+          duration: Duration(milliseconds: (maxScroll * 25).toInt()),
+          curve: Curves.linear,
+        );
+      } catch (_) {
+        return;
+      }
+      if (!mounted || !_controller.hasClients) return;
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted || !_controller.hasClients) return;
+      _controller.jumpTo(0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      controller: _controller,
+      physics: const NeverScrollableScrollPhysics(),
+      child: Text(widget.text),
+    );
+  }
+}
+
 class SearchHistoryList extends ConsumerWidget {
   const SearchHistoryList({super.key});
 
@@ -40,9 +102,7 @@ class SearchHistoryList extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: Text(word,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis),
+                                child: _AutoScrollText(word),
                               ),
                               Text(' ${search.numberOfHits}件',
                                   style: const TextStyle(fontSize: 12)),
@@ -73,7 +133,7 @@ class SearchHistoryList extends ConsumerWidget {
 
   String _connectWord(Search search) {
     final List<String> searchList = [];
-    //searchList.addAll(search.searchWord!);
+    searchList.addAll(search.searchWord);
     search.category != Category.none
         ? searchList.add(search.category.displayName)
         : null;
