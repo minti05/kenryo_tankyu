@@ -88,15 +88,11 @@ final algoliaSearchProvider =
     }
   }
 
-  if (result == null && page > 0) {
-    return SearchResult(hits: [], page: page, nbPages: page, nbHits: 0);
-  }
+  final resolved =
+      result ?? SearchResult(hits: [], page: page, nbPages: page, nbHits: 0);
 
-  if (result != null) {
-    cache.set(page, result);
-  }
-
-  return result;
+  cache.set(page, resolved);
+  return resolved;
 });
 
 final sortedListProvider =
