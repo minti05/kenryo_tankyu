@@ -80,20 +80,23 @@ class WorkDetailsTable extends StatelessWidget {
             ),
           ),
         ),
-        Row(
-          children: [
-            _CategoryChip(
-              category: searched.category1,
-              subCategory: searched.subCategory1,
-            ),
-            if (searched.category2 != Category.none) ...[
-              const SizedBox(width: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
               _CategoryChip(
-                category: searched.category2,
-                subCategory: searched.subCategory2,
+                category: searched.category1,
+                subCategory: searched.subCategory1,
               ),
+              if (searched.category2 != Category.none) ...[
+                const SizedBox(width: 8),
+                _CategoryChip(
+                  category: searched.category2,
+                  subCategory: searched.subCategory2,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ],
     );
@@ -149,7 +152,13 @@ class _CategoryChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (imagePath != null) ...[
-            Image.asset(imagePath, width: 22, height: 22),
+            Image.asset(
+              imagePath,
+              width: 22,
+              height: 22,
+              errorBuilder: (context, error, stackTrace) =>
+                  const SizedBox(width: 22, height: 22),
+            ),
             const SizedBox(width: 6),
           ],
           Column(

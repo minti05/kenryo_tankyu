@@ -105,6 +105,7 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
                 AnimatedSize(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
+                  alignment: Alignment.topCenter,
                   child: _isDetailsExpanded
                       ? Padding(
                           padding: const EdgeInsets.only(bottom: 4.0),
