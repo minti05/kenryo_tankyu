@@ -64,7 +64,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage>
           children: [
             SwitchListTile(
               value: _notificationGranted,
-              onChanged: (_) => openAppSettings(),
+              onChanged: (_) async {
+                if (!_notificationGranted) {
+                  final status = await Permission.notification.request();
+                  if (mounted) {
+                    setState(() {
+                      _notificationGranted = status.isGranted;
+                    });
+                  }
+                  if (status.isGranted) return;
+                }
+                await openAppSettings();
+              },
               secondary: const Icon(Icons.notifications_active_outlined),
               title: const Text('通知を受け取る'),
             ),
