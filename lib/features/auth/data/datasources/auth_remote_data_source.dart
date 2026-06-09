@@ -22,6 +22,12 @@ abstract class AuthRemoteDataSource {
 
   /// Googleサインインを試みる。ユーザーがキャンセルした場合は false を返す。
   Future<bool> signInWithGoogle();
+
+  Future<void> reauthenticateWithEmailAndPassword(
+      {required String email, required String password});
+
+  /// Googleで再認証を試みる。ユーザーがキャンセルした場合は false を返す。
+  Future<bool> reauthenticateWithGoogle();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -88,6 +94,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final user = _firebaseAuth.currentUser;
     if (user == null) throw StateError('User not logged in');
     await user.reload();
+  }
+
+  @override
+  Future<void> reauthenticateWithEmailAndPassword(
+      {required String email, required String password}) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) throw StateError('User not logged in');
+    final credential =
+        EmailAuthProvider.credential(email: email, password: password);
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  @override
+  Future<bool> reauthenticateWithGoogle() async {
+    try {
+      final account = await GoogleSignIn.instance.authenticate();
+      final idToken = account.authentication.idToken;
+      final credential = GoogleAuthProvider.credential(idToken: idToken);
+      final user = _firebaseAuth.currentUser;
+      if (user == null) throw StateError('User not logged in');
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } on GoogleSignInException catch (e) {
+      switch (e.code) {
+        case GoogleSignInExceptionCode.canceled:
+        case GoogleSignInExceptionCode.interrupted:
+          return false;
+        default:
+          rethrow;
+      }
+    }
   }
 
   @override
