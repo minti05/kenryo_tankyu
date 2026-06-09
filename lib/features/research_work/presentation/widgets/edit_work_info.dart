@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
+import 'package:kenryo_tankyu/core/utils/write_spread_sheet.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
-class EditWorkInfo extends StatefulWidget {
+class EditWorkInfo extends ConsumerStatefulWidget {
   final Searched searched;
-  EditWorkInfo({super.key, required this.searched});
+  const EditWorkInfo({super.key, required this.searched});
 
   @override
-  State<EditWorkInfo> createState() => _EditWorkInfoState();
+  ConsumerState<EditWorkInfo> createState() => _EditWorkInfoState();
 }
 
-class _EditWorkInfoState extends State<EditWorkInfo> {
+class _EditWorkInfoState extends ConsumerState<EditWorkInfo> {
   final TextEditingController _authorController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   Course? _selectedCourse;
   EnterYear? _selectedYear;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -30,6 +33,34 @@ class _EditWorkInfoState extends State<EditWorkInfo> {
     _authorController.dispose();
     _titleController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() => _isSubmitting = true);
+    try {
+      await EditSpreadSheet.instance.submitSuggestWorksInfo(
+        ref,
+        widget.searched.documentID,
+        _authorController.text,
+        _titleController.text,
+        _selectedCourse?.displayName ?? '',
+        _selectedYear?.displayName.toString() ?? '',
+      );
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('送信しました。ご報告ありがとうございます。')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('送信に失敗しました。時間をおいて再試行してください。')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -99,19 +130,14 @@ class _EditWorkInfoState extends State<EditWorkInfo> {
         ),
         const SizedBox(height: 16),
         ElevatedButton(
-          onPressed: () {
-            // 入力値を取得して処理
-            final author = _authorController.text;
-            final title = _titleController.text;
-            final course = _selectedCourse?.displayName;
-            final year = _selectedYear?.displayName;
-
-            print('名前: $author');
-            print('タイトル: $title');
-            print('学科: $course');
-            print('入学年度: $year');
-          },
-          child: const Text('保存'),
+          onPressed: _isSubmitting ? null : _submit,
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('保存'),
         ),
       ],
     );

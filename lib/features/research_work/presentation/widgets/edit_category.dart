@@ -1,22 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
+import 'package:kenryo_tankyu/core/utils/write_spread_sheet.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
 enum RadioValue { category1, category2 }
 
-class EditCategory extends StatefulWidget {
+class EditCategory extends ConsumerStatefulWidget {
   final Searched searched;
   const EditCategory({super.key, required this.searched});
 
   @override
-  State<EditCategory> createState() => _EditCategoryState();
+  ConsumerState<EditCategory> createState() => _EditCategoryState();
 }
 
-class _EditCategoryState extends State<EditCategory> {
+class _EditCategoryState extends ConsumerState<EditCategory> {
   RadioValue? selectedRadio = RadioValue.category1;
   Category selectedCategory = Category.none;
   SubCategory selectedSubCategory = SubCategory.other;
+  bool _isSubmitting = false;
+
+  Future<void> _submit() async {
+    final searched = widget.searched;
+    final radioLabel = selectedRadio == RadioValue.category1
+        ? '${searched.category1.displayName} - ${searched.subCategory1.displayName}'
+        : '${searched.category2.displayName} - ${searched.subCategory2.displayName}';
+
+    setState(() => _isSubmitting = true);
+    try {
+      await EditSpreadSheet.instance.submitSuggestCategory(
+        ref,
+        searched.documentID,
+        radioLabel,
+        selectedCategory.displayName,
+        selectedSubCategory.displayName,
+      );
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('送信しました。ご報告ありがとうございます。')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('送信に失敗しました。時間をおいて再試行してください。')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,10 +137,14 @@ class _EditCategoryState extends State<EditCategory> {
 
   Widget _buildSubmitButton() {
     return ElevatedButton(
-      onPressed: () {
-        print('category: $selectedCategory, subCategory: $selectedSubCategory');
-      },
-      child: const Text('送信'),
+      onPressed: _isSubmitting ? null : _submit,
+      child: _isSubmitting
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Text('送信'),
     );
   }
 }

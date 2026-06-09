@@ -1,17 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
+import 'package:kenryo_tankyu/core/utils/write_spread_sheet.dart';
+import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
-class CannotViewPdf extends StatefulWidget {
-  const CannotViewPdf({super.key});
+class CannotViewPdf extends ConsumerStatefulWidget {
+  final Searched searched;
+  const CannotViewPdf({super.key, required this.searched});
 
   @override
-  State<CannotViewPdf> createState() => _CannotViewPdfState();
+  ConsumerState<CannotViewPdf> createState() => _CannotViewPdfState();
 }
 
-class _CannotViewPdfState extends State<CannotViewPdf> {
-  List<bool> _selectedCannotViewPdf =
-      List.generate(DocumentType.values.length, (index) => false);
-  TextEditingController _freeDescriptionController = TextEditingController();
+class _CannotViewPdfState extends ConsumerState<CannotViewPdf> {
+  late List<bool> _selectedCannotViewPdf;
+  final TextEditingController _freeDescriptionController =
+      TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCannotViewPdf =
+        List.generate(DocumentType.values.length, (index) => false);
+  }
+
+  @override
+  void dispose() {
+    _freeDescriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final selectedTypes = [
+      for (int i = 0; i < DocumentType.values.length; i++)
+        if (_selectedCannotViewPdf[i]) DocumentType.values[i].displayName
+    ];
+
+    setState(() => _isSubmitting = true);
+    try {
+      await EditSpreadSheet.instance.submitCannotViewPdf(
+        ref,
+        widget.searched.documentID,
+        selectedTypes,
+        _freeDescriptionController.text,
+      );
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('送信しました。ご報告ありがとうございます。')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('送信に失敗しました。時間をおいて再試行してください。')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +96,14 @@ class _CannotViewPdfState extends State<CannotViewPdf> {
         ),
         const SizedBox(height: 8),
         ElevatedButton(
-          onPressed: () {
-            print(_freeDescriptionController.text);
-          },
-          child: const Text('送信'),
+          onPressed: _isSubmitting ? null : _submit,
+          child: _isSubmitting
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('送信'),
         ),
       ],
     );

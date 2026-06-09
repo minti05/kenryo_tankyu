@@ -70,9 +70,9 @@ class _ChangeInfoFromUserState extends State<ChangeInfoFromUser> {
           case ChangeInfoFromUserType.editWorkInfo:
             return EditWorkInfo(searched: widget.searched);
           case ChangeInfoFromUserType.cannotViewPdf:
-            return CannotViewPdf();
+            return CannotViewPdf(searched: widget.searched);
           case ChangeInfoFromUserType.otherReason:
-            return OtherReason();
+            return OtherReason(searched: widget.searched);
           default:
             return const SizedBox();
         }
