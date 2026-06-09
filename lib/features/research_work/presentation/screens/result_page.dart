@@ -6,8 +6,7 @@ import 'package:kenryo_tankyu/features/research_work/presentation/providers/sear
 import 'package:kenryo_tankyu/features/research_work/presentation/screens/pdf_expand_page.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/utils/share_helper.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/header_for_result.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_title.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_details_table.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_info_section.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/pdf_choice_chip.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/display_pdf.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
@@ -24,6 +23,7 @@ class ResultPage extends ConsumerStatefulWidget {
 class _ResultPageMainState extends ConsumerState<ResultPage> {
   final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
   ProviderSubscription<AsyncValue<Searched>>? _staleCheckSub;
+  bool _isDetailsExpanded = true;
 
   @override
   void initState() {
@@ -96,13 +96,32 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
             body: Padding(
               padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
               child: Column(children: [
-                WorkTitle(searched: searchedData),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: WorkDetailsTable(searched: searchedData),
+                WorkTitle(
+                  searched: searchedData,
+                  isDetailsExpanded: _isDetailsExpanded,
+                  onToggleDetails: () =>
+                      setState(() => _isDetailsExpanded = !_isDetailsExpanded),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  alignment: Alignment.topCenter,
+                  child: _isDetailsExpanded
+                      ? Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: WorkDetailsTable(searched: searchedData),
+                        )
+                      : const SizedBox.shrink(),
                 ),
                 PdfChoiceChip(searched: searchedData),
-                DisplayPdf(searched: searchedData),
+                DisplayPdf(
+                  searched: searchedData,
+                  onPdfTapped: () {
+                    if (_isDetailsExpanded) {
+                      setState(() => _isDetailsExpanded = false);
+                    }
+                  },
+                ),
               ]),
             ),
           ),
