@@ -27,16 +27,25 @@ class _AutoScrollTextState extends State<_AutoScrollText> {
 
   Future<void> _startScroll() async {
     if (!mounted || !_controller.hasClients) return;
-    final maxScroll = _controller.position.maxScrollExtent;
+    double maxScroll;
+    try {
+      maxScroll = _controller.position.maxScrollExtent;
+    } catch (_) {
+      return;
+    }
     if (maxScroll <= 0) return;
     while (mounted) {
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted || !_controller.hasClients) return;
-      await _controller.animateTo(
-        maxScroll,
-        duration: Duration(milliseconds: (maxScroll * 25).toInt()),
-        curve: Curves.linear,
-      );
+      try {
+        await _controller.animateTo(
+          maxScroll,
+          duration: Duration(milliseconds: (maxScroll * 25).toInt()),
+          curve: Curves.linear,
+        );
+      } catch (_) {
+        return;
+      }
       if (!mounted || !_controller.hasClients) return;
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted || !_controller.hasClients) return;

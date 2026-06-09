@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import "package:kenryo_tankyu/core/constants/work/category_value.dart";
-import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import "package:kenryo_tankyu/core/constants/work/search_value.dart";
-import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_list_preview.dart'; // ResultList is here
@@ -11,7 +8,6 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/result_header
 import 'package:kenryo_tankyu/features/search/presentation/widgets/sidebar.dart';
 
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 
 class ResultListPage extends ConsumerWidget {
@@ -61,29 +57,8 @@ class ResultListPage extends ConsumerWidget {
                   return asyncValue.when(
                     data: (data) {
                       if (data == null) {
-                        final search = ref.read(searchProvider);
-                        final isEmptySearch = search.searchWord.isEmpty &&
-                            search.category == Category.none &&
-                            search.subCategory == SubCategory.none &&
-                            search.enterYear == EnterYear.undefined &&
-                            search.course == Course.undefined &&
-                            search.eventName == EventName.undefined;
-                        return Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(isEmptySearch
-                                ? '検索条件を設定してください'
-                                : 'データがヒットしませんでした'),
-                            if (!isEmptySearch) ...[
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                  onPressed: () =>
-                                      ref.invalidate(algoliaSearchProvider),
-                                  child: const Text('リロードする')),
-                            ],
-                          ],
-                        ));
+                        // algoliaSearchProvider が null を返すのは search.isEmpty の場合のみ
+                        return const Center(child: Text('検索条件を設定してください'));
                       } else {
                         final currentPage = ref.watch(searchPageProvider);
                         final hits = data.hits;
