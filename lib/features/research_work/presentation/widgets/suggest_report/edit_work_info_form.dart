@@ -4,15 +4,15 @@ import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/core/utils/write_spread_sheet.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
-class EditWorkInfo extends ConsumerStatefulWidget {
+class EditWorkInfoForm extends ConsumerStatefulWidget {
   final Searched searched;
-  const EditWorkInfo({super.key, required this.searched});
+  const EditWorkInfoForm({super.key, required this.searched});
 
   @override
-  ConsumerState<EditWorkInfo> createState() => _EditWorkInfoState();
+  ConsumerState<EditWorkInfoForm> createState() => _EditWorkInfoFormState();
 }
 
-class _EditWorkInfoState extends ConsumerState<EditWorkInfo> {
+class _EditWorkInfoFormState extends ConsumerState<EditWorkInfoForm> {
   final TextEditingController _authorController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   Course? _selectedCourse;
@@ -68,8 +68,10 @@ class _EditWorkInfoState extends ConsumerState<EditWorkInfo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('間違っている箇所の訂正をお願いします',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          '間違っている箇所の訂正をお願いします',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _authorController,
@@ -91,7 +93,8 @@ class _EditWorkInfoState extends ConsumerState<EditWorkInfo> {
           ),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField(
+        DropdownButtonFormField<Course>(
+          isExpanded: true,
           decoration: const InputDecoration(
             labelText: '学科',
             border: OutlineInputBorder(),
@@ -99,34 +102,26 @@ class _EditWorkInfoState extends ConsumerState<EditWorkInfo> {
           ),
           initialValue: _selectedCourse,
           items: Course.values
-              .map<DropdownMenuItem<Course>>((Course value) => DropdownMenuItem(
-                  value: value, child: Text(value.displayName)))
+              .map(
+                  (v) => DropdownMenuItem(value: v, child: Text(v.displayName)))
               .toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedCourse = value;
-            });
-          },
+          onChanged: (value) => setState(() => _selectedCourse = value),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField(
+        DropdownButtonFormField<EnterYear>(
+          isExpanded: true,
           decoration: const InputDecoration(
             labelText: '入学年度',
             border: OutlineInputBorder(),
             isDense: true,
           ),
           initialValue: _selectedYear,
-          items: EnterYear.values
-              .map<DropdownMenuItem<EnterYear>>((EnterYear value) =>
-                  DropdownMenuItem(
-                      value: value, child: Text(value.displayName.toString())))
-              .toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedYear = value;
-            });
-          },
           hint: const Text('入学年度を選択してください'),
+          items: EnterYear.values
+              .map((v) => DropdownMenuItem(
+                  value: v, child: Text(v.displayName.toString())))
+              .toList(),
+          onChanged: (value) => setState(() => _selectedYear = value),
         ),
         const SizedBox(height: 16),
         ElevatedButton(

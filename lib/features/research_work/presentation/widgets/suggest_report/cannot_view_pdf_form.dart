@@ -4,16 +4,16 @@ import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import 'package:kenryo_tankyu/core/utils/write_spread_sheet.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
-class CannotViewPdf extends ConsumerStatefulWidget {
+class CannotViewPdfForm extends ConsumerStatefulWidget {
   final Searched searched;
-  const CannotViewPdf({super.key, required this.searched});
+  const CannotViewPdfForm({super.key, required this.searched});
 
   @override
-  ConsumerState<CannotViewPdf> createState() => _CannotViewPdfState();
+  ConsumerState<CannotViewPdfForm> createState() => _CannotViewPdfFormState();
 }
 
-class _CannotViewPdfState extends ConsumerState<CannotViewPdf> {
-  late List<bool> _selectedCannotViewPdf;
+class _CannotViewPdfFormState extends ConsumerState<CannotViewPdfForm> {
+  late List<bool> _selected;
   final TextEditingController _freeDescriptionController =
       TextEditingController();
   bool _isSubmitting = false;
@@ -21,8 +21,7 @@ class _CannotViewPdfState extends ConsumerState<CannotViewPdf> {
   @override
   void initState() {
     super.initState();
-    _selectedCannotViewPdf =
-        List.generate(DocumentType.values.length, (index) => false);
+    _selected = List.generate(DocumentType.values.length, (_) => false);
   }
 
   @override
@@ -34,7 +33,7 @@ class _CannotViewPdfState extends ConsumerState<CannotViewPdf> {
   Future<void> _submit() async {
     final selectedTypes = [
       for (int i = 0; i < DocumentType.values.length; i++)
-        if (_selectedCannotViewPdf[i]) DocumentType.values[i].displayName
+        if (_selected[i]) DocumentType.values[i].displayName
     ];
 
     setState(() => _isSubmitting = true);
@@ -66,26 +65,27 @@ class _CannotViewPdfState extends ConsumerState<CannotViewPdf> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text('問題のあるPDFを選択してください',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          '問題のあるPDFを選択してください',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         ListView.builder(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            itemCount: DocumentType.values.length,
-            itemBuilder: (context, index) {
-              return CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(DocumentType.values[index].displayName),
-                value: _selectedCannotViewPdf[index],
-                onChanged: (bool? value) {
-                  setState(() {
-                    _selectedCannotViewPdf[index] = value!;
-                  });
-                },
-              );
-            }),
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          itemCount: DocumentType.values.length,
+          itemBuilder: (context, index) {
+            return CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(DocumentType.values[index].displayName),
+              value: _selected[index],
+              onChanged: (value) {
+                setState(() => _selected[index] = value!);
+              },
+            );
+          },
+        ),
         TextFormField(
           controller: _freeDescriptionController,
           maxLines: 3,

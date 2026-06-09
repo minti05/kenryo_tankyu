@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/core/utils/write_spread_sheet.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
-class OtherReason extends ConsumerStatefulWidget {
+class OtherReasonForm extends ConsumerStatefulWidget {
   final Searched searched;
-  const OtherReason({super.key, required this.searched});
+  const OtherReasonForm({super.key, required this.searched});
 
   @override
-  ConsumerState<OtherReason> createState() => _OtherReasonState();
+  ConsumerState<OtherReasonForm> createState() => _OtherReasonFormState();
 }
 
-class _OtherReasonState extends ConsumerState<OtherReason> {
+class _OtherReasonFormState extends ConsumerState<OtherReasonForm> {
   final TextEditingController _freeDescriptionController =
       TextEditingController();
   bool _isSubmitting = false;
