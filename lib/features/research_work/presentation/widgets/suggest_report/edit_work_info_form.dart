@@ -118,8 +118,8 @@ class _EditWorkInfoFormState extends ConsumerState<EditWorkInfoForm> {
           initialValue: _selectedYear,
           hint: const Text('入学年度を選択してください'),
           items: EnterYear.values
-              .map((v) => DropdownMenuItem(
-                  value: v, child: Text(v.displayName.toString())))
+              .where((v) => v != EnterYear.undefined)
+              .map((v) => DropdownMenuItem(value: v, child: Text(v.label)))
               .toList(),
           onChanged: (value) => setState(() => _selectedYear = value),
         ),
