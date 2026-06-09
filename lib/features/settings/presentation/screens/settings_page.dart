@@ -7,22 +7,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:kenryo_tankyu/core/providers/firebase_providers.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/providers/settings_providers.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notificationAsync = ref.watch(notificationEnabledProvider);
-    // ロード中も直前の値を保持することでトグルのスナップバックを防ぐ
-    final notification = notificationAsync.value ?? false;
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends ConsumerState<SettingsPage>
+    with WidgetsBindingObserver {
+  bool _notificationGranted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshPermission();
+    }
+  }
+
+  Future<void> _refreshPermission() async {
+    final status = await Permission.notification.status;
+    if (mounted) {
+      setState(() {
+        _notificationGranted = status.isGranted;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeModeAsync = ref.watch(themeModeProvider);
 
     return Scaffold(
@@ -31,51 +63,18 @@ class SettingsPage extends ConsumerWidget {
         child: ListBody(
           children: [
             SwitchListTile(
-              value: notification,
-              onChanged: (bool value) async {
-                if (value) {
-                  // iOS APNs への登録も含めた権限リクエスト
-                  final settings = await ref
-                      .read(firebaseMessagingProvider)
-                      .requestPermission();
-                  debugPrint(
-                      'Notification auth status: ${settings.authorizationStatus}');
-
-                  final granted = settings.authorizationStatus ==
-                          AuthorizationStatus.authorized ||
-                      settings.authorizationStatus ==
-                          AuthorizationStatus.provisional;
-
-                  if (!granted) {
-                    // 拒否されている場合はシステム設定へ誘導
-                    if (context.mounted) {
-                      _showPermissionDeniedDialog(context);
-                    }
-                    return;
+              value: _notificationGranted,
+              onChanged: (_) async {
+                if (!_notificationGranted) {
+                  final status = await Permission.notification.request();
+                  if (mounted) {
+                    setState(() {
+                      _notificationGranted = status.isGranted;
+                    });
                   }
-
-                  // FCMトークンの取得を試みる（ブロックしない）
-                  ref
-                      .read(firebaseMessagingProvider)
-                      .getToken()
-                      .then((token) => debugPrint('FCM Token: $token'))
-                      .catchError((e) => debugPrint('FCM Token Error: $e'));
+                  if (status.isGranted) return;
                 }
-
-                try {
-                  debugPrint('Updating notification setting to: $value');
-                  await ref
-                      .read(settingsProvider.notifier)
-                      .setNotification(value);
-                  debugPrint('Notification setting updated successfully');
-                } catch (e) {
-                  debugPrint('Error updating notification setting: $e');
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('設定の更新に失敗しました: $e')),
-                    );
-                  }
-                }
+                await openAppSettings();
               },
               secondary: const Icon(Icons.notifications_active_outlined),
               title: const Text('通知を受け取る'),
@@ -159,7 +158,7 @@ class SettingsPage extends ConsumerWidget {
             ListTile(
               title: const Text('履歴の削除'),
               leading: const Icon(Icons.history),
-              onTap: () => _showDeleteDataDialog(context, ref),
+              onTap: () => _showDeleteDataDialog(context),
             ),
             ListTile(
               title: const Text('ログアウト'),
@@ -218,7 +217,7 @@ class SettingsPage extends ConsumerWidget {
                         TextButton(
                           onPressed: () async {
                             Navigator.of(context).pop();
-                            await _deleteAccountWithReauth(context, ref);
+                            await _deleteAccountWithReauth(context);
                           },
                           child: const Text('はい'),
                         ),
@@ -234,8 +233,7 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _deleteAccountWithReauth(
-      BuildContext context, WidgetRef ref) async {
+  Future<void> _deleteAccountWithReauth(BuildContext context) async {
     try {
       await ref.read(authProvider.notifier).deleteAccount();
     } on RequiresRecentLogin {
@@ -244,9 +242,9 @@ class SettingsPage extends ConsumerWidget {
       final isGoogle =
           user?.providerData.any((p) => p.providerId == 'google.com') ?? false;
       if (isGoogle) {
-        await _reauthWithGoogleAndDelete(context, ref);
+        await _reauthWithGoogleAndDelete(context);
       } else {
-        await _reauthWithPasswordAndDelete(context, ref);
+        await _reauthWithPasswordAndDelete(context);
       }
     } on Failure catch (e) {
       if (!context.mounted) return;
@@ -259,8 +257,7 @@ class SettingsPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _reauthWithGoogleAndDelete(
-      BuildContext context, WidgetRef ref) async {
+  Future<void> _reauthWithGoogleAndDelete(BuildContext context) async {
     try {
       final reauthenticated =
           await ref.read(authRepositoryProvider).reauthenticateWithGoogle();
@@ -283,8 +280,7 @@ class SettingsPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _reauthWithPasswordAndDelete(
-      BuildContext context, WidgetRef ref) async {
+  Future<void> _reauthWithPasswordAndDelete(BuildContext context) async {
     final passwordController = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
@@ -344,8 +340,7 @@ class SettingsPage extends ConsumerWidget {
     }
   }
 
-  Future<void> _showDeleteDataDialog(
-      BuildContext context, WidgetRef ref) async {
+  Future<void> _showDeleteDataDialog(BuildContext context) async {
     final repository = ref.read(userArchiveRepositoryProvider);
 
     final List<DateTime> historyDates;
@@ -392,28 +387,5 @@ class SettingsPage extends ConsumerWidget {
         SnackBar(content: Text(result)),
       );
     }
-  }
-
-  void _showPermissionDeniedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('通知が許可されていません'),
-        content: const Text('通知を受け取るには、システム設定から通知を許可してください。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () {
-              openAppSettings();
-              Navigator.pop(context);
-            },
-            child: const Text('設定を開く'),
-          ),
-        ],
-      ),
-    );
   }
 }
