@@ -12,12 +12,14 @@ class FavoriteButton extends ConsumerStatefulWidget {
   final Searched searched;
   final bool isLarge;
   final bool enabled;
+  final bool horizontal;
 
   const FavoriteButton({
     super.key,
     required this.searched,
     this.isLarge = false,
     this.enabled = true,
+    this.horizontal = false,
   });
 
   @override
@@ -68,26 +70,47 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
         isFavorite ? Colors.red : Theme.of(context).colorScheme.onSurface;
     final icon = isFavorite ? Icons.favorite : Icons.favorite_border;
 
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: widget.isLarge ? 28 : 24),
-        if (!widget.searched.isCached) ...[
-          const SizedBox(height: 4),
-          Text(
-            likes.toString(),
-            style: TextStyle(
-              color: color,
-              fontSize: widget.isLarge ? 14 : 12,
+    final Widget content;
+    if (widget.horizontal) {
+      content = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: widget.isLarge ? 24 : 20),
+          if (!widget.searched.isCached) ...[
+            const SizedBox(width: 4),
+            Text(
+              likes.toString(),
+              style: TextStyle(
+                color: color,
+                fontSize: widget.isLarge ? 14 : 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+          ],
         ],
-      ],
-    );
+      );
+    } else {
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: widget.isLarge ? 28 : 24),
+          if (!widget.searched.isCached) ...[
+            const SizedBox(height: 4),
+            Text(
+              likes.toString(),
+              style: TextStyle(
+                color: color,
+                fontSize: widget.isLarge ? 14 : 12,
+              ),
+            ),
+          ],
+        ],
+      );
+    }
 
     final buttonBase = Opacity(
       opacity: isLoading ? 0.5 : 1.0,
-      child: widget.isLarge
+      child: widget.isLarge && !widget.horizontal
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(

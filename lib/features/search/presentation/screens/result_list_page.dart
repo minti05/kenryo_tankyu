@@ -57,77 +57,76 @@ class ResultListPage extends ConsumerWidget {
                   return asyncValue.when(
                     data: (data) {
                       if (data == null) {
-                        return Center(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('データがヒットしませんでした'),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                                onPressed: () =>
-                                    ref.invalidate(algoliaSearchProvider),
-                                child: const Text('リロードする')),
-                          ],
-                        ));
+                        // algoliaSearchProvider が null を返すのは search.isEmpty の場合のみ
+                        return const Center(child: Text('検索条件を設定してください'));
                       } else {
                         final currentPage = ref.watch(searchPageProvider);
                         final hits = data.hits;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0, top: 4.0, bottom: 4.0),
-                              child: Text(
-                                hits.isEmpty
-                                    ? '該当するデータはありません'
-                                    : data.isLastPage && currentPage == 0
-                                        ? '${hits.length}件ヒットしました'
-                                        : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中（総${data.nbHits}件）',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            ResultList(data: sortedList),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextButton.icon(
-                                    onPressed: asyncValue.isLoading ||
-                                            currentPage == 0
-                                        ? null
-                                        : () {
-                                            ref
-                                                .read(
-                                                    searchPageProvider.notifier)
-                                                .setPage(currentPage - 1);
-                                          },
-                                    icon: const Icon(Icons.arrow_back_ios,
-                                        size: 16),
-                                    label: const Text('前のページへ'),
+                            if (hits.isEmpty)
+                              const Expanded(
+                                child: Center(
+                                  child: Text(
+                                    'ヒットしませんでした。\nキーワードやカテゴリを変えて再検索してください。',
+                                    textAlign: TextAlign.center,
                                   ),
-                                  Text('${currentPage + 1}ページ目'),
-                                  TextButton.icon(
-                                    onPressed: asyncValue.isLoading ||
-                                            data.isLastPage
-                                        ? null
-                                        : () {
-                                            ref
-                                                .read(
-                                                    searchPageProvider.notifier)
-                                                .setPage(currentPage + 1);
-                                          },
-                                    icon: const Icon(Icons.arrow_forward_ios,
-                                        size: 16),
-                                    label: const Text('次のページへ'),
-                                    iconAlignment: IconAlignment.end,
-                                  ),
-                                ],
+                                ),
+                              )
+                            else
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 8.0, top: 4.0, bottom: 4.0),
+                                child: Text(
+                                  data.isLastPage && currentPage == 0
+                                      ? '${hits.length}件ヒットしました'
+                                      : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中（総${data.nbHits}件）',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
                               ),
-                            ),
+                            if (hits.isNotEmpty) ResultList(data: sortedList),
+                            if (hits.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: asyncValue.isLoading ||
+                                              currentPage == 0
+                                          ? null
+                                          : () {
+                                              ref
+                                                  .read(searchPageProvider
+                                                      .notifier)
+                                                  .setPage(currentPage - 1);
+                                            },
+                                      icon: const Icon(Icons.arrow_back_ios,
+                                          size: 16),
+                                      label: const Text('前のページへ'),
+                                    ),
+                                    Text('${currentPage + 1}ページ目'),
+                                    TextButton.icon(
+                                      onPressed: asyncValue.isLoading ||
+                                              data.isLastPage
+                                          ? null
+                                          : () {
+                                              ref
+                                                  .read(searchPageProvider
+                                                      .notifier)
+                                                  .setPage(currentPage + 1);
+                                            },
+                                      icon: const Icon(Icons.arrow_forward_ios,
+                                          size: 16),
+                                      label: const Text('次のページへ'),
+                                      iconAlignment: IconAlignment.end,
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         );
                       }

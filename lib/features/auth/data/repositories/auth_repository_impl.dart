@@ -116,6 +116,31 @@ class AuthRepositoryImpl with ErrorMapper implements AuthRepository {
     }
   }
 
+  @override
+  Future<void> reauthenticateWithEmailAndPassword(
+      {required String email, required String password}) async {
+    try {
+      await _dataSource
+          .reauthenticateWithEmailAndPassword(email: email, password: password)
+          .timeout(const Duration(seconds: 10));
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  @override
+  Future<bool> reauthenticateWithGoogle() async {
+    try {
+      return await _dataSource.reauthenticateWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      throw _mapFirebaseException(e);
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
   Failure _mapFirebaseException(FirebaseAuthException e) {
     if (e.code == 'unavailable' || e.code == 'network-request-failed') {
       return const NetworkFailure();

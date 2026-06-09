@@ -6,7 +6,6 @@ enum EnterYear {
   enter2022(displayName: 2022),
   enter2023(displayName: 2023),
   enter2024(displayName: 2024),
-  enter2025(displayName: 2025),
   undefined(displayName: 0);
 
   final int displayName;

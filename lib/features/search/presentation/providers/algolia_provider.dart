@@ -61,6 +61,8 @@ final algoliaSearchProvider =
   final search =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
 
+  if (search.isEmpty) return null;
+
   final page = ref.watch(searchPageProvider);
   final cache = ref.watch(searchResultCacheProvider.notifier);
 
@@ -86,15 +88,11 @@ final algoliaSearchProvider =
     }
   }
 
-  if (result == null && page > 0) {
-    return SearchResult(hits: [], page: page, nbPages: page, nbHits: 0);
-  }
+  final resolved =
+      result ?? SearchResult(hits: [], page: page, nbPages: page, nbHits: 0);
 
-  if (result != null) {
-    cache.set(page, result);
-  }
-
-  return result;
+  cache.set(page, resolved);
+  return resolved;
 });
 
 final sortedListProvider =
