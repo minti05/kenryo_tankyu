@@ -34,14 +34,10 @@ class HeaderForResultPage extends ConsumerWidget
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: null,
-                    child: FavoriteButton(
-                      searched: searched,
-                      isLarge: true,
-                      horizontal: true,
-                    ),
+                  child: FavoriteButton(
+                    searched: searched,
+                    isLarge: true,
+                    horizontal: true,
                   ),
                 ),
                 PopupMenuButton(

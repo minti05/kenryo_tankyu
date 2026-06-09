@@ -97,40 +97,21 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
             body: Padding(
               padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
               child: Column(children: [
-                WorkTitle(searched: searchedData),
+                WorkTitle(
+                  searched: searchedData,
+                  isDetailsExpanded: _isDetailsExpanded,
+                  onToggleDetails: () =>
+                      setState(() => _isDetailsExpanded = !_isDetailsExpanded),
+                ),
                 AnimatedSize(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_isDetailsExpanded)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                  child: _isDetailsExpanded
+                      ? Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
                           child: WorkDetailsTable(searched: searchedData),
-                        ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          onTap: () => setState(
-                              () => _isDetailsExpanded = !_isDetailsExpanded),
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 2.0),
-                            child: Icon(
-                              _isDetailsExpanded
-                                  ? Icons.keyboard_arrow_up
-                                  : Icons.keyboard_arrow_down,
-                              size: 20,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.5),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
                 PdfChoiceChip(searched: searchedData),
                 DisplayPdf(
