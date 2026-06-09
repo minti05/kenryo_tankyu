@@ -68,7 +68,7 @@ class WorkDetailsTable extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+          padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
           child: Text(
             '$enterYearText${searched.course.displayName} ／ $author',
             style: TextStyle(
@@ -84,6 +84,7 @@ class WorkDetailsTable extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(left: 8.0),
             child: Row(
               children: [
                 _CategoryChip(
