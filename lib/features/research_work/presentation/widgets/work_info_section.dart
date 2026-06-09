@@ -117,27 +117,12 @@ class _CategoryChip extends StatelessWidget {
 
   String? _imagePath(bool isDark) {
     const imageDir = 'assets/images/categories/';
-    const validNames = {
-      'history',
-      'rights',
-      'international',
-      'business',
-      'education',
-      'industry',
-      'environment',
-      'science',
-      'technology',
-      'health',
-      'art',
-      'life',
-      'society',
-    };
     if (category == Category.other) {
       return isDark
           ? '${imageDir}other_for_dark.png'
           : '${imageDir}other_for_light.png';
     }
-    if (validNames.contains(category.name)) {
+    if (category != Category.none) {
       return '$imageDir${category.name}.png';
     }
     return null;
