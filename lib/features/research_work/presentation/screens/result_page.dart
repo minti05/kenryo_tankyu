@@ -24,6 +24,7 @@ class ResultPage extends ConsumerStatefulWidget {
 class _ResultPageMainState extends ConsumerState<ResultPage> {
   final ScreenCaptureEvent screenListener = ScreenCaptureEvent();
   ProviderSubscription<AsyncValue<Searched>>? _staleCheckSub;
+  bool _isDetailsExpanded = true;
 
   @override
   void initState() {
@@ -97,12 +98,49 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
               padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
               child: Column(children: [
                 WorkTitle(searched: searchedData),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: WorkDetailsTable(searched: searchedData),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_isDetailsExpanded)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                          child: WorkDetailsTable(searched: searchedData),
+                        ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () => setState(
+                              () => _isDetailsExpanded = !_isDetailsExpanded),
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 2.0),
+                            child: Icon(
+                              _isDetailsExpanded
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              size: 20,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 PdfChoiceChip(searched: searchedData),
-                DisplayPdf(searched: searchedData),
+                DisplayPdf(
+                  searched: searchedData,
+                  onPdfTapped: () {
+                    if (_isDetailsExpanded) {
+                      setState(() => _isDetailsExpanded = false);
+                    }
+                  },
+                ),
               ]),
             ),
           ),

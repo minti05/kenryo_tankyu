@@ -10,10 +10,12 @@ import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 
 class DisplayPdf extends ConsumerWidget {
   final Searched searched;
-  const DisplayPdf({super.key, required this.searched});
+  final VoidCallback? onPdfTapped;
+  const DisplayPdf({super.key, required this.searched, this.onPdfTapped});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final onPdfTapped = this.onPdfTapped;
     return Expanded(
       child: Stack(
         alignment: Alignment.topRight,
@@ -64,6 +66,7 @@ class DisplayPdf extends ConsumerWidget {
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
                           notifier.state = !showFullScreen;
+                          onPdfTapped?.call();
                         },
                         child: const SizedBox(
                           width: double.infinity,
