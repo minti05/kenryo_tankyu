@@ -96,7 +96,7 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
             body: Padding(
               padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
               child: Column(children: [
-                WorkTitle(
+                WorkInfoSection(
                   searched: searchedData,
                   isDetailsExpanded: _isDetailsExpanded,
                   onToggleDetails: () =>
