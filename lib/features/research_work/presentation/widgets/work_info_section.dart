@@ -5,12 +5,12 @@ import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
-class WorkTitle extends StatelessWidget {
+class WorkInfoSection extends StatelessWidget {
   final Searched searched;
   final bool isDetailsExpanded;
   final VoidCallback onToggleDetails;
 
-  const WorkTitle({
+  const WorkInfoSection({
     super.key,
     required this.searched,
     required this.isDetailsExpanded,
@@ -19,21 +19,23 @@ class WorkTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text(
-              searched.title,
-              softWrap: true,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: onToggleDetails,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                searched.title,
+                softWrap: true,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          GestureDetector(
-            onTap: onToggleDetails,
-            child: Padding(
+            Padding(
               padding: const EdgeInsets.only(left: 8.0, top: 4.0),
               child: Icon(
                 isDetailsExpanded
@@ -46,8 +48,8 @@ class WorkTitle extends StatelessWidget {
                     .withValues(alpha: 0.5),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -115,25 +117,12 @@ class _CategoryChip extends StatelessWidget {
 
   String? _imagePath(bool isDark) {
     const imageDir = 'assets/images/categories/';
-    const validNames = {
-      'history',
-      'rights',
-      'international',
-      'business',
-      'education',
-      'science',
-      'technology',
-      'health',
-      'art',
-      'life',
-      'society',
-    };
     if (category == Category.other) {
       return isDark
           ? '${imageDir}other_for_dark.png'
           : '${imageDir}other_for_light.png';
     }
-    if (validNames.contains(category.name)) {
+    if (category != Category.none) {
       return '$imageDir${category.name}.png';
     }
     return null;
