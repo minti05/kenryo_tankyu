@@ -6,8 +6,7 @@ import 'package:kenryo_tankyu/features/research_work/presentation/providers/sear
 import 'package:kenryo_tankyu/features/research_work/presentation/screens/pdf_expand_page.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/utils/share_helper.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/header_for_result.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_title.dart';
-import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_details_table.dart';
+import 'package:kenryo_tankyu/features/research_work/presentation/widgets/work_info_section.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/pdf_choice_chip.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/widgets/display_pdf.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
