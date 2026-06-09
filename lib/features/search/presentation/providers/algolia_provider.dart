@@ -1,7 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
+import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
 import 'package:kenryo_tankyu/core/constants/work/search_value.dart';
+import 'package:kenryo_tankyu/core/constants/work/sub_category_value.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 import 'package:kenryo_tankyu/features/search/data/repositories/search_repository_impl.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search_result.dart';
@@ -60,6 +63,14 @@ final algoliaSearchProvider =
 
   final search =
       ref.read(searchProvider); //ref.readにすると、watchと違って値が変更されたときに再ビルドされない！
+
+  final bool isEmptySearch = search.searchWord.isEmpty &&
+      search.category == Category.none &&
+      search.subCategory == SubCategory.none &&
+      search.enterYear == EnterYear.undefined &&
+      search.course == Course.undefined &&
+      search.eventName == EventName.undefined;
+  if (isEmptySearch) return null;
 
   final page = ref.watch(searchPageProvider);
   final cache = ref.watch(searchResultCacheProvider.notifier);
