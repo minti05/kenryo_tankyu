@@ -2,6 +2,7 @@ import 'package:kenryo_tankyu/features/settings/presentation/widgets/delete_data
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_dialog.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
+import 'package:kenryo_tankyu/features/auth/domain/models/auth_failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -216,23 +217,8 @@ class SettingsPage extends ConsumerWidget {
                         ),
                         TextButton(
                           onPressed: () async {
-                            try {
-                              await ref
-                                  .read(authProvider.notifier)
-                                  .deleteAccount();
-                              if (!context.mounted) return;
-                              Navigator.of(context).pop();
-                            } on Failure catch (e) {
-                              if (!context.mounted) return;
-                              Navigator.of(context).pop();
-                              showErrorDialog(context, e);
-                            } catch (e) {
-                              if (!context.mounted) return;
-                              Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('予期せぬエラーが発生しました: $e')),
-                              );
-                            }
+                            Navigator.of(context).pop();
+                            await _deleteAccountWithReauth(context, ref);
                           },
                           child: const Text('はい'),
                         ),
@@ -246,6 +232,116 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _deleteAccountWithReauth(
+      BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(authProvider.notifier).deleteAccount();
+    } on RequiresRecentLogin {
+      if (!context.mounted) return;
+      final user = ref.read(authRepositoryProvider).currentUser;
+      final isGoogle =
+          user?.providerData.any((p) => p.providerId == 'google.com') ?? false;
+      if (isGoogle) {
+        await _reauthWithGoogleAndDelete(context, ref);
+      } else {
+        await _reauthWithPasswordAndDelete(context, ref);
+      }
+    } on Failure catch (e) {
+      if (!context.mounted) return;
+      showErrorDialog(context, e);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('予期せぬエラーが発生しました: $e')),
+      );
+    }
+  }
+
+  Future<void> _reauthWithGoogleAndDelete(
+      BuildContext context, WidgetRef ref) async {
+    try {
+      final reauthenticated =
+          await ref.read(authRepositoryProvider).reauthenticateWithGoogle();
+      if (!context.mounted) return;
+      if (!reauthenticated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Googleサインインがキャンセルされました')),
+        );
+        return;
+      }
+      await ref.read(authProvider.notifier).deleteAccount();
+    } on Failure catch (e) {
+      if (!context.mounted) return;
+      showErrorDialog(context, e);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('予期せぬエラーが発生しました: $e')),
+      );
+    }
+  }
+
+  Future<void> _reauthWithPasswordAndDelete(
+      BuildContext context, WidgetRef ref) async {
+    final passwordController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('再認証が必要です'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('セキュリティのため、パスワードを入力してアカウント削除を続けてください。'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'パスワード',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('削除する'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      passwordController.dispose();
+      return;
+    }
+    final password = passwordController.text;
+    passwordController.dispose();
+
+    if (!context.mounted) return;
+    try {
+      final user = ref.read(authRepositoryProvider).currentUser;
+      final email = user?.email ?? '';
+      await ref
+          .read(authRepositoryProvider)
+          .reauthenticateWithEmailAndPassword(email: email, password: password);
+      await ref.read(authProvider.notifier).deleteAccount();
+    } on Failure catch (e) {
+      if (!context.mounted) return;
+      showErrorDialog(context, e);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('予期せぬエラーが発生しました: $e')),
+      );
+    }
   }
 
   Future<void> _showDeleteDataDialog(
