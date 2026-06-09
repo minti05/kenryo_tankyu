@@ -80,22 +80,25 @@ class WorkDetailsTable extends StatelessWidget {
             ),
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _CategoryChip(
-                category: searched.category1,
-                subCategory: searched.subCategory1,
-              ),
-              if (searched.category2 != Category.none) ...[
-                const SizedBox(width: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
                 _CategoryChip(
-                  category: searched.category2,
-                  subCategory: searched.subCategory2,
+                  category: searched.category1,
+                  subCategory: searched.subCategory1,
                 ),
+                if (searched.category2 != Category.none) ...[
+                  const SizedBox(width: 8),
+                  _CategoryChip(
+                    category: searched.category2,
+                    subCategory: searched.subCategory2,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ],
