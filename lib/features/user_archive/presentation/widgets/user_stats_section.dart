@@ -29,37 +29,40 @@ class _StatsLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (context.isTablet) {
-      return Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: _StreakCard(streakDays: stats?.streakDays),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _CountCard(
-              label: '今日',
-              count: stats?.todayViews,
-              icon: Icons.today_outlined,
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 2,
+              child: _StreakCard(streakDays: stats?.streakDays),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _CountCard(
-              label: '7日間',
-              count: stats?.weekViews,
-              icon: Icons.date_range_outlined,
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CountCard(
+                label: '今日',
+                count: stats?.todayViews,
+                icon: Icons.today_outlined,
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _CountCard(
-              label: '累計',
-              count: stats?.totalViews,
-              icon: Icons.library_books_outlined,
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CountCard(
+                label: '7日間',
+                count: stats?.weekViews,
+                icon: Icons.date_range_outlined,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CountCard(
+                label: '累計',
+                count: stats?.totalViews,
+                icon: Icons.library_books_outlined,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
