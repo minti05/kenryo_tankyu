@@ -16,6 +16,7 @@ import 'package:kenryo_tankyu/core/services/firebase_tracking_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -46,6 +47,10 @@ Future<void> main() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    // Firebase Third-party Auth: 現在のFirebaseユーザーのIDトークンをSupabaseに渡す
+    accessToken: () async {
+      return await FirebaseAuth.instance.currentUser?.getIdToken();
+    },
   );
 
   final sharedPreferences = await SharedPreferences.getInstance();
