@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kenryo_tankyu/core/utils/device_type.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
@@ -71,32 +72,70 @@ class _LibraryListState extends ConsumerState<LibraryList> {
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.separated(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: searcheds.length + (hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == searcheds.length) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                return Consumer(builder: (context, ref, child) {
-                  final searched = searcheds[index];
-                  return ResultPreviewContent(
-                    searched: searched,
-                    mode: ResultPreviewMode.library,
-                  );
-                });
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Divider(),
-                );
-              },
-            ),
+            child: context.isTablet
+                ? CustomScrollView(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.zero,
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 4,
+                            mainAxisExtent: 130,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final searched = searcheds[index];
+                              return Card(
+                                child: ResultPreviewContent(
+                                  searched: searched,
+                                  mode: ResultPreviewMode.library,
+                                ),
+                              );
+                            },
+                            childCount: searcheds.length,
+                          ),
+                        ),
+                      ),
+                      if (hasMore)
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                        ),
+                    ],
+                  )
+                : ListView.separated(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: searcheds.length + (hasMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == searcheds.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      return Consumer(builder: (context, ref, child) {
+                        final searched = searcheds[index];
+                        return ResultPreviewContent(
+                          searched: searched,
+                          mode: ResultPreviewMode.library,
+                        );
+                      });
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Divider(),
+                      );
+                    },
+                  ),
           ),
         );
       },
