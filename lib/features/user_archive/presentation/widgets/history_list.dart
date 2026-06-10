@@ -81,7 +81,7 @@ class _LibraryListState extends ConsumerState<LibraryList> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 4,
-                      childAspectRatio: 2.2,
+                      mainAxisExtent: 155,
                     ),
                     itemCount: searcheds.length + (hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
