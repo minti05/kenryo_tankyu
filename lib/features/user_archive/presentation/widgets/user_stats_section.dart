@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kenryo_tankyu/core/utils/device_type.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/models/user_stats.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_stats_provider.dart';
 
@@ -28,11 +28,49 @@ class _StatsLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.isTablet) {
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 2,
+              child: _StreakCard(streakDays: stats?.streakDays),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CountCard(
+                label: '今日',
+                count: stats?.todayViews,
+                icon: Icons.today_outlined,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CountCard(
+                label: '7日間',
+                count: stats?.weekViews,
+                icon: Icons.date_range_outlined,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _CountCard(
+                label: '累計',
+                count: stats?.totalViews,
+                icon: Icons.library_books_outlined,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _StreakCard(streakDays: stats?.streakDays),
-        SizedBox(height: 8.h),
+        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
@@ -42,7 +80,7 @@ class _StatsLayout extends StatelessWidget {
                 icon: Icons.today_outlined,
               ),
             ),
-            SizedBox(width: 8.w),
+            const SizedBox(width: 8),
             Expanded(
               child: _CountCard(
                 label: '7日間',
@@ -50,7 +88,7 @@ class _StatsLayout extends StatelessWidget {
                 icon: Icons.date_range_outlined,
               ),
             ),
-            SizedBox(width: 8.w),
+            const SizedBox(width: 8),
             Expanded(
               child: _CountCard(
                 label: '累計',
@@ -79,23 +117,25 @@ class _StreakCard extends StatelessWidget {
     return Card(
       color: colorScheme.primaryContainer,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               'assets/images/app_icon.png',
-              width: 28.w,
-              height: 28.h,
+              width: 28,
+              height: 28,
             ),
-            SizedBox(width: 8.w),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     isLoading ? '読み込み中...' : '$days日連続閲覧中！',
                     style: TextStyle(
-                      fontSize: 15.sp,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onPrimaryContainer,
                     ),
@@ -103,7 +143,7 @@ class _StreakCard extends StatelessWidget {
                   Text(
                     '毎日続けて探究を深めよう',
                     style: TextStyle(
-                      fontSize: 11.sp,
+                      fontSize: 11,
                       color:
                           colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
                     ),
@@ -176,19 +216,18 @@ class _AnimatedDaysCounterState extends State<_AnimatedDaysCounter>
             Text(
               '${_animation.value.toInt()}',
               style: TextStyle(
-                fontSize: 32.sp,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: colorScheme.primary,
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 4.h),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 4),
               child: Text(
                 '日',
                 style: TextStyle(
-                  fontSize: 13.sp,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
                 ),
               ),
             ),
@@ -256,16 +295,17 @@ class _CountCardState extends State<_CountCard>
 
     return Card(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(widget.icon, size: 20.sp, color: colorScheme.primary),
-            SizedBox(height: 4.h),
+            Icon(widget.icon, size: 20, color: colorScheme.primary),
+            const SizedBox(height: 4),
             isLoading
-                ? SizedBox(
-                    height: 24.h,
-                    width: 24.w,
-                    child: const CircularProgressIndicator(strokeWidth: 2),
+                ? const SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : AnimatedBuilder(
                     animation: _animation,
@@ -277,17 +317,17 @@ class _CountCardState extends State<_CountCard>
                           Text(
                             '${_animation.value.toInt()}',
                             style: TextStyle(
-                              fontSize: 22.sp,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: colorScheme.onSurface,
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(bottom: 2.h),
+                            padding: const EdgeInsets.only(bottom: 2),
                             child: Text(
                               '件',
                               style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 11,
                                 color: colorScheme.onSurfaceVariant,
                               ),
                             ),
@@ -296,11 +336,11 @@ class _CountCardState extends State<_CountCard>
                       );
                     },
                   ),
-            SizedBox(height: 2.h),
+            const SizedBox(height: 2),
             Text(
               widget.label,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 11,
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
