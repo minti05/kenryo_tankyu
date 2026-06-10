@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/app_unique_value.dart";
+import 'package:kenryo_tankyu/core/utils/device_type.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/result_preview_content.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
@@ -81,6 +82,30 @@ class _HomePageState extends ConsumerState<HomePage> {
                           },
                         ),
                     data: (data) {
+                      if (context.isTablet) {
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Card(
+                                child: ResultPreviewContent(
+                                  searched: data[0],
+                                  mode: ResultPreviewMode.search,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Card(
+                                child: ResultPreviewContent(
+                                  searched: data[1],
+                                  mode: ResultPreviewMode.search,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
                       return Column(
                         children: [
                           Card(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kenryo_tankyu/core/utils/device_type.dart';
 import 'package:kenryo_tankyu/features/user_archive/domain/models/user_stats.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_stats_provider.dart';
 
@@ -28,6 +29,41 @@ class _StatsLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.isTablet) {
+      return Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: _StreakCard(streakDays: stats?.streakDays),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: _CountCard(
+              label: '今日',
+              count: stats?.todayViews,
+              icon: Icons.today_outlined,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: _CountCard(
+              label: '7日間',
+              count: stats?.weekViews,
+              icon: Icons.date_range_outlined,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: _CountCard(
+              label: '累計',
+              count: stats?.totalViews,
+              icon: Icons.library_books_outlined,
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
