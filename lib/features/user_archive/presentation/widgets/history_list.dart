@@ -73,32 +73,42 @@ class _LibraryListState extends ConsumerState<LibraryList> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: context.isTablet
-                ? GridView.builder(
+                ? CustomScrollView(
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 4,
-                      mainAxisExtent: 130,
-                    ),
-                    itemCount: searcheds.length + (hasMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == searcheds.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-                      final searched = searcheds[index];
-                      return Card(
-                        child: ResultPreviewContent(
-                          searched: searched,
-                          mode: ResultPreviewMode.library,
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.zero,
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 4,
+                            mainAxisExtent: 130,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final searched = searcheds[index];
+                              return Card(
+                                child: ResultPreviewContent(
+                                  searched: searched,
+                                  mode: ResultPreviewMode.library,
+                                ),
+                              );
+                            },
+                            childCount: searcheds.length,
+                          ),
                         ),
-                      );
-                    },
+                      ),
+                      if (hasMore)
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                        ),
+                    ],
                   )
                 : ListView.separated(
                     controller: _scrollController,

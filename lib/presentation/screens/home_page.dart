@@ -86,22 +86,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                         return Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Card(
-                                child: ResultPreviewContent(
-                                  searched: data[0],
-                                  mode: ResultPreviewMode.search,
+                            if (data.isNotEmpty)
+                              Expanded(
+                                child: Card(
+                                  child: ResultPreviewContent(
+                                    searched: data[0],
+                                    mode: ResultPreviewMode.search,
+                                  ),
                                 ),
                               ),
-                            ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Card(
-                                child: ResultPreviewContent(
-                                  searched: data[1],
-                                  mode: ResultPreviewMode.search,
-                                ),
-                              ),
+                              child: data.length > 1
+                                  ? Card(
+                                      child: ResultPreviewContent(
+                                        searched: data[1],
+                                        mode: ResultPreviewMode.search,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
                             ),
                           ],
                         );

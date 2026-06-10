@@ -297,6 +297,7 @@ class _CountCardState extends State<_CountCard>
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(widget.icon, size: 20, color: colorScheme.primary),
             const SizedBox(height: 4),
