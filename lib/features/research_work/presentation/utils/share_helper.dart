@@ -27,8 +27,10 @@ Future<void> shareSearched(Searched searched, {BuildContext? context}) async {
 
 /// 共有シートのポップオーバー表示用のアンカー位置（iPad向け）を返す。
 Rect? _sharePositionOrigin(BuildContext? context) {
-  if (context == null) return null;
-  final box = context.findRenderObject() as RenderBox?;
-  if (box == null || !box.hasSize) return null;
-  return box.localToGlobal(Offset.zero) & box.size;
+  // アンマウント済みのcontextでfindRenderObject()を呼ぶとAssertionErrorで
+  // クラッシュするため、mountedを確認してからアクセスする。
+  if (context == null || !context.mounted) return null;
+  final renderObject = context.findRenderObject();
+  if (renderObject is! RenderBox || !renderObject.hasSize) return null;
+  return renderObject.localToGlobal(Offset.zero) & renderObject.size;
 }
