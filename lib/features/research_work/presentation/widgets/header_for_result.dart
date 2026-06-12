@@ -57,7 +57,8 @@ class HeaderForResultPage extends ConsumerWidget
                         child: const Text('情報の変更を提案'),
                       ),
                       PopupMenuItem(
-                        onTap: () async => shareSearched(searched),
+                        onTap: () async =>
+                            shareSearched(searched, context: context),
                         child: const Text('共有する...'),
                       ),
                     ];
