@@ -29,6 +29,7 @@ mixin _$Search {
   int get numberOfHits;
   @DateTimeConverter()
   DateTime? get savedAt;
+  bool get awardOnly;
 
   /// Create a copy of Search
   /// with the given fields replaced by the non-null parameter values.
@@ -58,7 +59,9 @@ mixin _$Search {
                 .equals(other.searchWord, searchWord) &&
             (identical(other.numberOfHits, numberOfHits) ||
                 other.numberOfHits == numberOfHits) &&
-            (identical(other.savedAt, savedAt) || other.savedAt == savedAt));
+            (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
+            (identical(other.awardOnly, awardOnly) ||
+                other.awardOnly == awardOnly));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -72,11 +75,12 @@ mixin _$Search {
       course,
       const DeepCollectionEquality().hash(searchWord),
       numberOfHits,
-      savedAt);
+      savedAt,
+      awardOnly);
 
   @override
   String toString() {
-    return 'Search(category: $category, subCategory: $subCategory, enterYear: $enterYear, eventName: $eventName, course: $course, searchWord: $searchWord, numberOfHits: $numberOfHits, savedAt: $savedAt)';
+    return 'Search(category: $category, subCategory: $subCategory, enterYear: $enterYear, eventName: $eventName, course: $course, searchWord: $searchWord, numberOfHits: $numberOfHits, savedAt: $savedAt, awardOnly: $awardOnly)';
   }
 }
 
@@ -93,7 +97,8 @@ abstract mixin class $SearchCopyWith<$Res> {
       @CourseEnumConverter() Course course,
       @SearchWordConverter() List<String> searchWord,
       int numberOfHits,
-      @DateTimeConverter() DateTime? savedAt});
+      @DateTimeConverter() DateTime? savedAt,
+      bool awardOnly});
 }
 
 /// @nodoc
@@ -116,6 +121,7 @@ class _$SearchCopyWithImpl<$Res> implements $SearchCopyWith<$Res> {
     Object? searchWord = null,
     Object? numberOfHits = null,
     Object? savedAt = freezed,
+    Object? awardOnly = null,
   }) {
     return _then(_self.copyWith(
       category: null == category
@@ -150,6 +156,10 @@ class _$SearchCopyWithImpl<$Res> implements $SearchCopyWith<$Res> {
           ? _self.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      awardOnly: null == awardOnly
+          ? _self.awardOnly
+          : awardOnly // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -255,7 +265,8 @@ extension SearchPatterns on Search {
             @CourseEnumConverter() Course course,
             @SearchWordConverter() List<String> searchWord,
             int numberOfHits,
-            @DateTimeConverter() DateTime? savedAt)?
+            @DateTimeConverter() DateTime? savedAt,
+            bool awardOnly)?
         $default, {
     required TResult orElse(),
   }) {
@@ -270,7 +281,8 @@ extension SearchPatterns on Search {
             _that.course,
             _that.searchWord,
             _that.numberOfHits,
-            _that.savedAt);
+            _that.savedAt,
+            _that.awardOnly);
       case _:
         return orElse();
     }
@@ -299,7 +311,8 @@ extension SearchPatterns on Search {
             @CourseEnumConverter() Course course,
             @SearchWordConverter() List<String> searchWord,
             int numberOfHits,
-            @DateTimeConverter() DateTime? savedAt)
+            @DateTimeConverter() DateTime? savedAt,
+            bool awardOnly)
         $default,
   ) {
     final _that = this;
@@ -313,7 +326,8 @@ extension SearchPatterns on Search {
             _that.course,
             _that.searchWord,
             _that.numberOfHits,
-            _that.savedAt);
+            _that.savedAt,
+            _that.awardOnly);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -341,7 +355,8 @@ extension SearchPatterns on Search {
             @CourseEnumConverter() Course course,
             @SearchWordConverter() List<String> searchWord,
             int numberOfHits,
-            @DateTimeConverter() DateTime? savedAt)?
+            @DateTimeConverter() DateTime? savedAt,
+            bool awardOnly)?
         $default,
   ) {
     final _that = this;
@@ -355,7 +370,8 @@ extension SearchPatterns on Search {
             _that.course,
             _that.searchWord,
             _that.numberOfHits,
-            _that.savedAt);
+            _that.savedAt,
+            _that.awardOnly);
       case _:
         return null;
     }
@@ -373,7 +389,8 @@ class _Search extends Search {
       @CourseEnumConverter() required this.course,
       @SearchWordConverter() final List<String> searchWord = const [],
       this.numberOfHits = 0,
-      @DateTimeConverter() this.savedAt})
+      @DateTimeConverter() this.savedAt,
+      this.awardOnly = false})
       : _searchWord = searchWord,
         super._();
   factory _Search.fromJson(Map<String, dynamic> json) => _$SearchFromJson(json);
@@ -409,6 +426,9 @@ class _Search extends Search {
   @override
   @DateTimeConverter()
   final DateTime? savedAt;
+  @override
+  @JsonKey()
+  final bool awardOnly;
 
   /// Create a copy of Search
   /// with the given fields replaced by the non-null parameter values.
@@ -443,7 +463,9 @@ class _Search extends Search {
                 .equals(other._searchWord, _searchWord) &&
             (identical(other.numberOfHits, numberOfHits) ||
                 other.numberOfHits == numberOfHits) &&
-            (identical(other.savedAt, savedAt) || other.savedAt == savedAt));
+            (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
+            (identical(other.awardOnly, awardOnly) ||
+                other.awardOnly == awardOnly));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -457,11 +479,12 @@ class _Search extends Search {
       course,
       const DeepCollectionEquality().hash(_searchWord),
       numberOfHits,
-      savedAt);
+      savedAt,
+      awardOnly);
 
   @override
   String toString() {
-    return 'Search(category: $category, subCategory: $subCategory, enterYear: $enterYear, eventName: $eventName, course: $course, searchWord: $searchWord, numberOfHits: $numberOfHits, savedAt: $savedAt)';
+    return 'Search(category: $category, subCategory: $subCategory, enterYear: $enterYear, eventName: $eventName, course: $course, searchWord: $searchWord, numberOfHits: $numberOfHits, savedAt: $savedAt, awardOnly: $awardOnly)';
   }
 }
 
@@ -479,7 +502,8 @@ abstract mixin class _$SearchCopyWith<$Res> implements $SearchCopyWith<$Res> {
       @CourseEnumConverter() Course course,
       @SearchWordConverter() List<String> searchWord,
       int numberOfHits,
-      @DateTimeConverter() DateTime? savedAt});
+      @DateTimeConverter() DateTime? savedAt,
+      bool awardOnly});
 }
 
 /// @nodoc
@@ -502,6 +526,7 @@ class __$SearchCopyWithImpl<$Res> implements _$SearchCopyWith<$Res> {
     Object? searchWord = null,
     Object? numberOfHits = null,
     Object? savedAt = freezed,
+    Object? awardOnly = null,
   }) {
     return _then(_Search(
       category: null == category
@@ -536,6 +561,10 @@ class __$SearchCopyWithImpl<$Res> implements _$SearchCopyWith<$Res> {
           ? _self.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      awardOnly: null == awardOnly
+          ? _self.awardOnly
+          : awardOnly // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

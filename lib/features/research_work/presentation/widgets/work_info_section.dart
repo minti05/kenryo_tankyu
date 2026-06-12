@@ -100,45 +100,49 @@ class WorkDetailsTable extends StatelessWidget {
                     subCategory: searched.subCategory2,
                   ),
                 ],
-                if (searched.awardDisplayText != null) ...[
-                  const SizedBox(width: 8),
-                  _AwardChip(text: searched.awardDisplayText!),
-                ],
               ],
             ),
           ),
         ),
+        if (searched.awardDisplayText != null) ...[
+          const SizedBox(height: 8),
+          _AwardBanner(text: searched.awardDisplayText!),
+        ],
       ],
     );
   }
 }
 
-class _AwardChip extends StatelessWidget {
+class _AwardBanner extends StatelessWidget {
   final String text;
-  const _AwardChip({required this.text});
+  const _AwardBanner({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    final color = const Color(0xFFB8860B);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
+    const color = Color(0xFFB8860B);
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.emoji_events_outlined,
-              size: 14, color: Color(0xFFB8860B)),
+          Container(
+            width: 3,
+            height: 28,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.emoji_events_outlined, size: 16, color: color),
           const SizedBox(width: 4),
           Text(
             text,
             style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFFB8860B),
+              fontSize: 13,
+              color: color,
               fontWeight: FontWeight.bold,
+              letterSpacing: 0.3,
             ),
           ),
         ],

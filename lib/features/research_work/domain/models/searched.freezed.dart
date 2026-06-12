@@ -40,7 +40,8 @@ mixin _$Searched {
   @DateTimeConverter()
   DateTime? get savedAt;
   bool get isCached;
-  int? get awardType;
+  @AwardTypeConverter()
+  AwardType? get awardType;
   String? get awardName;
 
   /// Create a copy of Searched
@@ -151,7 +152,7 @@ abstract mixin class $SearchedCopyWith<$Res> {
       bool existsPoster,
       @DateTimeConverter() DateTime? savedAt,
       bool isCached,
-      int? awardType,
+      @AwardTypeConverter() AwardType? awardType,
       String? awardName});
 }
 
@@ -264,7 +265,7 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
       awardType: freezed == awardType
           ? _self.awardType
           : awardType // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as AwardType?,
       awardName: freezed == awardName
           ? _self.awardName
           : awardName // ignore: cast_nullable_to_non_nullable
@@ -385,7 +386,7 @@ extension SearchedPatterns on Searched {
             bool existsPoster,
             @DateTimeConverter() DateTime? savedAt,
             bool isCached,
-            int? awardType,
+            @AwardTypeConverter() AwardType? awardType,
             String? awardName)?
         $default, {
     required TResult orElse(),
@@ -453,7 +454,7 @@ extension SearchedPatterns on Searched {
             bool existsPoster,
             @DateTimeConverter() DateTime? savedAt,
             bool isCached,
-            int? awardType,
+            @AwardTypeConverter() AwardType? awardType,
             String? awardName)
         $default,
   ) {
@@ -519,7 +520,7 @@ extension SearchedPatterns on Searched {
             bool existsPoster,
             @DateTimeConverter() DateTime? savedAt,
             bool isCached,
-            int? awardType,
+            @AwardTypeConverter() AwardType? awardType,
             String? awardName)?
         $default,
   ) {
@@ -575,7 +576,7 @@ class _Searched extends Searched {
       this.existsPoster = false,
       @DateTimeConverter() this.savedAt,
       this.isCached = true,
-      this.awardType,
+      @AwardTypeConverter() this.awardType,
       this.awardName})
       : super._();
   factory _Searched.fromJson(Map<String, dynamic> json) =>
@@ -636,7 +637,8 @@ class _Searched extends Searched {
   @JsonKey()
   final bool isCached;
   @override
-  final int? awardType;
+  @AwardTypeConverter()
+  final AwardType? awardType;
   @override
   final String? awardName;
 
@@ -755,7 +757,7 @@ abstract mixin class _$SearchedCopyWith<$Res>
       bool existsPoster,
       @DateTimeConverter() DateTime? savedAt,
       bool isCached,
-      int? awardType,
+      @AwardTypeConverter() AwardType? awardType,
       String? awardName});
 }
 
@@ -868,7 +870,7 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
       awardType: freezed == awardType
           ? _self.awardType
           : awardType // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as AwardType?,
       awardName: freezed == awardName
           ? _self.awardName
           : awardName // ignore: cast_nullable_to_non_nullable
