@@ -71,15 +71,23 @@ class WorkDetailsTable extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-          child: Text(
-            '$enterYearText${searched.course.displayName} ／ $author',
-            style: TextStyle(
-              fontSize: 13,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.6),
-            ),
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            children: [
+              Text(
+                '$enterYearText${searched.course.displayName} ／ $author',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
+                ),
+              ),
+              if (searched.awardDisplayText != null)
+                _AwardChip(text: searched.awardDisplayText!),
+            ],
           ),
         ),
         Align(
@@ -104,45 +112,36 @@ class WorkDetailsTable extends StatelessWidget {
             ),
           ),
         ),
-        if (searched.awardDisplayText != null) ...[
-          const SizedBox(height: 8),
-          _AwardBanner(text: searched.awardDisplayText!),
-        ],
       ],
     );
   }
 }
 
-class _AwardBanner extends StatelessWidget {
+class _AwardChip extends StatelessWidget {
   final String text;
-  const _AwardBanner({required this.text});
+  const _AwardChip({required this.text});
 
   @override
   Widget build(BuildContext context) {
     const color = Color(0xFFB8860B);
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 3,
-            height: 28,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Icon(Icons.emoji_events_outlined, size: 16, color: color),
-          const SizedBox(width: 4),
+          const Icon(Icons.emoji_events_outlined, size: 11, color: color),
+          const SizedBox(width: 3),
           Text(
             text,
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 11,
               color: color,
               fontWeight: FontWeight.bold,
-              letterSpacing: 0.3,
             ),
           ),
         ],

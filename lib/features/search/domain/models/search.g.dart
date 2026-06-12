@@ -22,7 +22,6 @@ _Search _$SearchFromJson(Map<String, dynamic> json) => _Search(
       numberOfHits: (json['numberOfHits'] as num?)?.toInt() ?? 0,
       savedAt: _$JsonConverterFromJson<String, DateTime>(
           json['savedAt'], const DateTimeConverter().fromJson),
-      awardOnly: json['awardOnly'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$SearchToJson(_Search instance) => <String, dynamic>{
@@ -36,7 +35,6 @@ Map<String, dynamic> _$SearchToJson(_Search instance) => <String, dynamic>{
       'numberOfHits': instance.numberOfHits,
       'savedAt': _$JsonConverterToJson<String, DateTime>(
           instance.savedAt, const DateTimeConverter().toJson),
-      'awardOnly': instance.awardOnly,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(

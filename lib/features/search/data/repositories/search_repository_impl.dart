@@ -116,7 +116,6 @@ class SearchRepositoryImpl with ErrorMapper implements SearchRepository {
     searchState.course.name != 'undefined'
         ? str += ' AND course:${searchState.course.name}'
         : null;
-    searchState.awardOnly ? str += ' AND awardType >= 1' : null;
     str != '' ? str = str.substring(4, str.length) : null;
     return str;
   }

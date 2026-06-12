@@ -30,8 +30,7 @@ abstract class Search with _$Search {
       subCategory == SubCategory.none &&
       enterYear == EnterYear.undefined &&
       course == Course.undefined &&
-      eventName == EventName.undefined &&
-      !awardOnly;
+      eventName == EventName.undefined;
 
   const factory Search({
     @CategoryEnumConverter() required Category category,
@@ -42,7 +41,6 @@ abstract class Search with _$Search {
     @SearchWordConverter() @Default([]) List<String> searchWord,
     @Default(0) int numberOfHits,
     @DateTimeConverter() DateTime? savedAt,
-    @Default(false) bool awardOnly,
   }) = _Search;
 
   factory Search.fromJson(Map<String, dynamic> json) => _$SearchFromJson(json);

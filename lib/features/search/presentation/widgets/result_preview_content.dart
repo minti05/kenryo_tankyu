@@ -86,24 +86,14 @@ class ResultPreviewContent extends ConsumerWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
                         children: [
                           Text(
                               '${searched.enterYear.displayName.toString()}年度入学 ${searched.course.displayName}'),
-                          if (searched.awardDisplayText != null) ...[
-                            const SizedBox(width: 6),
-                            const Icon(Icons.emoji_events_outlined,
-                                size: 13, color: Color(0xFFB8860B)),
-                            const SizedBox(width: 2),
-                            Text(
-                              searched.awardDisplayText!,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFFB8860B),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          if (searched.awardDisplayText != null)
+                            _AwardChip(text: searched.awardDisplayText!),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -145,6 +135,39 @@ class ResultPreviewContent extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AwardChip extends StatelessWidget {
+  final String text;
+  const _AwardChip({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    const color = Color(0xFFB8860B);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.emoji_events_outlined, size: 11, color: color),
+          const SizedBox(width: 3),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 11,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

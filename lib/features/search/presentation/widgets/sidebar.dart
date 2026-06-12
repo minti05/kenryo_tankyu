@@ -60,8 +60,6 @@ class SideBar extends ConsumerWidget {
                               .map((e) => e.displayName)
                               .toList()),
                       const SizedBox(height: 15.0),
-                      _AwardOnlyToggle(awardOnly: data.awardOnly),
-                      const SizedBox(height: 15.0),
                       const Text('サブカテゴリを選択'),
                       data.category != Category.none
                           ? const SubCategoryChip()
@@ -86,28 +84,6 @@ class SideBar extends ConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AwardOnlyToggle extends ConsumerWidget {
-  final bool awardOnly;
-  const _AwardOnlyToggle({required this.awardOnly});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
-      children: [
-        const Icon(Icons.emoji_events_outlined,
-            size: 18, color: Color(0xFFB8860B)),
-        const SizedBox(width: 6),
-        const Expanded(child: Text('グランプリ受賞作品のみ')),
-        Switch(
-          value: awardOnly,
-          onChanged: (value) =>
-              ref.read(searchProvider.notifier).selectedAwardOnly(value),
-        ),
-      ],
     );
   }
 }

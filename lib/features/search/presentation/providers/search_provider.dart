@@ -48,10 +48,6 @@ class SearchNotifier extends Notifier<Search> {
     state = state.copyWith(subCategory: selectSubCategory);
   }
 
-  void selectedAwardOnly(bool value) {
-    state = state.copyWith(awardOnly: value);
-  }
-
   void deleteAllParameters() {
     state = state.copyWith(
         enterYear: EnterYear.undefined,
@@ -59,8 +55,7 @@ class SearchNotifier extends Notifier<Search> {
         course: Course.undefined,
         subCategory: SubCategory.none,
         category: Category.none,
-        searchWord: [],
-        awardOnly: false);
+        searchWord: []);
   }
 
   void deleteParameter(String parameterName) {
