@@ -25,6 +25,18 @@ abstract class Searched with _$Searched {
   @JsonSerializable(explicitToJson: true)
   const Searched._();
 
+  static const _awardTypeNames = {1: '大賞', 2: '優秀賞', 3: '奨励賞', 4: '入賞'};
+
+  /// 受賞がある場合に「KRGP:優秀賞 弱音を吐くな賞」のような表示テキストを返す。なければ null。
+  String? get awardDisplayText {
+    if (awardType == null) return null;
+    final typeName = _awardTypeNames[awardType] ?? '入賞';
+    if (awardName != null && awardName!.isNotEmpty) {
+      return 'KRGP:$typeName $awardName';
+    }
+    return 'KRGP:$typeName';
+  }
+
   const factory Searched({
     @Default(00000000) int documentID,
     @Default(false) bool isFavorite,
@@ -44,6 +56,8 @@ abstract class Searched with _$Searched {
     @Default(false) bool existsPoster,
     @DateTimeConverter() DateTime? savedAt,
     @Default(true) bool isCached,
+    int? awardType,
+    String? awardName,
   }) = _Searched;
 
   factory Searched.fromJson(Map<String, dynamic> json) =>
@@ -108,6 +122,8 @@ abstract class Searched with _$Searched {
       'exists_report': existsReport,
       'exists_thesis': existsThesis,
       'exists_poster': existsPoster,
+      'award_type': awardType,
+      'award_name': awardName,
     };
   }
 
@@ -138,6 +154,8 @@ abstract class Searched with _$Searched {
       existsPoster: row['exists_poster'] as bool,
       savedAt: DateTime.parse(row['viewed_at'] as String).toLocal(),
       isCached: true,
+      awardType: row['award_type'] as int?,
+      awardName: row['award_name'] as String?,
     );
   }
 }

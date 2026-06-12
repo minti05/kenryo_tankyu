@@ -86,6 +86,10 @@ class ResultPreviewContent extends ConsumerWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
+                      if (searched.awardDisplayText != null) ...[
+                        _AwardBadge(text: searched.awardDisplayText!),
+                        const SizedBox(height: 4),
+                      ],
                       Text(
                           '${searched.enterYear.displayName.toString()}年度入学 ${searched.course.displayName}'),
                       const SizedBox(height: 4),
@@ -128,6 +132,31 @@ class ResultPreviewContent extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AwardBadge extends StatelessWidget {
+  final String text;
+  const _AwardBadge({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    const color = Color(0xFFB8860B);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.emoji_events_outlined, size: 12, color: color),
+        const SizedBox(width: 2),
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 }
