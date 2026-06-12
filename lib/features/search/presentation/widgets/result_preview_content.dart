@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/presentation/widget/award_chip.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/image_chip.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite_button.dart';
@@ -93,7 +94,7 @@ class ResultPreviewContent extends ConsumerWidget {
                           Text(
                               '${searched.enterYear.displayName.toString()}年度入学 ${searched.course.displayName}'),
                           if (searched.awardDisplayText != null)
-                            _AwardChip(text: searched.awardDisplayText!),
+                            AwardChip(text: searched.awardDisplayText!),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -135,39 +136,6 @@ class ResultPreviewContent extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _AwardChip extends StatelessWidget {
-  final String text;
-  const _AwardChip({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    const color = Color(0xFFB8860B);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.emoji_events_outlined, size: 11, color: color),
-          const SizedBox(width: 3),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 11,
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }

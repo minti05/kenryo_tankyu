@@ -30,8 +30,9 @@ abstract class Searched with _$Searched {
   String? get awardDisplayText {
     if (awardType == null) return null;
     final typeName = awardType!.displayName;
-    if (awardName != null && awardName!.isNotEmpty) {
-      return 'KRGP:$typeName $awardName';
+    final trimmedName = awardName?.trim();
+    if (trimmedName != null && trimmedName.isNotEmpty) {
+      return 'KRGP:$typeName $trimmedName';
     }
     return 'KRGP:$typeName';
   }
