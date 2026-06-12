@@ -4,6 +4,7 @@ import 'package:algoliasearch/algoliasearch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import "package:kenryo_tankyu/core/constants/work/award_value.dart";
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
@@ -25,6 +26,17 @@ abstract class Searched with _$Searched {
   @JsonSerializable(explicitToJson: true)
   const Searched._();
 
+  /// 受賞がある場合に「KRGP:優秀賞 弱音を吐くな賞」のような表示テキストを返す。なければ null。
+  String? get awardDisplayText {
+    if (awardType == null) return null;
+    final typeName = awardType!.displayName;
+    final trimmedName = awardName?.trim();
+    if (trimmedName != null && trimmedName.isNotEmpty) {
+      return 'KRGP:$typeName $trimmedName';
+    }
+    return 'KRGP:$typeName';
+  }
+
   const factory Searched({
     @Default(00000000) int documentID,
     @Default(false) bool isFavorite,
@@ -44,6 +56,8 @@ abstract class Searched with _$Searched {
     @Default(false) bool existsPoster,
     @DateTimeConverter() DateTime? savedAt,
     @Default(true) bool isCached,
+    @AwardTypeConverter() AwardType? awardType,
+    String? awardName,
   }) = _Searched;
 
   factory Searched.fromJson(Map<String, dynamic> json) =>
@@ -60,12 +74,14 @@ abstract class Searched with _$Searched {
         isFavorite: isFavorite,
         isCached: false);
   }
+
   factory Searched.fromFirestore(DocumentSnapshot doc, bool isFavorite) {
     final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     final searched = Searched.fromJson(data);
     return searched.copyWith(
         documentID: int.parse(doc.id), isFavorite: isFavorite, isCached: false);
   }
+
   factory Searched.fromSQLite(Map<String, dynamic> json) {
     final mutableJson = Map<String, dynamic>.from(json);
     //SQLiteから取得したデータは、0,1で保存されているため、bool型に変換する。
@@ -108,6 +124,8 @@ abstract class Searched with _$Searched {
       'exists_report': existsReport,
       'exists_thesis': existsThesis,
       'exists_poster': existsPoster,
+      'award_type': const AwardTypeConverter().toJson(awardType),
+      'award_name': awardName,
     };
   }
 
@@ -138,6 +156,8 @@ abstract class Searched with _$Searched {
       existsPoster: row['exists_poster'] as bool,
       savedAt: DateTime.parse(row['viewed_at'] as String).toLocal(),
       isCached: true,
+      awardType: AwardType.fromValue(row['award_type'] as int?),
+      awardName: row['award_name'] as String?,
     );
   }
 }

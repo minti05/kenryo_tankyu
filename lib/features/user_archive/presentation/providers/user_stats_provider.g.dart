@@ -33,7 +33,7 @@ final class UserStatsNotifierProvider
   UserStatsNotifier create() => UserStatsNotifier();
 }
 
-String _$userStatsNotifierHash() => r'920e1d7c1eded90039cacaaf369d4bb12cbb9d2a';
+String _$userStatsNotifierHash() => r'f5025c96523979c5c729073b3dc018337f5c8b5e';
 
 abstract class _$UserStatsNotifier extends $AsyncNotifier<UserStats> {
   FutureOr<UserStats> build();

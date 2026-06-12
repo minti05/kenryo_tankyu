@@ -40,6 +40,9 @@ mixin _$Searched {
   @DateTimeConverter()
   DateTime? get savedAt;
   bool get isCached;
+  @AwardTypeConverter()
+  AwardType? get awardType;
+  String? get awardName;
 
   /// Create a copy of Searched
   /// with the given fields replaced by the non-null parameter values.
@@ -86,35 +89,42 @@ mixin _$Searched {
                 other.existsPoster == existsPoster) &&
             (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
             (identical(other.isCached, isCached) ||
-                other.isCached == isCached));
+                other.isCached == isCached) &&
+            (identical(other.awardType, awardType) ||
+                other.awardType == awardType) &&
+            (identical(other.awardName, awardName) ||
+                other.awardName == awardName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      documentID,
-      isFavorite,
-      category1,
-      subCategory1,
-      category2,
-      subCategory2,
-      enterYear,
-      eventName,
-      course,
-      title,
-      author,
-      likes,
-      existsSlide,
-      existsReport,
-      existsThesis,
-      existsPoster,
-      savedAt,
-      isCached);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        documentID,
+        isFavorite,
+        category1,
+        subCategory1,
+        category2,
+        subCategory2,
+        enterYear,
+        eventName,
+        course,
+        title,
+        author,
+        likes,
+        existsSlide,
+        existsReport,
+        existsThesis,
+        existsPoster,
+        savedAt,
+        isCached,
+        awardType,
+        awardName
+      ]);
 
   @override
   String toString() {
-    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
+    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached, awardType: $awardType, awardName: $awardName)';
   }
 }
 
@@ -141,7 +151,9 @@ abstract mixin class $SearchedCopyWith<$Res> {
       bool existsThesis,
       bool existsPoster,
       @DateTimeConverter() DateTime? savedAt,
-      bool isCached});
+      bool isCached,
+      @AwardTypeConverter() AwardType? awardType,
+      String? awardName});
 }
 
 /// @nodoc
@@ -174,6 +186,8 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
     Object? existsPoster = null,
     Object? savedAt = freezed,
     Object? isCached = null,
+    Object? awardType = freezed,
+    Object? awardName = freezed,
   }) {
     return _then(_self.copyWith(
       documentID: null == documentID
@@ -248,6 +262,14 @@ class _$SearchedCopyWithImpl<$Res> implements $SearchedCopyWith<$Res> {
           ? _self.isCached
           : isCached // ignore: cast_nullable_to_non_nullable
               as bool,
+      awardType: freezed == awardType
+          ? _self.awardType
+          : awardType // ignore: cast_nullable_to_non_nullable
+              as AwardType?,
+      awardName: freezed == awardName
+          ? _self.awardName
+          : awardName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -363,7 +385,9 @@ extension SearchedPatterns on Searched {
             bool existsThesis,
             bool existsPoster,
             @DateTimeConverter() DateTime? savedAt,
-            bool isCached)?
+            bool isCached,
+            @AwardTypeConverter() AwardType? awardType,
+            String? awardName)?
         $default, {
     required TResult orElse(),
   }) {
@@ -388,7 +412,9 @@ extension SearchedPatterns on Searched {
             _that.existsThesis,
             _that.existsPoster,
             _that.savedAt,
-            _that.isCached);
+            _that.isCached,
+            _that.awardType,
+            _that.awardName);
       case _:
         return orElse();
     }
@@ -427,7 +453,9 @@ extension SearchedPatterns on Searched {
             bool existsThesis,
             bool existsPoster,
             @DateTimeConverter() DateTime? savedAt,
-            bool isCached)
+            bool isCached,
+            @AwardTypeConverter() AwardType? awardType,
+            String? awardName)
         $default,
   ) {
     final _that = this;
@@ -451,7 +479,9 @@ extension SearchedPatterns on Searched {
             _that.existsThesis,
             _that.existsPoster,
             _that.savedAt,
-            _that.isCached);
+            _that.isCached,
+            _that.awardType,
+            _that.awardName);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -489,7 +519,9 @@ extension SearchedPatterns on Searched {
             bool existsThesis,
             bool existsPoster,
             @DateTimeConverter() DateTime? savedAt,
-            bool isCached)?
+            bool isCached,
+            @AwardTypeConverter() AwardType? awardType,
+            String? awardName)?
         $default,
   ) {
     final _that = this;
@@ -513,7 +545,9 @@ extension SearchedPatterns on Searched {
             _that.existsThesis,
             _that.existsPoster,
             _that.savedAt,
-            _that.isCached);
+            _that.isCached,
+            _that.awardType,
+            _that.awardName);
       case _:
         return null;
     }
@@ -541,7 +575,9 @@ class _Searched extends Searched {
       this.existsThesis = false,
       this.existsPoster = false,
       @DateTimeConverter() this.savedAt,
-      this.isCached = true})
+      this.isCached = true,
+      @AwardTypeConverter() this.awardType,
+      this.awardName})
       : super._();
   factory _Searched.fromJson(Map<String, dynamic> json) =>
       _$SearchedFromJson(json);
@@ -600,6 +636,11 @@ class _Searched extends Searched {
   @override
   @JsonKey()
   final bool isCached;
+  @override
+  @AwardTypeConverter()
+  final AwardType? awardType;
+  @override
+  final String? awardName;
 
   /// Create a copy of Searched
   /// with the given fields replaced by the non-null parameter values.
@@ -651,35 +692,42 @@ class _Searched extends Searched {
                 other.existsPoster == existsPoster) &&
             (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
             (identical(other.isCached, isCached) ||
-                other.isCached == isCached));
+                other.isCached == isCached) &&
+            (identical(other.awardType, awardType) ||
+                other.awardType == awardType) &&
+            (identical(other.awardName, awardName) ||
+                other.awardName == awardName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      documentID,
-      isFavorite,
-      category1,
-      subCategory1,
-      category2,
-      subCategory2,
-      enterYear,
-      eventName,
-      course,
-      title,
-      author,
-      likes,
-      existsSlide,
-      existsReport,
-      existsThesis,
-      existsPoster,
-      savedAt,
-      isCached);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        documentID,
+        isFavorite,
+        category1,
+        subCategory1,
+        category2,
+        subCategory2,
+        enterYear,
+        eventName,
+        course,
+        title,
+        author,
+        likes,
+        existsSlide,
+        existsReport,
+        existsThesis,
+        existsPoster,
+        savedAt,
+        isCached,
+        awardType,
+        awardName
+      ]);
 
   @override
   String toString() {
-    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached)';
+    return 'Searched(documentID: $documentID, isFavorite: $isFavorite, category1: $category1, subCategory1: $subCategory1, category2: $category2, subCategory2: $subCategory2, enterYear: $enterYear, eventName: $eventName, course: $course, title: $title, author: $author, likes: $likes, existsSlide: $existsSlide, existsReport: $existsReport, existsThesis: $existsThesis, existsPoster: $existsPoster, savedAt: $savedAt, isCached: $isCached, awardType: $awardType, awardName: $awardName)';
   }
 }
 
@@ -708,7 +756,9 @@ abstract mixin class _$SearchedCopyWith<$Res>
       bool existsThesis,
       bool existsPoster,
       @DateTimeConverter() DateTime? savedAt,
-      bool isCached});
+      bool isCached,
+      @AwardTypeConverter() AwardType? awardType,
+      String? awardName});
 }
 
 /// @nodoc
@@ -741,6 +791,8 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
     Object? existsPoster = null,
     Object? savedAt = freezed,
     Object? isCached = null,
+    Object? awardType = freezed,
+    Object? awardName = freezed,
   }) {
     return _then(_Searched(
       documentID: null == documentID
@@ -815,6 +867,14 @@ class __$SearchedCopyWithImpl<$Res> implements _$SearchedCopyWith<$Res> {
           ? _self.isCached
           : isCached // ignore: cast_nullable_to_non_nullable
               as bool,
+      awardType: freezed == awardType
+          ? _self.awardType
+          : awardType // ignore: cast_nullable_to_non_nullable
+              as AwardType?,
+      awardName: freezed == awardName
+          ? _self.awardName
+          : awardName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

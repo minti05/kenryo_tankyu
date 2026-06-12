@@ -49,7 +49,7 @@ final class ResearchWorkProvider
   }
 }
 
-String _$researchWorkHash() => r'796340f18356e701904ead3cfe7ff248ee9c7e75';
+String _$researchWorkHash() => r'67be6cb802fafd125dada0ee5440e7532e878b4a';
 
 final class ResearchWorkFamily extends $Family
     with

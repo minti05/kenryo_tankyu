@@ -4,6 +4,7 @@ import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import "package:kenryo_tankyu/core/constants/work/info_value.dart";
 import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/presentation/widget/award_chip.dart';
 
 class WorkInfoSection extends StatelessWidget {
   final Searched searched;
@@ -71,15 +72,23 @@ class WorkDetailsTable extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-          child: Text(
-            '$enterYearText${searched.course.displayName} ／ $author',
-            style: TextStyle(
-              fontSize: 13,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.6),
-            ),
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            children: [
+              Text(
+                '$enterYearText${searched.course.displayName} ／ $author',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
+                ),
+              ),
+              if (searched.awardDisplayText != null)
+                AwardChip(text: searched.awardDisplayText!),
+            ],
           ),
         ),
         Align(

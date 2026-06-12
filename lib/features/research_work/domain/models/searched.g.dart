@@ -32,6 +32,9 @@ _Searched _$SearchedFromJson(Map<String, dynamic> json) => _Searched(
       savedAt: _$JsonConverterFromJson<String, DateTime>(
           json['savedAt'], const DateTimeConverter().fromJson),
       isCached: json['isCached'] as bool? ?? true,
+      awardType: const AwardTypeConverter()
+          .fromJson((json['awardType'] as num?)?.toInt()),
+      awardName: json['awardName'] as String?,
     );
 
 Map<String, dynamic> _$SearchedToJson(_Searched instance) => <String, dynamic>{
@@ -56,6 +59,8 @@ Map<String, dynamic> _$SearchedToJson(_Searched instance) => <String, dynamic>{
       'savedAt': _$JsonConverterToJson<String, DateTime>(
           instance.savedAt, const DateTimeConverter().toJson),
       'isCached': instance.isCached,
+      'awardType': const AwardTypeConverter().toJson(instance.awardType),
+      'awardName': instance.awardName,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(
