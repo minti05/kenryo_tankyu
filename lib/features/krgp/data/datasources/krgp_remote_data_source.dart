@@ -24,20 +24,8 @@ class KrgpRemoteDataSource {
 
     for (final item in rawWorks) {
       try {
-        final map = Map<String, dynamic>.from(item as Map);
-        final documentID = (map['documentID'] as num?)?.toInt() ?? 0;
-        // documentID は fromJson で無視されるフィールドなので copyWith で後付け
-        map.putIfAbsent('likes', () => 0);
-        map.putIfAbsent('existsSlide', () => false);
-        map.putIfAbsent('existsReport', () => false);
-        map.putIfAbsent('existsThesis', () => false);
-        map.putIfAbsent('existsPoster', () => false);
-        final searched = Searched.fromJson(map);
-        results.add(searched.copyWith(
-          documentID: documentID,
-          isFavorite: false,
-          isCached: false,
-        ));
+        results
+            .add(Searched.fromKrgpDb(Map<String, dynamic>.from(item as Map)));
       } catch (e) {
         debugPrint('[KrgpDataSource] parse error: $e\nitem: $item');
       }

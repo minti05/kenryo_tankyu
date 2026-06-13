@@ -82,6 +82,22 @@ abstract class Searched with _$Searched {
         documentID: int.parse(doc.id), isFavorite: isFavorite, isCached: false);
   }
 
+  /// krgp/awards の works 配列の各要素からパースする
+  factory Searched.fromKrgpDb(Map<String, dynamic> raw) {
+    final map = Map<String, dynamic>.from(raw);
+    final documentID = (map['documentID'] as num?)?.toInt() ?? 0;
+    map.putIfAbsent('likes', () => 0);
+    map.putIfAbsent('existsSlide', () => false);
+    map.putIfAbsent('existsReport', () => false);
+    map.putIfAbsent('existsThesis', () => false);
+    map.putIfAbsent('existsPoster', () => false);
+    return Searched.fromJson(map).copyWith(
+      documentID: documentID,
+      isFavorite: false,
+      isCached: false,
+    );
+  }
+
   factory Searched.fromSQLite(Map<String, dynamic> json) {
     final mutableJson = Map<String, dynamic>.from(json);
     //SQLiteから取得したデータは、0,1で保存されているため、bool型に変換する。

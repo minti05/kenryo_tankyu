@@ -19,13 +19,12 @@ class _KrgpAwardsPageState extends ConsumerState<KrgpAwardsPage>
   KrgpSortMode _sortMode = KrgpSortMode.year;
   TabController? _tabController;
 
-  static const _years = [
-    EnterYear.enter2024,
-    EnterYear.enter2023,
-    EnterYear.enter2022,
-    EnterYear.enter2021,
-    EnterYear.enter2020,
-  ];
+  // undefined を除いた年度リスト（新しい順）
+  static final _years = EnterYear.values
+      .where((y) => y != EnterYear.undefined)
+      .toList()
+      .reversed
+      .toList();
 
   @override
   void dispose() {
@@ -193,16 +192,14 @@ class _AwardTabContent extends StatelessWidget {
   final Map<String?, Map<EnterYear, List<Searched>>> awardData;
   const _AwardTabContent({required this.awardData});
 
+  static final _yearsDesc = EnterYear.values
+      .where((y) => y != EnterYear.undefined)
+      .toList()
+      .reversed
+      .toList();
+
   @override
   Widget build(BuildContext context) {
-    const yearsDesc = [
-      EnterYear.enter2024,
-      EnterYear.enter2023,
-      EnterYear.enter2022,
-      EnterYear.enter2021,
-      EnterYear.enter2020,
-    ];
-
     final items = <Widget>[];
     var isFirst = true;
 
@@ -211,7 +208,7 @@ class _AwardTabContent extends StatelessWidget {
         items.add(_SectionHeader(label: entry.key!, isTop: isFirst));
         isFirst = false;
       }
-      for (final year in yearsDesc) {
+      for (final year in _yearsDesc) {
         final works = entry.value[year];
         if (works == null) continue;
 
