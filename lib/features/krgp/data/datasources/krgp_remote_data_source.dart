@@ -24,8 +24,11 @@ class KrgpRemoteDataSource {
 
     for (final item in rawWorks) {
       try {
-        results
-            .add(Searched.fromKrgpDb(Map<String, dynamic>.from(item as Map)));
+        if (item is Map) {
+          results.add(Searched.fromKrgpDb(Map<String, dynamic>.from(item)));
+        } else {
+          debugPrint('[KrgpDataSource] item is not a Map: $item');
+        }
       } catch (e) {
         debugPrint('[KrgpDataSource] parse error: $e\nitem: $item');
       }

@@ -91,6 +91,8 @@ abstract class Searched with _$Searched {
     map.putIfAbsent('existsReport', () => false);
     map.putIfAbsent('existsThesis', () => false);
     map.putIfAbsent('existsPoster', () => false);
+    map.putIfAbsent('category2', () => 'none');
+    map.putIfAbsent('subCategory2', () => 'none');
     return Searched.fromJson(map).copyWith(
       documentID: documentID,
       isFavorite: false,

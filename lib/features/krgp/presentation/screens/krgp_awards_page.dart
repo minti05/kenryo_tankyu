@@ -14,10 +14,8 @@ class KrgpAwardsPage extends ConsumerStatefulWidget {
   ConsumerState<KrgpAwardsPage> createState() => _KrgpAwardsPageState();
 }
 
-class _KrgpAwardsPageState extends ConsumerState<KrgpAwardsPage>
-    with TickerProviderStateMixin {
+class _KrgpAwardsPageState extends ConsumerState<KrgpAwardsPage> {
   KrgpSortMode _sortMode = KrgpSortMode.year;
-  TabController? _tabController;
 
   // undefined を除いた年度リスト（新しい順）
   static final _years = EnterYear.values
@@ -27,27 +25,16 @@ class _KrgpAwardsPageState extends ConsumerState<KrgpAwardsPage>
       .toList();
 
   @override
-  void dispose() {
-    _tabController?.dispose();
-    super.dispose();
-  }
-
-  void _buildTabController(int length) {
-    _tabController?.dispose();
-    _tabController = TabController(length: length, vsync: this);
-  }
-
-  @override
   Widget build(BuildContext context) {
     final asyncWorks = ref.watch(krgpAwardsProvider);
 
     return asyncWorks.when(
       loading: () => Scaffold(
-        appBar: _buildAppBar(context, null),
+        appBar: _buildAppBar(context),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, st) => Scaffold(
-        appBar: _buildAppBar(context, null),
+        appBar: _buildAppBar(context),
         body: CommonErrorView(
           error: e,
           onRetry: () => ref.invalidate(krgpAwardsProvider),
@@ -58,78 +45,78 @@ class _KrgpAwardsPageState extends ConsumerState<KrgpAwardsPage>
           final grouped = groupByYear(works);
           final availableYears =
               _years.where((y) => grouped.containsKey(y)).toList();
-          if (_tabController == null ||
-              _tabController!.length != availableYears.length) {
-            _buildTabController(availableYears.length);
+          if (availableYears.isEmpty) {
+            return Scaffold(
+              appBar: _buildAppBar(context),
+              body: const Center(child: Text('データがありません')),
+            );
           }
-          return Scaffold(
-            appBar: _buildAppBar(context, _tabController),
-            body: availableYears.isEmpty
-                ? const Center(child: Text('データがありません'))
-                : Column(
-                    children: [
-                      TabBar(
-                        controller: _tabController,
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
-                        tabs: availableYears
-                            .map((y) => Tab(text: '${y.displayName}年度入学'))
-                            .toList(),
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: availableYears
-                              .map((y) => _YearTabContent(
-                                    yearData: grouped[y]!,
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-                    ],
+          return DefaultTabController(
+            key: ValueKey('year_${availableYears.length}'),
+            length: availableYears.length,
+            child: Scaffold(
+              appBar: _buildAppBar(context),
+              body: Column(
+                children: [
+                  TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    tabs: availableYears
+                        .map((y) => Tab(text: '${y.displayName}年度入学'))
+                        .toList(),
                   ),
+                  Expanded(
+                    child: TabBarView(
+                      children: availableYears
+                          .map((y) => _YearTabContent(yearData: grouped[y]!))
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         } else {
           final grouped = groupByAward(works);
           final availableTypes =
               AwardType.values.where((t) => grouped.containsKey(t)).toList();
-          if (_tabController == null ||
-              _tabController!.length != availableTypes.length) {
-            _buildTabController(availableTypes.length);
+          if (availableTypes.isEmpty) {
+            return Scaffold(
+              appBar: _buildAppBar(context),
+              body: const Center(child: Text('データがありません')),
+            );
           }
-          return Scaffold(
-            appBar: _buildAppBar(context, _tabController),
-            body: availableTypes.isEmpty
-                ? const Center(child: Text('データがありません'))
-                : Column(
-                    children: [
-                      TabBar(
-                        controller: _tabController,
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
-                        tabs: availableTypes
-                            .map((t) => Tab(text: t.displayName))
-                            .toList(),
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: availableTypes
-                              .map((t) => _AwardTabContent(
-                                    awardData: grouped[t]!,
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-                    ],
+          return DefaultTabController(
+            key: ValueKey('award_${availableTypes.length}'),
+            length: availableTypes.length,
+            child: Scaffold(
+              appBar: _buildAppBar(context),
+              body: Column(
+                children: [
+                  TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    tabs: availableTypes
+                        .map((t) => Tab(text: t.displayName))
+                        .toList(),
                   ),
+                  Expanded(
+                    child: TabBarView(
+                      children: availableTypes
+                          .map((t) => _AwardTabContent(awardData: grouped[t]!))
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         }
       },
     );
   }
 
-  AppBar _buildAppBar(BuildContext context, TabController? tabController) {
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text('KRGP受賞作品'),
       actions: [
@@ -139,10 +126,7 @@ class _KrgpAwardsPageState extends ConsumerState<KrgpAwardsPage>
           initialValue: _sortMode,
           onSelected: (mode) {
             if (mode == _sortMode) return;
-            setState(() {
-              _sortMode = mode;
-              _tabController = null;
-            });
+            setState(() => _sortMode = mode);
           },
           itemBuilder: (context) => [
             const PopupMenuItem(
