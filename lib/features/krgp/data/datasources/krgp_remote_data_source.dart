@@ -19,7 +19,8 @@ class KrgpRemoteDataSource {
     final docData = doc.data();
     if (docData == null) return [];
 
-    final rawWorks = docData['works'] as List<dynamic>? ?? [];
+    final worksData = docData['works'];
+    final rawWorks = worksData is List<dynamic> ? worksData : <dynamic>[];
     final results = <Searched>[];
 
     for (final item in rawWorks) {

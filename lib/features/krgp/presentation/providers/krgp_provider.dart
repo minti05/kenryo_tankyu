@@ -20,25 +20,21 @@ Map<EnterYear, Map<AwardType, Map<String?, List<Searched>>>> groupByYear(
     List<Searched> works) {
   final result = <EnterYear, Map<AwardType, Map<String?, List<Searched>>>>{};
 
-  for (final year in EnterYear.values.where((y) => y != EnterYear.undefined)) {
-    final byYear = works.where((w) => w.enterYear == year).toList();
-    if (byYear.isEmpty) continue;
+  for (final work in works) {
+    final year = work.enterYear;
+    if (year == EnterYear.undefined) continue;
 
-    final byType = <AwardType, Map<String?, List<Searched>>>{};
-    for (final type in AwardType.values) {
-      final byAwardType = byYear.where((w) => w.awardType == type).toList();
-      if (byAwardType.isEmpty) continue;
+    final type = work.awardType;
+    if (type == null) continue;
 
-      final byName = <String?, List<Searched>>{};
-      for (final work in byAwardType) {
-        final key = work.awardName?.trim().isEmpty ?? true
-            ? null
-            : work.awardName?.trim();
-        byName.putIfAbsent(key, () => []).add(work);
-      }
-      byType[type] = byName;
-    }
-    if (byType.isNotEmpty) result[year] = byType;
+    final nameKey =
+        work.awardName?.trim().isEmpty ?? true ? null : work.awardName?.trim();
+
+    result
+        .putIfAbsent(year, () => {})
+        .putIfAbsent(type, () => {})
+        .putIfAbsent(nameKey, () => [])
+        .add(work);
   }
 
   return result;
@@ -49,19 +45,18 @@ Map<AwardType, Map<String?, Map<EnterYear, List<Searched>>>> groupByAward(
     List<Searched> works) {
   final result = <AwardType, Map<String?, Map<EnterYear, List<Searched>>>>{};
 
-  for (final type in AwardType.values) {
-    final byType = works.where((w) => w.awardType == type).toList();
-    if (byType.isEmpty) continue;
+  for (final work in works) {
+    final type = work.awardType;
+    if (type == null) continue;
 
-    final byName = <String?, Map<EnterYear, List<Searched>>>{};
-    for (final work in byType) {
-      final nameKey = work.awardName?.trim().isEmpty ?? true
-          ? null
-          : work.awardName?.trim();
-      final byYear = byName.putIfAbsent(nameKey, () => {});
-      byYear.putIfAbsent(work.enterYear, () => []).add(work);
-    }
-    result[type] = byName;
+    final nameKey =
+        work.awardName?.trim().isEmpty ?? true ? null : work.awardName?.trim();
+
+    result
+        .putIfAbsent(type, () => {})
+        .putIfAbsent(nameKey, () => {})
+        .putIfAbsent(work.enterYear, () => [])
+        .add(work);
   }
 
   return result;

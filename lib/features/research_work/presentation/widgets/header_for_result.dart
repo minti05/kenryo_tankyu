@@ -41,7 +41,7 @@ class HeaderForResultPage extends ConsumerWidget
                   ),
                 ),
                 PopupMenuButton(
-                  itemBuilder: (context) {
+                  itemBuilder: (_) {
                     return [
                       PopupMenuItem(
                         onTap: () {
