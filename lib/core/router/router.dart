@@ -19,6 +19,7 @@ import 'package:kenryo_tankyu/features/search/presentation/screens/search_page.d
 import 'package:kenryo_tankyu/features/search/presentation/screens/sub_category_select_page.dart';
 
 // Features
+import 'package:kenryo_tankyu/features/krgp/presentation/screens/krgp_awards_page.dart';
 import 'package:kenryo_tankyu/features/notification/presentation/screens/notification_page.dart';
 import 'package:kenryo_tankyu/features/research_work/presentation/screens/result_page.dart';
 import 'package:kenryo_tankyu/features/settings/presentation/screens/settings_page.dart';
@@ -144,6 +145,10 @@ final routesProvider = Provider<GoRouter>((ref) {
       ),
 
       // ─── その他の機能 ─────────────────────────────────────────
+      GoRoute(
+        path: '/krgp',
+        builder: (context, state) => const KrgpAwardsPage(),
+      ),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
