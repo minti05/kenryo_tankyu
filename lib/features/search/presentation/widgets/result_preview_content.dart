@@ -13,8 +13,14 @@ enum ResultPreviewMode { search, library }
 class ResultPreviewContent extends ConsumerWidget {
   final Searched searched;
   final ResultPreviewMode mode;
+  final bool showAwardChip;
+  final bool showLikes;
   const ResultPreviewContent(
-      {super.key, required this.searched, required this.mode});
+      {super.key,
+      required this.searched,
+      required this.mode,
+      this.showAwardChip = true,
+      this.showLikes = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -93,7 +99,8 @@ class ResultPreviewContent extends ConsumerWidget {
                         children: [
                           Text(
                               '${searched.enterYear.displayName.toString()}年度入学 ${searched.course.displayName}'),
-                          if (searched.awardDisplayText != null)
+                          if (showAwardChip &&
+                              searched.awardDisplayText != null)
                             AwardChip(text: searched.awardDisplayText!),
                         ],
                       ),
@@ -107,6 +114,7 @@ class ResultPreviewContent extends ConsumerWidget {
                     searched: searched,
                     isLarge: false,
                     enabled: mode == ResultPreviewMode.library,
+                    showLikes: showLikes,
                   ),
                 ),
               ],
