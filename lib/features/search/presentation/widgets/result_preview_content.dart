@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import "package:kenryo_tankyu/core/constants/work/category_value.dart";
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/presentation/widget/award_chip.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/image_chip.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/favorite_button.dart';
@@ -12,8 +13,14 @@ enum ResultPreviewMode { search, library }
 class ResultPreviewContent extends ConsumerWidget {
   final Searched searched;
   final ResultPreviewMode mode;
+  final bool showAwardChip;
+  final bool showLikes;
   const ResultPreviewContent(
-      {super.key, required this.searched, required this.mode});
+      {super.key,
+      required this.searched,
+      required this.mode,
+      this.showAwardChip = true,
+      this.showLikes = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -86,8 +93,17 @@ class ResultPreviewContent extends ConsumerWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
-                      Text(
-                          '${searched.enterYear.displayName.toString()}年度入学 ${searched.course.displayName}'),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        children: [
+                          Text(
+                              '${searched.enterYear.displayName.toString()}年度入学 ${searched.course.displayName}'),
+                          if (showAwardChip &&
+                              searched.awardDisplayText != null)
+                            AwardChip(text: searched.awardDisplayText!),
+                        ],
+                      ),
                       const SizedBox(height: 4),
                     ],
                   ),
@@ -98,6 +114,7 @@ class ResultPreviewContent extends ConsumerWidget {
                     searched: searched,
                     isLarge: false,
                     enabled: mode == ResultPreviewMode.library,
+                    showLikes: showLikes,
                   ),
                 ),
               ],

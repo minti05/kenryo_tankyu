@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
 
@@ -13,8 +14,23 @@ String buildShareText(Searched searched) {
       '$url';
 }
 
-Future<void> shareSearched(Searched searched) async {
+Future<void> shareSearched(Searched searched, {BuildContext? context}) async {
   await SharePlus.instance.share(
-    ShareParams(text: buildShareText(searched)),
+    ShareParams(
+      text: buildShareText(searched),
+      // iPadでは共有シートがポップオーバー表示になるため、アンカー位置を渡さないと
+      // 何も表示されない。呼び出し元WidgetのRectを基準位置として指定する。
+      sharePositionOrigin: _sharePositionOrigin(context),
+    ),
   );
+}
+
+/// 共有シートのポップオーバー表示用のアンカー位置（iPad向け）を返す。
+Rect? _sharePositionOrigin(BuildContext? context) {
+  // アンマウント済みのcontextでfindRenderObject()を呼ぶとAssertionErrorで
+  // クラッシュするため、mountedを確認してからアクセスする。
+  if (context == null || !context.mounted) return null;
+  final renderObject = context.findRenderObject();
+  if (renderObject is! RenderBox || !renderObject.hasSize) return null;
+  return renderObject.localToGlobal(Offset.zero) & renderObject.size;
 }

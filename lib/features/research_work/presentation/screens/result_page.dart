@@ -151,6 +151,9 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
     if (!mounted) return;
     final searchedAsync = ref.read(searchedItemProvider(widget.documentID));
     final searched = searchedAsync.hasValue ? searchedAsync.requireValue : null;
+    // ダイアログのcontextはpop後に無効になるため、共有シートのアンカー位置には
+    // 画面(State)側の安定したcontextを使う。
+    final pageContext = context;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -163,7 +166,7 @@ class _ResultPageMainState extends ConsumerState<ResultPage> {
               TextButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  await shareSearched(searched);
+                  await shareSearched(searched, context: pageContext);
                 },
                 child: const Text('代わりに共有する...'),
               ),

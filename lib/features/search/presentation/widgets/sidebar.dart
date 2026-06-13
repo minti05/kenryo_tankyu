@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
 import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/drop_button.dart';
 import 'package:kenryo_tankyu/features/search/presentation/widgets/sub_category_chip.dart';
 

@@ -13,6 +13,7 @@ class FavoriteButton extends ConsumerStatefulWidget {
   final bool isLarge;
   final bool enabled;
   final bool horizontal;
+  final bool showLikes;
 
   const FavoriteButton({
     super.key,
@@ -20,6 +21,7 @@ class FavoriteButton extends ConsumerStatefulWidget {
     this.isLarge = false,
     this.enabled = true,
     this.horizontal = false,
+    this.showLikes = true,
   });
 
   @override
@@ -76,7 +78,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: color, size: widget.isLarge ? 24 : 20),
-          if (!widget.searched.isCached) ...[
+          if (widget.showLikes && !widget.searched.isCached) ...[
             const SizedBox(width: 4),
             Text(
               likes.toString(),
@@ -94,7 +96,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: color, size: widget.isLarge ? 28 : 24),
-          if (!widget.searched.isCached) ...[
+          if (widget.showLikes && !widget.searched.isCached) ...[
             const SizedBox(height: 4),
             Text(
               likes.toString(),
