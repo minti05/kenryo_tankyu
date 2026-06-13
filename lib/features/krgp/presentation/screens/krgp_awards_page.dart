@@ -283,6 +283,7 @@ class _WorkCard extends StatelessWidget {
         searched: work,
         mode: ResultPreviewMode.search,
         showAwardChip: false,
+        showLikes: false,
       ),
     );
   }
