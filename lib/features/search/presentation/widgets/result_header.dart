@@ -23,7 +23,6 @@ class ResultHeader extends ConsumerStatefulWidget
 
 class _ResultHeaderState extends ConsumerState<ResultHeader> {
   late final TextEditingController _controller;
-  late final FocusNode _keywordFocusNode;
 
   @override
   void initState() {
@@ -31,26 +30,26 @@ class _ResultHeaderState extends ConsumerState<ResultHeader> {
     _controller = TextEditingController(
       text: ref.read(searchProvider).searchWord.join(' '),
     );
-    _keywordFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _keywordFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<Search>(searchProvider, (previous, next) {
+      final keyword = next.searchWord.join(' ');
+      if (_controller.text != keyword) {
+        _controller.value = TextEditingValue(
+          text: keyword,
+          selection: TextSelection.collapsed(offset: keyword.length),
+        );
+      }
+    });
     final search = ref.watch(searchProvider);
-    final keyword = search.searchWord.join(' ');
-    if (_controller.text != keyword && !_keywordFocusNode.hasFocus) {
-      _controller.value = TextEditingValue(
-        text: keyword,
-        selection: TextSelection.collapsed(offset: keyword.length),
-      );
-    }
     final conditions = _conditionLabels(search);
 
     return AppBar(
@@ -58,7 +57,13 @@ class _ResultHeaderState extends ConsumerState<ResultHeader> {
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
       leadingWidth: 48,
       titleSpacing: 0,
-      leading: BackButton(onPressed: () => context.pop()),
+      leading: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: BackButton(onPressed: () => context.pop()),
+        ),
+      ),
       title: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
@@ -68,7 +73,6 @@ class _ResultHeaderState extends ConsumerState<ResultHeader> {
               height: 36,
               child: TextField(
                 controller: _controller,
-                focusNode: _keywordFocusNode,
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: 'キーワードを入力',
@@ -102,7 +106,7 @@ class _ResultHeaderState extends ConsumerState<ResultHeader> {
                 color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(10),
                 child: InkWell(
-                  onTap: widget.onOpenFilters,
+                  onTap: _openFilters,
                   borderRadius: BorderRadius.circular(10),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -166,13 +170,21 @@ class _ResultHeaderState extends ConsumerState<ResultHeader> {
   }
 
   void _applyKeyword(String text) {
-    final keywords = text
+    ref.read(searchProvider.notifier).addKeyWord(_parseKeywords(text));
+    ref.invalidate(algoliaSearchProvider);
+  }
+
+  void _openFilters() {
+    ref.read(searchProvider.notifier).addKeyWord(_parseKeywords(_controller.text));
+    widget.onOpenFilters();
+  }
+
+  List<String> _parseKeywords(String text) {
+    return text
         .replaceAll('　', ' ')
         .split(RegExp(r'\s+'))
         .where((word) => word.isNotEmpty)
         .toList();
-    ref.read(searchProvider.notifier).addKeyWord(keywords);
-    ref.invalidate(algoliaSearchProvider);
   }
 
   List<String> _conditionLabels(Search search) {

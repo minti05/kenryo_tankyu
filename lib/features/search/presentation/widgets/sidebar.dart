@@ -143,9 +143,10 @@ class _SearchFilterSheetState extends ConsumerState<SearchFilterSheet> {
                             ))
                         .toList(),
                     onChanged: (year) {
-                      if (year != null)
+                      if (year != null) {
                         setState(
                             () => _draft = _draft.copyWith(enterYear: year));
+                      }
                     },
                   ),
                   const SizedBox(height: 24),
@@ -161,9 +162,10 @@ class _SearchFilterSheetState extends ConsumerState<SearchFilterSheet> {
                             ))
                         .toList(),
                     onChanged: (course) {
-                      if (course != null)
+                      if (course != null) {
                         setState(
                             () => _draft = _draft.copyWith(course: course));
+                      }
                     },
                   ),
                   const SizedBox(height: 24),

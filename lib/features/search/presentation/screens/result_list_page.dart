@@ -213,7 +213,7 @@ class _SearchResultToolbar extends StatelessWidget {
                 .map(
                   (sortType) => PopupMenuItem(
                     value: sortType,
-                    child: Text(sortType.name),
+                    child: Text(sortType.displayName),
                   ),
                 )
                 .toList(),
