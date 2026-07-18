@@ -8,45 +8,20 @@ import 'package:kenryo_tankyu/features/search/presentation/widgets/result_header
 import 'package:kenryo_tankyu/features/search/presentation/widgets/sidebar.dart';
 
 import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 import 'package:kenryo_tankyu/core/connectivity/connectivity_provider.dart';
 
 class ResultListPage extends ConsumerWidget {
-  ResultListPage({super.key});
+  const ResultListPage({super.key});
 
-  ///drawerを開くボタンをbody内で使うために、ScaffoldにGlobalKeyを指定して、Scaffoldの状態を保持しているScaffoldStateを参照できるようにします。
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ///書き換えるときに使うところ
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: const ResultHeader(),
+      appBar: ResultHeader(onOpenFilters: () => _openFilters(context, ref)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                PopupMenuButton(
-                  icon: const Icon(Icons.sort),
-                  itemBuilder: (context) {
-                    return SortType.values //sortTypeはvalue.dartに定義
-                        .map((e) => PopupMenuItem(
-                              onTap: () => ref
-                                  .read(sortedListProvider.notifier)
-                                  .sortList(e),
-                              value: e,
-                              child: Text(e.name),
-                            ))
-                        .toList();
-                  },
-                ),
-                IconButton(
-                    onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
-                    icon: const Icon(Icons.tune)),
-              ],
-            ),
             Expanded(
               child: Consumer(
                 builder: (context, ref, child) {
@@ -65,6 +40,18 @@ class ResultListPage extends ConsumerWidget {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            _SearchResultToolbar(
+                              resultCount: data.nbHits,
+                              rangeStart:
+                                  hits.isEmpty ? null : currentPage * 20 + 1,
+                              rangeEnd: hits.isEmpty
+                                  ? null
+                                  : currentPage * 20 + hits.length,
+                              onSort: (sortType) => ref
+                                  .read(sortedListProvider.notifier)
+                                  .sortList(sortType),
+                              onOpenFilters: () => _openFilters(context, ref),
+                            ),
                             if (hits.isEmpty)
                               const Expanded(
                                 child: Center(
@@ -72,17 +59,6 @@ class ResultListPage extends ConsumerWidget {
                                     'ヒットしませんでした。\nキーワードやカテゴリを変えて再検索してください。',
                                     textAlign: TextAlign.center,
                                   ),
-                                ),
-                              )
-                            else
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 8.0, top: 4.0, bottom: 4.0),
-                                child: Text(
-                                  data.isLastPage && currentPage == 0
-                                      ? '${hits.length}件ヒットしました'
-                                      : '${currentPage * 20 + 1}〜${currentPage * 20 + hits.length}件目を表示中（総${data.nbHits}件）',
-                                  style: const TextStyle(fontSize: 16),
                                 ),
                               ),
                             if (hits.isNotEmpty) ResultList(data: sortedList),
@@ -177,7 +153,118 @@ class ResultListPage extends ConsumerWidget {
           ],
         ),
       ),
-      endDrawer: const SideBar(),
+    );
+  }
+
+  Future<void> _openFilters(BuildContext context, WidgetRef ref) async {
+    final selected = await showSearchFilterSheet(
+      context,
+      ref.read(searchProvider),
+    );
+    if (selected == null) return;
+    ref.read(searchProvider.notifier).setParameters(selected);
+    ref.invalidate(algoliaSearchProvider);
+  }
+}
+
+class _SearchResultToolbar extends StatelessWidget {
+  const _SearchResultToolbar({
+    required this.resultCount,
+    required this.rangeStart,
+    required this.rangeEnd,
+    required this.onSort,
+    required this.onOpenFilters,
+  });
+
+  final int resultCount;
+  final int? rangeStart;
+  final int? rangeEnd;
+  final ValueChanged<SortType> onSort;
+  final VoidCallback onOpenFilters;
+
+  @override
+  Widget build(BuildContext context) {
+    final actionStyle = TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      minimumSize: const Size(0, 36),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              rangeStart == null
+                  ? '0件（全$resultCount件）'
+                  : '$rangeStart〜$rangeEnd件（全$resultCount件）',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+          ),
+          PopupMenuButton<SortType>(
+            tooltip: '並び替え',
+            padding: EdgeInsets.zero,
+            onSelected: onSort,
+            itemBuilder: (context) => SortType.values
+                .map(
+                  (sortType) => PopupMenuItem(
+                    value: sortType,
+                    child: Text(sortType.name),
+                  ),
+                )
+                .toList(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.swap_vert_rounded,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 4),
+                  const Text('並び替え', style: TextStyle(fontSize: 13)),
+                ],
+              ),
+            ),
+          ),
+          _ToolbarAction(
+            icon: Icons.tune_rounded,
+            label: 'フィルター',
+            style: actionStyle,
+            onPressed: onOpenFilters,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToolbarAction extends StatelessWidget {
+  const _ToolbarAction({
+    required this.icon,
+    required this.label,
+    required this.style,
+    this.onPressed,
+  });
+
+  final IconData icon;
+  final String label;
+  final ButtonStyle style;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18),
+      label: Text(label, style: const TextStyle(fontSize: 13)),
+      style: style,
     );
   }
 }
