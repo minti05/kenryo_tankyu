@@ -175,7 +175,9 @@ class _ResultHeaderState extends ConsumerState<ResultHeader> {
   }
 
   void _openFilters() {
-    ref.read(searchProvider.notifier).addKeyWord(_parseKeywords(_controller.text));
+    ref
+        .read(searchProvider.notifier)
+        .addKeyWord(_parseKeywords(_controller.text));
     widget.onOpenFilters();
   }
 
