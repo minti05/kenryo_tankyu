@@ -90,7 +90,7 @@ class _SearchFilterSheetState extends ConsumerState<SearchFilterSheet> {
                   const SizedBox(height: 24),
                   _sectionTitle('カテゴリ'),
                   DropdownButtonFormField<Category>(
-                    value: _draft.category,
+                    initialValue: _draft.category,
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: Category.values
@@ -133,7 +133,7 @@ class _SearchFilterSheetState extends ConsumerState<SearchFilterSheet> {
                   const SizedBox(height: 24),
                   _sectionTitle('入学年度'),
                   DropdownButtonFormField<EnterYear>(
-                    value: _draft.enterYear,
+                    initialValue: _draft.enterYear,
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: EnterYear.values
@@ -152,7 +152,7 @@ class _SearchFilterSheetState extends ConsumerState<SearchFilterSheet> {
                   const SizedBox(height: 24),
                   _sectionTitle('学科'),
                   DropdownButtonFormField<Course>(
-                    value: _draft.course,
+                    initialValue: _draft.course,
                     decoration:
                         const InputDecoration(border: OutlineInputBorder()),
                     items: Course.values
