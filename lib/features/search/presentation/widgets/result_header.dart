@@ -1,74 +1,207 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import "package:kenryo_tankyu/core/constants/work/sub_category_value.dart";
-import 'package:kenryo_tankyu/features/search/presentation/widgets/search_chip_list.dart';
-import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
-
+import 'package:kenryo_tankyu/core/constants/work/category_value.dart';
+import 'package:kenryo_tankyu/core/constants/work/info_value.dart';
+import 'package:kenryo_tankyu/core/constants/work/sub_category_value.dart';
 import 'package:kenryo_tankyu/features/search/domain/models/search.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/algolia_provider.dart';
+import 'package:kenryo_tankyu/features/search/presentation/providers/search_provider.dart';
 
 class ResultHeader extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-  const ResultHeader({super.key});
+  const ResultHeader({required this.onOpenFilters, super.key});
+
+  final Future<void> Function() onOpenFilters;
 
   @override
-  ResultHeaderState createState() => ResultHeaderState();
+  Size get preferredSize => const Size.fromHeight(104);
+
+  @override
+  ConsumerState<ResultHeader> createState() => _ResultHeaderState();
 }
 
-class ResultHeaderState extends ConsumerState<ResultHeader> {
+class _ResultHeaderState extends ConsumerState<ResultHeader> {
+  late final TextEditingController _controller;
+
   @override
   void initState() {
     super.initState();
-    ref.read(searchProvider);
+    _controller = TextEditingController(
+      text: ref.read(searchProvider).searchWord.join(' '),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      actions: [Container()],
+    ref.listen<Search>(searchProvider, (previous, next) {
+      final keyword = next.searchWord.join(' ');
+      if (_controller.text != keyword) {
+        _controller.value = TextEditingValue(
+          text: keyword,
+          selection: TextSelection.collapsed(offset: keyword.length),
+        );
+      }
+    });
+    final search = ref.watch(searchProvider);
+    final conditions = _conditionLabels(search);
 
-      ///drawerを開くボタンを消している
+    return AppBar(
+      toolbarHeight: widget.preferredSize.height,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+      leadingWidth: 48,
       titleSpacing: 0,
-      leading: BackButton(
-        onPressed: () => _backTo(context),
+      leading: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: BackButton(onPressed: () => context.pop()),
+        ),
       ),
       title: Padding(
-        padding: const EdgeInsets.only(right: 16.0),
-        child: SizedBox(
-          height: 40,
-          child: InkWell(
-            onTap: () => context.pop(),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(width: 16),
-                  Icon(Icons.search),
-                  SizedBox(width: 8),
-                  Expanded(child: SearchChipList(true)),
-                  SizedBox(width: 16),
-                ],
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 36,
+              child: TextField(
+                controller: _controller,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: 'キーワードを入力',
+                  filled: true,
+                  fillColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  prefixIcon: const Icon(Icons.search),
+                  prefixIconConstraints:
+                      const BoxConstraints.tightFor(width: 40, height: 36),
+                  suffixIcon: IconButton(
+                    onPressed: () => _controller.clear(),
+                    icon: const Icon(Icons.clear),
+                    tooltip: '入力を消去',
+                  ),
+                  suffixIconConstraints:
+                      const BoxConstraints.tightFor(width: 40, height: 36),
+                  contentPadding: EdgeInsets.zero,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onSubmitted: _applyKeyword,
               ),
             ),
-          ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 36,
+              child: Material(
+                color: Theme.of(context).colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  onTap: _openFilters,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          size: 17,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: conditions.isEmpty
+                              ? Text(
+                                  'フィルターを追加',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                    fontSize: 13,
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: conditions
+                                        .map(
+                                          (condition) => Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 16),
+                                            child: Text(
+                                              condition,
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _backTo(BuildContext context) {
-    final notifier = ref.read(searchProvider.notifier);
-    final Search searchStatus = ref.read(searchProvider);
-    if (searchStatus.subCategory != SubCategory.none) {
-      notifier.deleteParameter('subCategory');
+  void _applyKeyword(String text) {
+    ref.read(searchProvider.notifier).addKeyWord(_parseKeywords(text));
+    ref.invalidate(algoliaSearchProvider);
+  }
+
+  void _openFilters() {
+    ref
+        .read(searchProvider.notifier)
+        .addKeyWord(_parseKeywords(_controller.text));
+    widget.onOpenFilters();
+  }
+
+  List<String> _parseKeywords(String text) {
+    return text
+        .replaceAll('　', ' ')
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .toList();
+  }
+
+  List<String> _conditionLabels(Search search) {
+    final labels = <String>[];
+    if (search.subCategory != SubCategory.none) {
+      labels.add('カテゴリ: ${search.subCategory.displayName}');
+    } else if (search.category != Category.none) {
+      labels.add('カテゴリ: ${search.category.displayName}');
     }
-    context.pop();
+    if (search.enterYear != EnterYear.undefined) {
+      labels.add('入学年度: ${search.enterYear.label}');
+    }
+    if (search.course != Course.undefined) {
+      labels.add('学科: ${search.course.displayName}');
+    }
+    return labels;
   }
 }

@@ -49,6 +49,7 @@ app.*.map.json
 
 # AI prompt
 /CLAUDE.md
+/AGENTS.md
 
 # Firebase CLI
 .firebase/
