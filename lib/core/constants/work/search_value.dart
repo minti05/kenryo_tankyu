@@ -3,7 +3,7 @@
 enum SortType { newOrder, oldOrder, likeOrder }
 
 extension SortTypeExtension on SortType {
-  String get name {
+  String get displayName {
     switch (this) {
       case SortType.newOrder:
         return '新しい順';
