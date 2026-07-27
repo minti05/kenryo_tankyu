@@ -7,7 +7,7 @@
 //flutter pub get
 //flutter build ios
 
-const String version = '1.3.0';
+const String version = '1.3.1';
 
 //Module cloud_firestore not foundになる場合の対処法
 //1. Xcodeでios/Runner.xcworkspaceを開く
