@@ -11,6 +11,8 @@ const String version = '1.3.0';
 
 //Module cloud_firestore not foundになる場合の対処法
 //1. Xcodeでios/Runner.xcworkspaceを開く
+
+//memo
 /*
 cd ios
 rm -rf Pods
