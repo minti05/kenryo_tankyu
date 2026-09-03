@@ -27,14 +27,18 @@
     in {
       devShells = forAllSystems (system: pkgs: {
         default = pkgs.mkShell {
+          # Keep the local shell on the same Flutter minor line as CI and
+          # .flutter-version.  The versioned package also keeps the SDK
+          # layout stable for Gradle's Flutter plugin loader.
           packages = [
-            pkgs.flutter
+            pkgs.flutterPackages.v3_41
             pkgs.jdk17
             pkgs.ruby
             pkgs.cocoapods
           ];
 
           shellHook = ''
+            export FLUTTER_ROOT=${pkgs.flutterPackages.v3_41}
             export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
             export ANDROID_HOME=$ANDROID_SDK_ROOT
             export JAVA_HOME=${pkgs.jdk17}
