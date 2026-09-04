@@ -7,6 +7,8 @@ const {google} = require("googleapis");
 initializeApp();
 
 const REGION = "asia-northeast1";
+const SHEET_REPORT_SERVICE_ACCOUNT =
+  "sheet-report-function@tankyu-app.iam.gserviceaccount.com";
 const SPREADSHEET_ID = "1g9kG-6wlBxWQ-kq4tyFtWjRJvJbWqLNLoJ_C67WYmaw";
 const MAX_TEXT_LENGTH = 500;
 const MAX_PDF_TYPE_COUNT = 10;
@@ -56,53 +58,59 @@ const reportDefinitions = {
   },
 };
 
-exports.submitSheetReport = onCall({region: REGION}, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "ログインが必要です。");
-  }
+exports.submitSheetReport = onCall(
+    {
+      region: REGION,
+      serviceAccount: SHEET_REPORT_SERVICE_ACCOUNT,
+    },
+    async (request) => {
+      if (!request.auth) {
+        throw new HttpsError("unauthenticated", "ログインが必要です。");
+      }
 
-  const email = request.auth.token.email;
-  if (typeof email !== "string" || !email.endsWith("@kenryo.ed.jp")) {
-    throw new HttpsError("permission-denied", "許可されたアカウントではありません。");
-  }
+      const email = request.auth.token.email;
+      if (typeof email !== "string" || !email.endsWith("@kenryo.ed.jp")) {
+        throw new HttpsError("permission-denied", "許可されたアカウントではありません。");
+      }
 
-  const data = request.data;
-  if (!isPlainObject(data)) {
-    throw new HttpsError("invalid-argument", "送信内容が不正です。");
-  }
+      const data = request.data;
+      if (!isPlainObject(data)) {
+        throw new HttpsError("invalid-argument", "送信内容が不正です。");
+      }
 
-  const definition = reportDefinitions[data.type];
-  if (!definition) {
-    throw new HttpsError("invalid-argument", "報告種別が不正です。");
-  }
+      const definition = reportDefinitions[data.type];
+      if (!definition) {
+        throw new HttpsError("invalid-argument", "報告種別が不正です。");
+      }
 
-  const documentId = readDocumentId(data);
-  const timestamp = jstTimestamp();
-  const values = definition.buildRow({timestamp, email, documentId, data});
+      const documentId = readDocumentId(data);
+      const timestamp = jstTimestamp();
+      const values = definition.buildRow({timestamp, email, documentId, data});
 
-  try {
-    const sheets = google.sheets({
-      version: "v4",
-      auth: await google.auth.getClient({
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-      }),
-    });
+      try {
+        const sheets = google.sheets({
+          version: "v4",
+          auth: await google.auth.getClient({
+            scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+          }),
+        });
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: definition.range,
-      valueInputOption: "RAW",
-      requestBody: {
-        values: [values],
-      },
-    });
-  } catch (error) {
-    console.error("Failed to append sheet report", error);
-    throw new HttpsError("internal", "報告の保存に失敗しました。");
-  }
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: SPREADSHEET_ID,
+          range: definition.range,
+          valueInputOption: "RAW",
+          requestBody: {
+            values: [values],
+          },
+        });
+      } catch (error) {
+        console.error("Failed to append sheet report", error);
+        throw new HttpsError("internal", "報告の保存に失敗しました。");
+      }
 
-  return {ok: true};
-});
+      return {ok: true};
+    },
+);
 
 function isPlainObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
