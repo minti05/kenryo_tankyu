@@ -54,6 +54,7 @@ app.*.map.json
 # Firebase CLI
 .firebase/
 firepit-log.txt
+functions/node_modules/
 
 # Env file (distributed manually; use assets/.env.example as template)
 assets/.env

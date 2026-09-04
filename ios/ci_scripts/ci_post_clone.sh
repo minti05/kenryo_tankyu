@@ -41,30 +41,5 @@ echo "Executing pod install..."
 /usr/local/bin/pod install --repo-update --clean-install
 echo "INFO: pod install completed."
 
-# 8. 認証情報ファイルの生成 (絶対パスで安全性を確保)
-CREDENTIALS_PATH="/Volumes/workspace/repository/assets/your_service_account_credentials.json"
-echo "INFO: Target path (Absolute Final): $CREDENTIALS_PATH"
-
-
-# 環境変数が設定されているか確認
-if [ -z "$FIREBASE_CREDENTIALS" ]; then
-    echo "FATAL ERROR: FIREBASE_CREDENTIALS environment variable is empty or not set."
-    echo "Check Xcode Cloud Secrets settings."
-    exit 1
-fi
-
-# 変数の内容を、特殊文字をエスケープして安全にファイルに書き出す
-printf "%s" "$FIREBASE_CREDENTIALS" > "$CREDENTIALS_PATH"
-chmod 600 "$CREDENTIALS_PATH"
-
-# ファイルが正しく作成されたか最終チェック
-if [ -f "$CREDENTIALS_PATH" ]; then
-    echo "SUCCESS: Credentials file created at $CREDENTIALS_PATH."
-else
-    # ファイル作成の失敗はここで確定する
-    echo "FATAL ERROR: Failed to create credentials file."
-    exit 1
-fi
-
 echo "--- END: Setup successful ---"
 exit 0
