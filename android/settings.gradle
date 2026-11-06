@@ -1,9 +1,24 @@
 pluginManagement {
     def flutterSdkPath = {
         def properties = new Properties()
-        file("local.properties").withInputStream { properties.load(it) }
-        def flutterSdkPath = properties.getProperty("flutter.sdk")
-        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        def localPropertiesFile = file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.withInputStream { properties.load(it) }
+        }
+
+        def localFlutterSdkPath = properties.getProperty("flutter.sdk")
+        def environmentFlutterSdkPath = System.getenv("FLUTTER_ROOT")
+        // The Nix shell exports FLUTTER_ROOT. Prefer it so an old local
+        // Flutter installation cannot override the pinned SDK.
+        def flutterSdkPath = [environmentFlutterSdkPath, localFlutterSdkPath]
+            .find { path -> path != null && file(path).isDirectory() }
+
+        if (flutterSdkPath == null) {
+            throw new GradleException(
+                "Flutter SDK not found. Run Flutter from the project or set FLUTTER_ROOT."
+            )
+        }
+
         return flutterSdkPath
     }
     settings.ext.flutterSdkPath = flutterSdkPath()

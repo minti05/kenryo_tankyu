@@ -12,9 +12,11 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new FileNotFoundException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+// FLUTTER_ROOT is set by the Nix development shell and must take precedence
+// over a developer's optional local.properties fallback.
+def flutterRoot = System.getenv('FLUTTER_ROOT') ?: localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null || !file(flutterRoot).isDirectory()) {
+    throw new FileNotFoundException("Flutter SDK not found. Run Flutter from the project or set FLUTTER_ROOT.")
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
