@@ -1,16 +1,11 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:googleapis/sheets/v4.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:flutter/services.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_repository_provider.dart';
+import 'package:kenryo_tankyu/features/research_work/data/datasources/legacy_report_data_source.dart';
 
 class EditSpreadSheet {
   static final EditSpreadSheet _instance = EditSpreadSheet._internal();
   EditSpreadSheet._internal();
   static EditSpreadSheet get instance => _instance;
-
-  static const _spreadsheetId = '1g9kG-6wlBxWQ-kq4tyFtWjRJvJbWqLNLoJ_C67WYmaw';
 
   // シートごとの範囲（1行目がヘッダー行）
   static const _rangeSuggestCategory = 'suggest_other_category!A1';
@@ -52,7 +47,7 @@ class EditSpreadSheet {
       newCategory,
       newSubCategory,
     ];
-    await _append(_rangeSuggestCategory, values);
+    await _append(ref, _rangeSuggestCategory, values);
   }
 
   /// 作品情報変更提案を送信
@@ -73,7 +68,7 @@ class EditSpreadSheet {
       course,
       enterYear,
     ];
-    await _append(_rangeSuggestWorksInfo, values);
+    await _append(ref, _rangeSuggestWorksInfo, values);
   }
 
   /// PDF閲覧不可報告を送信
@@ -90,7 +85,7 @@ class EditSpreadSheet {
       pdfTypes.join(', '),
       freeDescription,
     ];
-    await _append(_rangeCannotViewPdf, values);
+    await _append(ref, _rangeCannotViewPdf, values);
   }
 
   /// その他の理由を送信
@@ -105,27 +100,17 @@ class EditSpreadSheet {
       documentID.toString(),
       freeText,
     ];
-    await _append(_rangeOtherReason, values);
+    await _append(ref, _rangeOtherReason, values);
   }
 
-  Future<void> _append(String range, List<String> values) async {
-    final credentials =
-        await rootBundle.loadString('assets/sheets_service_account.json');
-    final jsonCredentials = jsonDecode(credentials);
-
-    final client = await clientViaServiceAccount(
-      ServiceAccountCredentials.fromJson(jsonCredentials),
-      [SheetsApi.spreadsheetsScope],
+  Future<void> _append(WidgetRef ref, String range, List<String> values) async {
+    final user = ref.read(authRepositoryProvider).currentUser;
+    final token = await user?.getIdToken();
+    if (token == null) throw StateError('ログインが必要です。');
+    await LegacyReportDataSource().submit(
+      token: token,
+      documentID: values[2],
+      description: '旧iOSアプリからの報告（$range）\n${values.join('\n')}',
     );
-
-    try {
-      final sheetsApi = SheetsApi(client);
-      final request = ValueRange(values: [values]);
-
-      await sheetsApi.spreadsheets.values
-          .append(request, _spreadsheetId, range, valueInputOption: 'RAW');
-    } finally {
-      client.close();
-    }
   }
 }

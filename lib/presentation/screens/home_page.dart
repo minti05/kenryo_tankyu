@@ -9,6 +9,7 @@ import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider
 import 'package:kenryo_tankyu/features/user_archive/presentation/widgets/user_stats_section.dart';
 import 'package:kenryo_tankyu/presentation/widget/error_view.dart';
 import 'package:kenryo_tankyu/presentation/widget/startup_dialogs.dart';
+import 'package:kenryo_tankyu/presentation/widget/transition_notice_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   static HomePage builder(BuildContext context, GoRouterState state) =>
@@ -51,6 +52,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
             ),
             const SizedBox(height: 8),
+            const TransitionNoticeCard(),
+            const SizedBox(height: 16),
             const UserStatsSection(),
             const SizedBox(height: 16),
             _KrgpBannerCard(),

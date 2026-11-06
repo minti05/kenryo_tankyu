@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:kenryo_tankyu/core/constants/app_unique_value.dart';
 import 'package:kenryo_tankyu/core/error/failures.dart';
 import 'package:kenryo_tankyu/features/auth/presentation/providers/auth_provider.dart';
+import 'package:kenryo_tankyu/presentation/widget/transition_notice_card.dart';
 
 class WelcomePage extends ConsumerWidget {
   const WelcomePage({super.key});
@@ -15,11 +16,10 @@ class WelcomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
           child: Column(
             children: [
-              const Spacer(flex: 1),
               Text(
                 '縣陵探究アーカイブ',
                 style: Theme.of(context)
@@ -35,13 +35,15 @@ class WelcomePage extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodySmall!,
                 textAlign: TextAlign.center,
               ),
-              const Spacer(flex: 1),
+              const SizedBox(height: 24),
+              const TransitionNoticeCard(),
+              const SizedBox(height: 24),
               _GoogleSignInButton(
                 onPressed: () => _signInWithGoogle(context, ref),
               ),
               const SizedBox(height: 16),
               const _TermsText(),
-              const Spacer(flex: 2),
+              const SizedBox(height: 32),
               _emailLoginSection(context, ref),
               const SizedBox(height: 20),
               Text('Version: $version',
@@ -78,20 +80,22 @@ class WelcomePage extends ConsumerWidget {
         Row(
           children: [
             const Expanded(child: Divider()),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text('または旧ログイン方法',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall!
-                      .copyWith(color: Theme.of(context).colorScheme.outline)),
+            Flexible(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text('または旧ログイン方法',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.outline)),
+              ),
             ),
             const Expanded(child: Divider()),
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             TextButton(
               onPressed: () => _showDialog(false, context, ref),
@@ -218,13 +222,14 @@ class _GoogleSignInButton extends StatelessWidget {
             SvgPicture.asset('assets/images/google_logo.svg',
                 width: 24, height: 24),
             const SizedBox(width: 12),
-            Text(
+            Flexible(
+                child: Text(
               '縣陵アカウントでサインイン',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white : const Color(0xFF1F1F1F),
                   ),
-            ),
+            )),
           ],
         ),
       ),
