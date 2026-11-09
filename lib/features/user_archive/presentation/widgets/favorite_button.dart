@@ -66,7 +66,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
     // likes は Firestore 確認後に SQLite へ反映された値のみ使用（楽観的更新なし）
     final likes = widget.searched.likes;
 
-    final isLoading = favoriteState.isLoading;
+    final canToggle = favoriteState.asData != null && !favoriteState.isLoading;
 
     final color =
         isFavorite ? Colors.red : Theme.of(context).colorScheme.onSurface;
@@ -111,7 +111,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
     }
 
     final buttonBase = Opacity(
-      opacity: isLoading ? 0.5 : 1.0,
+      opacity: canToggle ? 1.0 : 0.5,
       child: widget.isLarge && !widget.horizontal
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -129,7 +129,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton> {
     }
 
     return InkWell(
-      onTap: isLoading
+      onTap: !canToggle
           ? null
           : () {
               // ハートアイコンのみ楽観的に更新（counts は確認後に自動反映）
