@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:kenryo_tankyu/features/research_work/data/repositories/research_work_repository_impl.dart';
 import 'package:kenryo_tankyu/features/research_work/domain/models/searched.dart';
+import 'package:kenryo_tankyu/features/user_archive/domain/repositories/user_archive_repository.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_archive_providers.dart';
 import 'package:kenryo_tankyu/features/user_archive/presentation/providers/user_stats_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,30 +31,48 @@ class ResearchWork extends _$ResearchWork {
     final archiveRepo = ref.watch(userArchiveRepositoryProvider);
     final forceReload = ref.read(forceReloadProvider);
 
-    Future<Searched> fetchFromServer() async {
-      final data = await repository.getWork(documentID.toString());
-      final isFavorite = await archiveRepo.getFavoriteState(documentID);
-      final combined = data.copyWith(isFavorite: isFavorite, isCached: false);
-      if (forceReload) {
-        ref.read(forceReloadProvider.notifier).state = false;
+    var historyReadFailed = false;
+    if (!forceReload) {
+      Searched? cached;
+      try {
+        cached = await archiveRepo
+            .getHistory(documentID)
+            .timeout(const Duration(seconds: 2));
+      } on Exception {
+        historyReadFailed = true;
+        debugPrint('閲覧履歴を読み込めませんでした。作品情報を取得します。');
       }
-      await archiveRepo.insertHistory(combined);
-      // 新規閲覧としてカウントをリアルタイムに反映
-      ref.read(userStatsProvider.notifier).incrementViewCount();
-      return combined;
+      if (cached != null) {
+        unawaited(
+            archiveRepo.updateHistoryViewedAt(documentID).catchError((_) {}));
+        return cached.copyWith(isCached: false);
+      }
     }
 
-    if (forceReload) {
-      return await fetchFromServer();
+    final work = (await repository.getWork(documentID.toString()))
+        .copyWith(isCached: false);
+    if (ref.mounted && forceReload) {
+      ref.read(forceReloadProvider.notifier).state = false;
     }
+    // お気に入りはボタン側で取得し、履歴の保存も作品表示と切り離す。
+    unawaited(_recordView(archiveRepo, work, countAsNew: !historyReadFailed));
+    return work;
+  }
 
-    final cached = await archiveRepo.getHistory(documentID);
-    if (cached != null) {
-      unawaited(
-          archiveRepo.updateHistoryViewedAt(documentID).catchError((_) {}));
-      return cached.copyWith(isCached: false);
+  Future<void> _recordView(
+    UserArchiveRepository repository,
+    Searched work, {
+    required bool countAsNew,
+  }) async {
+    final viewRef = ref;
+    try {
+      await repository.insertHistory(work);
+      if (countAsNew && viewRef.mounted) {
+        viewRef.read(userStatsProvider.notifier).incrementViewCount();
+      }
+    } on Exception {
+      debugPrint('閲覧履歴を保存できませんでした。');
     }
-    return await fetchFromServer();
   }
 
   /// お気に入り操作後に UI を即時更新する（invalidate による再フェッチを使わない）
